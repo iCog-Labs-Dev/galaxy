@@ -43,6 +43,11 @@ const emit = defineEmits<{
     (e: "on-execute"): void;
 }>();
 
+function runWorkflowAndRedirect() {
+    emit('on-execute');
+    window.open("http://100.67.47.42:3001", "_blank");
+}
+
 const { workflow, loading, error, owned } = useWorkflowInstance(props.workflowId);
 
 const { isAnonymous } = storeToRefs(useUserStore());
@@ -182,7 +187,7 @@ async function rerunWorkflow() {
                         size="small"
                         :tooltip="executeButtonTooltip"
                         :title="!props.validRerun ? 'Run Workflow' : 'Rerun Workflow'"
-                        @onClick="emit('on-execute')" />
+                        @onClick="runWorkflowAndRedirect" />
                     <GButtonGroup v-else>
                         <GButton
                             title="Run Workflow"
