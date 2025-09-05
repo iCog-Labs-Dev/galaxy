@@ -48,7 +48,6 @@ function runWorkflowAndRedirect() {
     window.open("http://100.67.47.42:3001", "_blank");
 }
 
-
 const { workflow, loading, error, owned } = useWorkflowInstance(props.workflowId);
 
 const { isAnonymous } = storeToRefs(useUserStore());
