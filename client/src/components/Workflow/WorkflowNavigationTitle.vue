@@ -43,11 +43,6 @@ const emit = defineEmits<{
     (e: "on-execute"): void;
 }>();
 
-function runWorkflowAndRedirect() {
-    emit('on-execute');
-    window.open("http://100.67.47.42:3001", "_blank");
-}
-
 
 const { workflow, loading, error, owned } = useWorkflowInstance(props.workflowId);
 
@@ -100,6 +95,12 @@ const executeButtonTooltip = computed(() => {
 });
 
 const { currentHistoryId } = storeToRefs(useHistoryStore());
+
+function runWorkflowAndRedirect() {
+    emit('on-execute');
+    window.open("http://100.67.47.42:3001/workflow", "_blank");
+}
+
 
 async function rerunWorkflow() {
     if (!props.invocation) {
