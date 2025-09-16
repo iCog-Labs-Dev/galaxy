@@ -8,7 +8,7 @@ import { useRoute } from "vue-router/composables";
 import draggable from "vuedraggable";
 
 import { useConfig } from "@/composables/config";
-import { convertDropData } from "@/stores/activitySetup";
+import { convertDropData } from "@/stores/activitySetup";  
 import { useActivityStore } from "@/stores/activityStore";
 import type { Activity } from "@/stores/activityStoreTypes";
 import { useEventStore } from "@/stores/eventStore";
@@ -48,12 +48,12 @@ const props = withDefaults(
         defaultActivities: undefined,
         activityBarId: "default",
         specialActivities: () => [],
-        showAdmin: true,
-        optionsTitle: "More",
+        // showAdmin: true,
+        // optionsTitle: "More",
         optionsHeading: "Additional Activities",
-        optionsIcon: () => faEllipsisH,
-        optionsSearchPlaceholder: "Search Activities",
-        optionsTooltip: "View additional activities",
+        // optionsIcon: () => faEllipsisH,
+        // optionsSearchPlaceholder: "Search Activities",
+        // optionsTooltip: "View additional activities",
         initialActivity: undefined,
         hidePanel: false,
     },
@@ -228,7 +228,15 @@ defineExpose({
             @dragover.prevent="onDragOver"
             @dragenter.prevent="onDragEnter"
             @dragleave.prevent="onDragLeave">
-            <b-nav vertical class="flex-nowrap p-1 h-100 vertical-overflow">
+              <div class="sidebar-logo text-center">
+                    <img
+                    src="https://i.postimg.cc/g0tDwRVD/rejuve-logo.png"
+                    alt="Logo"
+                    width="56"
+                    height="56"
+                    />
+            </div>
+            <b-nav vertical class="flex-nowrap h-100 vertical-overflow" style="margin-top: 24px">
                 <draggable
                     v-model="activities"
                     :class="{ 'activity-popper-disabled': isDragging }"
@@ -291,8 +299,8 @@ defineExpose({
                     </div>
                 </draggable>
             </b-nav>
-            <b-nav v-if="!isAnonymous" vertical class="activity-footer flex-nowrap p-1">
-                <NotificationItem
+            <b-nav v-if="!isAnonymous" vertical class="flex-nowrap" style="align-items:center">
+                <!-- <NotificationItem
                     v-if="isConfigLoaded && config.enable_notification_system"
                     id="notifications"
                     :activity-bar-id="props.activityBarId"
@@ -343,11 +351,11 @@ defineExpose({
                         :to="activity.to ?? undefined"
                         :variant="activity.variant"
                         @click="onActivityClicked(activity)" />
-                </template>
+                </template> -->
             </b-nav>
         </div>
         <FlexPanel
-            v-if="isSideBarOpen && !hidePanel"
+            v-if="false"
             side="left"
             :collapsible="false"
             :reactive-width.sync="sidePanelWidth">
@@ -374,8 +382,14 @@ defineExpose({
 @import "theme/blue.scss";
 
 .activity-bar {
-    background: $panel-bg-color;
-    border-right: $border-default;
+    background: white;
+    border-right: solid 1px var(--border);
+    padding: 16px 8px;
+}
+
+.activity-bar ul div:nth-of-type(4)  .nav-icon {
+    background-color: #0a0a0a;
+      color: white;
 }
 
 .activity-bar::-webkit-scrollbar {

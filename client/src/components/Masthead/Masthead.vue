@@ -18,7 +18,7 @@ const { isAnonymous, currentUser } = storeToRefs(useUserStore());
 
 const router = useRouter();
 const { config, isConfigLoaded } = useConfig();
-
+// it works
 const props = defineProps({
     brand: {
         type: String,
@@ -83,7 +83,7 @@ onMounted(() => {
                 id="analysis"
                 v-b-tooltip.hover
                 class="ml-2 mr-2 p-0"
-                title="Home"
+                title="Homesdfsdf"
                 aria-label="homepage"
                 :href="withPrefix(logoUrl)">
                 <img alt="logo" :src="withPrefix(logoSrc)" />
