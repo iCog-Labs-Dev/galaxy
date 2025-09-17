@@ -12,6 +12,7 @@ from typing import (
     Dict,
     List,
     Optional,
+    Sequence,
     Tuple,
     TYPE_CHECKING,
     Union,
@@ -32,7 +33,9 @@ from galaxy.tool_util_models.tool_source import (
     Citation,
     DrillDownOptionsDict,
     FieldDict,
+    FileSourceConfigFile,
     HelpContent,
+    InputConfigFile,
     JavascriptRequirement,
     JsonTestCollectionDefCollectionElementDict,
     JsonTestCollectionDefDatasetElementDict,
@@ -40,6 +43,7 @@ from galaxy.tool_util_models.tool_source import (
     JsonTestCollectionDefElementDict,
     JsonTestDatasetDefDict,
     OutputCompareType,
+    TemplateConfigFile,
     XrefDict,
 )
 from galaxy.util import Element
@@ -399,8 +403,17 @@ class ToolSource(metaclass=ABCMeta):
         """
         return []
 
+    def parse_template_configfiles(self) -> Sequence[TemplateConfigFile]:
+        return []
+
+    def parse_input_configfiles(self) -> Sequence[InputConfigFile]:
+        return []
+
+    def parse_file_sources(self) -> Sequence[FileSourceConfigFile]:
+        return []
+
     @property
-    def macro_paths(self):
+    def macro_paths(self) -> List[str]:
         return []
 
     @property
@@ -679,9 +692,7 @@ class TestCollectionDef:
                     identifier=identifier, **element_object._test_format_to_dict()
                 )
             else:
-                input_as_dict: Optional[JsonTestDatasetDefDict] = xml_data_input_to_json(
-                    cast(ToolSourceTestInput, element_object)
-                )
+                input_as_dict: Optional[JsonTestDatasetDefDict] = xml_data_input_to_json(element_object)
                 if input_as_dict is not None:
                     as_dict = JsonTestCollectionDefDatasetElementDict(
                         identifier=identifier,

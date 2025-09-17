@@ -7,10 +7,7 @@ from abc import (
     ABCMeta,
     abstractmethod,
 )
-from typing import (
-    List,
-    Union,
-)
+from typing import Union
 
 from galaxy.model import (
     DatasetCollectionElement,
@@ -22,9 +19,9 @@ DeferrableObjectsT = Union[
     DatasetInstance,
     HistoryDatasetCollectionAssociation,
     DatasetCollectionElement,
-    List[DatasetInstance],
-    List[Union[HistoryDatasetCollectionAssociation, DatasetCollectionElement]],
-    List[Union[DatasetInstance, HistoryDatasetCollectionAssociation, DatasetCollectionElement]],
+    list[DatasetInstance],
+    list[Union[HistoryDatasetCollectionAssociation, DatasetCollectionElement]],
+    list[Union[DatasetInstance, HistoryDatasetCollectionAssociation, DatasetCollectionElement]],
 ]
 
 

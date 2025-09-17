@@ -9,7 +9,7 @@ import { useRouter } from "vue-router/composables";
 import { useConfig } from "@/composables/config";
 import { useUserStore } from "@/stores/userStore";
 
-import { loadWebhookMenuItems } from "./_webhooks";
+import { loadMastheadWebhooks } from "./_webhooks";
 import MastheadDropdown from "./MastheadDropdown";
 import MastheadItem from "./MastheadItem";
 import QuotaMeter from "./QuotaMeter";
@@ -18,7 +18,7 @@ const { isAnonymous, currentUser } = storeToRefs(useUserStore());
 
 const router = useRouter();
 const { config, isConfigLoaded } = useConfig();
-
+// it works
 const props = defineProps({
     brand: {
         type: String,
@@ -72,7 +72,7 @@ function onWindowToggle() {
 }
 
 onMounted(() => {
-    loadWebhookMenuItems(extensionTabs.value);
+    loadMastheadWebhooks(extensionTabs.value);
 });
 </script>
 
@@ -83,7 +83,7 @@ onMounted(() => {
                 id="analysis"
                 v-b-tooltip.hover
                 class="ml-2 mr-2 p-0"
-                title="Home"
+                title="Homesdfsdf"
                 aria-label="homepage"
                 :href="withPrefix(logoUrl)">
                 <img alt="logo" :src="withPrefix(logoSrc)" />

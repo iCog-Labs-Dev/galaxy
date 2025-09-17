@@ -176,6 +176,7 @@ export type HDAObject = components["schemas"]["HDAObject"];
 export type DatasetCollectionAttributes = components["schemas"]["DatasetCollectionAttributesResult"];
 
 export type ConcreteObjectStoreModel = components["schemas"]["ConcreteObjectStoreModel"];
+export type UserConcreteObjectStoreModel = components["schemas"]["UserConcreteObjectStoreModel"];
 
 export interface SelectableObjectStore extends ConcreteObjectStoreModel {
     object_store_id: string;
@@ -325,6 +326,10 @@ export type ModelStoreFormat = components["schemas"]["ModelStoreFormat"];
 export type ObjectExportTaskResponse = components["schemas"]["ObjectExportTaskResponse"];
 export type ExportObjectRequestMetadata = components["schemas"]["ExportObjectRequestMetadata"];
 export type ExportObjectResultMetadata = components["schemas"]["ExportObjectResultMetadata"];
+
+export type SampleSheetColumnDefinition = components["schemas"]["SampleSheetColumnDefinitionModel"];
+export type SampleSheetColumnDefinitionType = SampleSheetColumnDefinition["type"];
+export type SampleSheetColumnDefinitions = SampleSheetColumnDefinition[] | null;
 
 export type AsyncTaskResultSummary = components["schemas"]["AsyncTaskResultSummary"];
 

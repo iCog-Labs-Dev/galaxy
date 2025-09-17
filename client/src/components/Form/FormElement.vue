@@ -9,7 +9,7 @@ import { computed, ref, useAttrs } from "vue";
 
 import { linkify } from "@/utils/utils";
 
-import { isDataUri } from "./Elements/FormData/types";
+import { type ExtendedCollectionType, isDataUri } from "./Elements/FormData/types";
 import type { FormParameterAttributes, FormParameterTypes, FormParameterValue } from "./parameterTypes";
 
 import FormBoolean from "./Elements/FormBoolean.vue";
@@ -115,7 +115,9 @@ const computedPlaceholder = computed(() => {
  */
 const unPopulatedError = computed(
     () =>
-        props.workflowRun && alerts.value?.length === 1 && alerts.value[0] === "Please provide a value for this option."
+        props.workflowRun &&
+        alerts.value?.length === 1 &&
+        alerts.value[0] === "Please provide a value for this option.",
 );
 
 const connected = ref(false);
@@ -167,7 +169,7 @@ const hasAlert = computed(() => alerts.value.length > 0);
 const showPreview = computed(() => (collapsed.value && attrs.value["collapsible_preview"]) || props.disabled);
 const showField = computed(() => !collapsed.value && !props.disabled);
 const formDataField = computed(() =>
-    props.type && ["data", "data_collection"].includes(props.type) ? (props.type as "data" | "data_collection") : null
+    props.type && ["data", "data_collection"].includes(props.type) ? (props.type as "data" | "data_collection") : null,
 );
 const isUriDataField = computed(() => formDataField.value && isDataUri(props.value));
 
@@ -183,7 +185,7 @@ const helpText = computed(() => {
 const nonMdHelp = computed(() =>
     Boolean(helpText.value) && props.helpFormat != "markdown" && (!props.workflowRun || helpText.value !== props.title)
         ? sanitize(helpText.value!)
-        : ""
+        : "",
 );
 const showNonMdHelp = computed(() => Boolean(nonMdHelp.value) && (!props.workflowRun || props.type !== "boolean"));
 
@@ -215,7 +217,7 @@ const userDefinedTitle = computed(() => {
 const isHiddenType = computed(
     () =>
         ["hidden", "hidden_data", "baseurl"].includes(props.type ?? "") ||
-        (props.attributes && props.attributes.titleonly)
+        (props.attributes && props.attributes.titleonly),
 );
 
 /** Determines if the element renders content below the title. */
@@ -224,7 +226,7 @@ const rendersContent = computed(
         (props.workflowRun && hasAlert.value && !unPopulatedError.value) ||
         showField.value ||
         showPreview.value ||
-        helpText.value
+        helpText.value,
 );
 
 const collapseText = computed(() => (collapsed.value ? props.collapsedEnableText : props.collapsedDisableText));
@@ -267,6 +269,14 @@ function addTempFocus() {
 function onAlert(value: string | undefined) {
     formAlert.value = value;
 }
+
+const extendedCollectionType = computed<ExtendedCollectionType>(() => {
+    const attrsValue = attrs.value;
+    return {
+        columnDefinitions: attrsValue.column_definitions ?? undefined,
+        fields: attrsValue.fields ?? undefined,
+    };
+});
 </script>
 
 <template>
@@ -389,7 +399,7 @@ function onAlert(value: string | undefined) {
                         ['text', 'password'].includes(props.type ?? '') ||
                         (attrs.is_workflow &&
                             ['data_column', 'drill_down', 'genomebuild', 'group_tag', 'select'].includes(
-                                props.type ?? ''
+                                props.type ?? '',
                             ))
                     "
                     :id="props.id"
@@ -435,6 +445,7 @@ function onAlert(value: string | undefined) {
                     :user-defined-title="userDefinedTitle"
                     :type="formDataField"
                     :collection-types="attrs.collection_types"
+                    :extended-collection-type="extendedCollectionType"
                     :workflow-run="props.workflowRun"
                     @alert="onAlert"
                     @focus="addTempFocus" />
@@ -476,18 +487,21 @@ function onAlert(value: string | undefined) {
         border: solid 3px $brand-primary;
     }
     &:not(.temp-focus) {
-        border: solid 1px $portlet-bg-color;
-        box-shadow: 0 0 5px $portlet-bg-color;
+        border: solid 1px var(--border);
+        box-shadow: none;
+        border: none;
     }
 
     .ui-form-title {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        background-color: white !important;
+        border-bottom: none;
+        
 
         // inherit the border radius from the parent .alert class
-        border-top-left-radius: inherit;
-        border-top-right-radius: inherit;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
 
         &:deep(.form-element-header-badge) {
             display: flex;
@@ -498,10 +512,10 @@ function onAlert(value: string | undefined) {
             padding-right: $spacer;
 
             &.populated {
-                background-color: $state-success-bg;
+                background-color: white;
             }
             &.unpopulated {
-                background-color: $state-info-bg;
+                background-color: white;
             }
         }
     }

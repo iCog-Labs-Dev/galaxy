@@ -20,7 +20,7 @@ withDefaults(
     }>(),
     {
         isLoading: false,
-    }
+    },
 );
 </script>
 
@@ -30,14 +30,20 @@ withDefaults(
     <div v-else>
         <div class="position-relative">
             <div class="ui-form-header-underlay sticky-top" />
-            <div class="tool-header sticky-top bg-secondary px-2 py-1 rounded">
+            <div class="tool-header sticky-top px-2 py-1 rounded">
                 <div class="d-flex justify-content-between">
                     <div class="py-1 d-flex flex-wrap flex-gapx-1 align-items-center">
                         <img v-if="logo" class="fa-fw" alt="logo" :src="absPath(logo)" />
                         <FontAwesomeIcon v-else :icon="icon || faWrench" class="fa-fw" />
                         <Heading h1 inline bold size="text" itemprop="name">{{ name }}</Heading>
                         <span itemprop="description">{{ description }}</span>
-                        <span v-if="version" class="text-muted">(Galaxy Version {{ version }})</span>
+                        <span
+                            v-if="version"
+                            class="text-muted"
+                            data-description="galaxy tool version"
+                            :data-version="version"
+                            >(Galaxy Version {{ version }})</span
+                        >
                     </div>
                     <div class="d-flex flex-nowrap align-items-start flex-gapx-1">
                         <slot name="buttons" />

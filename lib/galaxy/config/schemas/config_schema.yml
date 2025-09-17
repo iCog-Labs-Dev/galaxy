@@ -882,19 +882,6 @@ mapping:
           should be disabled. Containerized jobs always use /bin/sh - so more maximum
           portability tool authors should assume generated commands run in sh.
 
-      enable_tool_document_cache:
-        type: bool
-        default: false
-        required: false
-        desc: |
-          This option is deprecated, and the tool document cache will be removed
-          in the next release.
-          Whether to enable the tool document cache. This cache stores
-          expanded XML strings. Enabling the tool cache results in slightly faster startup
-          times. The tool cache is backed by a SQLite database, which cannot
-          be stored on certain network disks. The cache location is configurable
-          with the ``tool_cache_data_dir`` tag in tool config files.
-
       tool_search_index_dir:
         type: str
         default: tool_search_index
@@ -1836,6 +1823,14 @@ mapping:
         per_host: true
         desc: |
           The URL linked by the "How to Cite Galaxy" link in the "Help" menu.
+
+      citation_bibtex:
+        type: str
+        default: "@article{Galaxy2024, title={The Galaxy platform for accessible, reproducible, and collaborative data analyses: 2024 update}, author={{The Galaxy Community}}, journal={Nucleic Acids Research}, year={2024}, doi={10.1093/nar/gkae410}, url={https://doi.org/10.1093/nar/gkae410}}"
+        required: false
+        per_host: true
+        desc: |
+          The BibTeX citation for Galaxy, to be displayed in the History Tool Reference List
 
       release_doc_base_url:
         type: str
@@ -3085,6 +3080,17 @@ mapping:
         required: false
         desc: |
           Sets the path to OIDC backends configuration file.
+
+      oidc_auth_pipeline:
+        type: seq
+        required: false
+        desc: |
+          Sets the sequence of steps that Python Social Auth goes
+          through when authenticating an OIDC login. By default,
+          Galaxy uses galaxy.authnz.psa_authnz.AUTH_PIPELINE - see
+          there for example steps.
+          Each element should be an import path to a function,
+          e.g. galaxy.authnz.psa_authnz.contains_required_data
 
       oidc_scope_prefix:
         type: str

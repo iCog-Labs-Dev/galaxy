@@ -100,6 +100,12 @@ const executeButtonTooltip = computed(() => {
 
 const { currentHistoryId } = storeToRefs(useHistoryStore());
 
+function runWorkflowAndRedirect() {
+    emit('on-execute');
+    window.open("http://100.67.47.42:3001/workflow?showLatest=true", "_blank");
+}
+
+
 async function rerunWorkflow() {
     if (!props.invocation) {
         return;
@@ -110,14 +116,14 @@ async function rerunWorkflow() {
     }
     const confirmed = await confirm(
         localize(
-            "Rerunning this workflow requires changing the history to the one with the original inputs. Do you want to continue?"
+            "Rerunning this workflow requires changing the history to the one with the original inputs. Do you want to continue?",
         ),
         {
             id: "change-history-rerun-workflow",
             title: localize("Change History and Rerun Workflow"),
             okTitle: localize("Change History and Rerun"),
             okVariant: "primary",
-        }
+        },
     );
 
     if (confirmed) {
@@ -142,9 +148,9 @@ async function rerunWorkflow() {
         <BAlert v-if="error" variant="danger" show>{{ error }}</BAlert>
 
         <div class="position-relative">
-            <div v-if="workflow" class="bg-secondary px-2 py-1 rounded d-flex flex-gapx-1 justify-content-between">
-                <div class="py-1 d-flex flex-wrap align-items-center flex-gapx-1" data-description="workflow heading">
-                    <FontAwesomeIcon :icon="faSitemap" fixed-width />
+            <div v-if="workflow" class="px-2 py-1 rounded d-flex flex-gapx-1 justify-content-between">
+                <div style="font-size: 20px" class="py-1 d-flex flex-wrap align-items-center flex-gapx-1" data-description="workflow heading">
+                    <FontAwesomeIcon :icon="faSitemap" fixed-width style="margin-right: 8px" />
                     <b> {{ props.invocation ? "Invoked " : "" }}Workflow: {{ getWorkflowName() }} </b>
                     <span>(Version: {{ workflow.version + 1 }})</span>
                 </div>
@@ -184,10 +190,9 @@ async function rerunWorkflow() {
                         data-description="execute workflow button"
                         :wait="runWaiting"
                         :disabled="runDisabled"
-                        size="small"
                         :tooltip="executeButtonTooltip"
                         :title="!props.validRerun ? 'Run Workflow' : 'Rerun Workflow'"
-                        @onClick="runWorkflowAndRedirect" />
+                         @onClick="runWorkflowAndRedirect" />
                     <GButtonGroup v-else>
                         <GButton
                             title="Run Workflow"

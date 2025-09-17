@@ -185,6 +185,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/data_landings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Data Landing */
+        post: operations["create_data_landing_api_data_landings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dataset_collection_element/{dce_id}": {
         parameters: {
             query?: never;
@@ -328,6 +345,40 @@ export interface paths {
          *     can be tracked with the short_term_storage API.
          */
         post: operations["prepare_collection_download_api_dataset_collections__hdca_id__prepare_download_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset_collections/{hdca_id}/sample_sheet_workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an XLSX workbook for a sample sheet definition targeting an existing collection. */
+        post: operations["dataset_collections__workbook_download_for_collection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset_collections/{hdca_id}/sample_sheet_workbook/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parse an XLSX workbook for a sample sheet definition and supplied file contents. */
+        post: operations["dataset_collections__workbook_parse_for_collection"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2739,6 +2790,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/invocations/{invocation_id}/error": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submits a bug report for a workflow run via the API. */
+        post: operations["report_error_api_invocations__invocation_id__error_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/invocations/{invocation_id}/jobs_summary": {
         parameters: {
             query?: never;
@@ -4216,6 +4284,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sample_sheet_workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an XLSX workbook for a sample sheet definition. */
+        post: operations["dataset_collections__workbook_download"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sample_sheet_workbook/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parse an XLSX workbook for a sample sheet definition and supplied file contents. */
+        post: operations["dataset_collections__workbook_parse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/short_term_storage/{storage_request_id}": {
         parameters: {
             query?: never;
@@ -4558,6 +4660,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tool_landings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Landing */
+        post: operations["create_landing_api_tool_landings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tool_landings/{uuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Landing */
+        get: operations["get_landing_api_tool_landings__uuid__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tool_landings/{uuid}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim Landing */
+        post: operations["claim_landing_api_tool_landings__uuid__claim_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tool_shed_repositories": {
         parameters: {
             query?: never;
@@ -4620,6 +4773,40 @@ export interface paths {
         put?: never;
         /** Upload files to Galaxy */
         post: operations["fetch_form_api_tools_fetch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tools/fetch/workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Generate a template workbook to use with the activity builder UI */
+        get: operations["tools__fetch_workbook_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tools/fetch/workbook/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate a template workbook to use with the activity builder UI */
+        post: operations["tools__fetch_workbook_parse"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7144,7 +7331,7 @@ export interface components {
              * Source
              * @description The source of the element.
              */
-            src: components["schemas"]["ColletionSourceType"];
+            src: components["schemas"]["CollectionSourceType"];
             /**
              * Tags
              * @description The list of tags associated with the element.
@@ -7152,10 +7339,10 @@ export interface components {
             tags?: string[] | null;
         };
         /**
-         * ColletionSourceType
+         * CollectionSourceType
          * @enum {string}
          */
-        ColletionSourceType: "hda" | "ldda" | "hdca" | "new_collection";
+        CollectionSourceType: "hda" | "ldda" | "hdca" | "new_collection";
         /** ColorParameterModel */
         ColorParameterModel: {
             /** Argument */
@@ -7201,17 +7388,40 @@ export interface components {
         };
         /** CompositeDataElement */
         CompositeDataElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -7222,35 +7432,61 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
             } | null;
             /** Name */
             name?: string | number | boolean | null;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -7259,10 +7495,21 @@ export interface components {
              * @enum {string}
              */
             src: "composite";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -7553,6 +7800,13 @@ export interface components {
              */
             type: "container";
         };
+        /** ContentTypeMessage */
+        ContentTypeMessage: {
+            /** Content Type */
+            content_type: string;
+            /** Message */
+            message: string;
+        };
         /** ContentsObject */
         ContentsObject: {
             /**
@@ -7586,6 +7840,17 @@ export interface components {
         ConvertedDatasetsMap: {
             [key: string]: string;
         };
+        /** CreateDataLandingPayload */
+        CreateDataLandingPayload: {
+            /** Client Secret */
+            client_secret?: string | null;
+            /**
+             * Public
+             * @default false
+             */
+            public: boolean;
+            request_state: components["schemas"]["DataLandingRequestState"];
+        };
         /** CreateEntryPayload */
         CreateEntryPayload: {
             /**
@@ -7616,6 +7881,11 @@ export interface components {
              * @description The type of the collection, can be `list`, `paired`, or define subcollections using `:` as separator like `list:paired` or `list:list`.
              */
             collection_type?: string | null;
+            /**
+             * Column Definitions
+             * @description Specify definitions for row data if collection_type if sample_sheet
+             */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
             /**
              * Content
              * @description Depending on the `source` it can be:
@@ -7675,6 +7945,13 @@ export interface components {
              * @description The name of the new collection.
              */
             name?: string | null;
+            /**
+             * Row data
+             * @description Specify rows of metadata data corresponding to an identifier if collection_type is sample_sheet
+             */
+            rows?: {
+                [key: string]: (number | boolean | string | null)[];
+            } | null;
             /**
              * Source
              * @description The source of the content. Can be other history element to be copied or library elements.
@@ -7836,6 +8113,11 @@ export interface components {
              */
             collection_type?: string | null;
             /**
+             * Column Definitions
+             * @description Specify definitions for row data if collection_type if sample_sheet
+             */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
+            /**
              * Copy Elements
              * @description Whether to create a copy of the source HDAs for the new collection.
              * @default true
@@ -7879,6 +8161,13 @@ export interface components {
              * @description The name of the new collection.
              */
             name?: string | null;
+            /**
+             * Row data
+             * @description Specify rows of metadata data corresponding to an identifier if collection_type is sample_sheet
+             */
+            rows?: {
+                [key: string]: (number | boolean | string | null)[];
+            } | null;
         };
         /** CreatePagePayload */
         CreatePagePayload: {
@@ -8000,11 +8289,73 @@ export interface components {
              */
             url: string;
         };
+        /** CreateToolLandingRequestPayload */
+        CreateToolLandingRequestPayload: {
+            /** Client Secret */
+            client_secret?: string | null;
+            /**
+             * Public
+             * @default false
+             */
+            public: boolean;
+            /** Request State */
+            request_state?: {
+                [key: string]: unknown;
+            } | null;
+            /** Tool Id */
+            tool_id: string;
+            /** Tool Version */
+            tool_version?: string | null;
+        };
         /**
          * CreateType
          * @enum {string}
          */
         CreateType: "file" | "folder" | "collection";
+        /** CreateWorkbookForCollectionApi */
+        CreateWorkbookForCollectionApi: {
+            /**
+             * Column Descriptions
+             * @description A description of the columns expected in the workbook after the first columns described by 'prefix_columns_type'
+             */
+            column_definitions: components["schemas"]["SampleSheetColumnDefinitionModel"][];
+            /**
+             * Prefix sample sheet values
+             * @description An area to pre-populate URIs, etc...
+             */
+            prefix_values?: (number | boolean | string | null)[][] | null;
+        };
+        /** CreateWorkbookRequest */
+        CreateWorkbookRequest: {
+            /**
+             * Collection Type
+             * @enum {string}
+             */
+            collection_type:
+                | "sample_sheet"
+                | "sample_sheet:paired"
+                | "sample_sheet:paired_or_unpaired"
+                | "sample_sheet:record";
+            /**
+             * Column Descriptions
+             * @description A description of the columns expected in the workbook after the first columns described by 'prefix_columns_type'
+             */
+            column_definitions: components["schemas"]["SampleSheetColumnDefinitionModel"][];
+            /**
+             * Prefix Columns Type
+             * @default URI
+             * @constant
+             */
+            prefix_columns_type: "URI";
+            /** Prefix Values */
+            prefix_values?: (number | boolean | string | null)[][] | null;
+            /**
+             * Title of the workbook to generate
+             * @description A short title to give the workbook.
+             * @default Sample Sheet for Galaxy
+             */
+            title: string;
+        };
         /** CreateWorkflowLandingRequestPayload */
         CreateWorkflowLandingRequestPayload: {
             /** Client Secret */
@@ -8096,6 +8447,27 @@ export interface components {
              * @description The name of the user.
              */
             username: string;
+        };
+        /** CsvDialect */
+        CsvDialect: {
+            /** Delimiter */
+            delimiter: string;
+            /** Double Quote */
+            double_quote: boolean;
+            /** Escape Character */
+            escape_character: string | null;
+            /** Line Terminator */
+            line_terminator: string;
+            /** Quote Character */
+            quote_character: string | null;
+            /** Skip Initial Space */
+            skip_initial_space: boolean;
+        };
+        /** CsvDialectInferenceMessage */
+        CsvDialectInferenceMessage: {
+            dialect: components["schemas"]["CsvDialect"];
+            /** Message */
+            message: string;
         };
         /** CustomArchivedHistoryView */
         CustomArchivedHistoryView: {
@@ -8672,6 +9044,11 @@ export interface components {
          */
         DCESummary: {
             /**
+             * Columns
+             * @description A row (or list of columns) of data associated with this element
+             */
+            columns?: (number | boolean | string | null)[] | null;
+            /**
              * Element Identifier
              * @description The actual name of this element.
              */
@@ -8736,6 +9113,18 @@ export interface components {
              * @default []
              */
             elements: components["schemas"]["DCESummary"][];
+            /**
+             * Elements Datatypes
+             * @description A set containing all the different element datatypes in the collection.
+             */
+            elements_datatypes: string[];
+            /**
+             * Datasets deleted
+             * @description The number of elements in the collection that are marked as deleted.
+             */
+            elements_deleted: number;
+            /** @description A dictionary containing counts for each dataset state in the collection. */
+            elements_states: components["schemas"]["ElementsStatesDict"];
             /**
              * Dataset Collection ID
              * @example 0123456789ABCDEF
@@ -8856,7 +9245,10 @@ export interface components {
         DataElementsFromTarget: {
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -8880,7 +9272,10 @@ export interface components {
         DataElementsTarget: {
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -8908,6 +9303,17 @@ export interface components {
          * @enum {string}
          */
         DataItemSourceType: "hda" | "ldda" | "hdca" | "dce" | "dc";
+        /** DataLandingRequestState */
+        DataLandingRequestState: {
+            /** Targets */
+            targets: (
+                | components["schemas"]["DataElementsTarget"]
+                | components["schemas"]["HdcaDataItemsTarget"]
+                | components["schemas"]["DataElementsFromTarget"]
+                | components["schemas"]["HdcaDataItemsFromTarget"]
+                | components["schemas"]["FtpImportTarget"]
+            )[];
+        };
         /** DataParameterModel */
         DataParameterModel: {
             /** Argument */
@@ -9086,10 +9492,22 @@ export interface components {
              */
             dep: string;
             /**
+             * Id
+             * @description ID of the referenced dataset
+             * @example 0123456789ABCDEF
+             */
+            id: string;
+            /**
              * Name
              * @description Name of the referenced dataset
              */
             name: string;
+            /**
+             * User Id
+             * @description ID of the user who owns the referenced dataset.
+             * @example 0123456789ABCDEF
+             */
+            user_id: string;
         };
         /**
          * DatasetPermissionAction
@@ -9952,11 +10370,6 @@ export interface components {
              */
             active: boolean | null;
             /**
-             * Allow Load
-             * @default true
-             */
-            allow_load: boolean | null;
-            /**
              * Hidden
              * @default false
              */
@@ -9969,8 +10382,6 @@ export interface components {
              * @constant
              */
             src: "representation";
-            /** Uuid */
-            uuid?: string | null;
         };
         /** DynamicUnprivilegedToolCreatePayload */
         DynamicUnprivilegedToolCreatePayload: {
@@ -9979,11 +10390,6 @@ export interface components {
              * @default true
              */
             active: boolean | null;
-            /**
-             * Allow Load
-             * @default true
-             */
-            allow_load: boolean | null;
             /**
              * Hidden
              * @default false
@@ -9996,14 +10402,39 @@ export interface components {
              * @constant
              */
             src: "representation";
-            /** Uuid */
-            uuid?: string | null;
         };
         /**
          * ElementsFromType
          * @enum {string}
          */
         ElementsFromType: "archive" | "bagit" | "bagit_archive" | "directory";
+        /** ElementsStatesDict */
+        ElementsStatesDict: {
+            /** Deferred */
+            deferred?: number;
+            /** Discarded */
+            discarded?: number;
+            /** Empty */
+            empty?: number;
+            /** Error */
+            error?: number;
+            /** Failed Metadata */
+            failed_metadata?: number;
+            /** New */
+            new?: number;
+            /** Ok */
+            ok?: number;
+            /** Paused */
+            paused?: number;
+            /** Queued */
+            queued?: number;
+            /** Running */
+            running?: number;
+            /** Setting Metadata */
+            setting_metadata?: number;
+            /** Upload */
+            upload?: number;
+        };
         /** EmptyFieldParameterValidatorModel */
         EmptyFieldParameterValidatorModel: {
             /**
@@ -10499,17 +10930,40 @@ export interface components {
         };
         /** FileDataElement */
         FileDataElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -10519,31 +10973,57 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Name */
             name?: string | number | boolean | null;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -10552,10 +11032,21 @@ export interface components {
              * @enum {string}
              */
             src: "files";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -10692,7 +11183,9 @@ export interface components {
                 | "elabftw"
                 | "inveniordm"
                 | "zenodo"
-                | "rspace";
+                | "rspace"
+                | "dataverse"
+                | "huggingface";
             /** Variables */
             variables?:
                 | (
@@ -10793,6 +11286,24 @@ export interface components {
              * @default false
              */
             sorting: boolean;
+        };
+        /** FillIdentifiers */
+        FillIdentifiers: {
+            /**
+             * Deduplication Index From
+             * @default 1
+             */
+            deduplication_index_from: number;
+            /**
+             * Deduplication Pattern
+             * @default _{#}
+             */
+            deduplication_pattern: string;
+            /**
+             * Fill Inner List Identifiers
+             * @default false
+             */
+            fill_inner_list_identifiers: boolean;
         };
         /** FillStepDefaultsAction */
         FillStepDefaultsAction: {
@@ -10897,17 +11408,40 @@ export interface components {
         };
         /** FtpImportElement */
         FtpImportElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -10917,19 +11451,32 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
@@ -10938,12 +11485,25 @@ export interface components {
             ftp_path: string;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Name */
             name?: string | number | boolean | null;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -10952,10 +11512,21 @@ export interface components {
              * @enum {string}
              */
             src: "ftp_import";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -10964,16 +11535,21 @@ export interface components {
         FtpImportTarget: {
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
             /** Collection Type */
             collection_type?: string | null;
+            /** Column Definitions */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
             destination: components["schemas"]["HdcaDestination"];
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /** Ftp Path */
             ftp_path: string;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Name */
             name?: string | null;
             /**
@@ -11545,9 +12121,10 @@ export interface components {
             copied_from_library_dataset_dataset_association_id?: string | null;
             /**
              * Create Time
+             * Format: date-time
              * @description The time and date this item was created.
              */
-            create_time: string | null;
+            create_time: string;
             /**
              * Created from basename
              * @description The basename of the output that produced this dataset.
@@ -11778,9 +12355,10 @@ export interface components {
             copied_from_ldda_id?: string | null;
             /**
              * Create Time
+             * Format: date-time
              * @description The time and date this item was created.
              */
-            create_time: string | null;
+            create_time: string;
             /**
              * Deleted
              * @description Whether this item is marked as deleted.
@@ -11897,9 +12475,10 @@ export interface components {
             copied_from_ldda_id?: string | null;
             /**
              * Create Time
+             * Format: date-time
              * @description The time and date this item was created.
              */
-            create_time: string | null;
+            create_time: string;
             /**
              * Dataset ID
              * @description The encoded ID of the dataset associated with this item.
@@ -11999,6 +12578,11 @@ export interface components {
              */
             collection_type?: string | null;
             /**
+             * Column Definitions
+             * @description Column data associated with each element of this collection.
+             */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
+            /**
              * Contents URL
              * @description The relative URL to access the contents of this History.
              */
@@ -12028,6 +12612,13 @@ export interface components {
              * @description A set containing all the different element datatypes in the collection.
              */
             elements_datatypes?: string[] | null;
+            /**
+             * Datasets deleted
+             * @description The number of elements in the collection that are marked as deleted.
+             */
+            elements_deleted?: number | null;
+            /** @description A dictionary containing counts for each dataset state in the collection. */
+            elements_states?: components["schemas"]["ElementsStatesDict"] | null;
             /**
              * HID
              * @description The index position of this item in the History.
@@ -12138,15 +12729,21 @@ export interface components {
              */
             collection_type: string;
             /**
+             * Column Definitions
+             * @description Column data associated with each element of this collection.
+             */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
+            /**
              * Contents URL
              * @description The relative URL to access the contents of this History.
              */
             contents_url: string;
             /**
              * Create Time
+             * Format: date-time
              * @description The time and date this item was created.
              */
-            create_time: string | null;
+            create_time: string;
             /**
              * Deleted
              * @description Whether this item is marked as deleted.
@@ -12168,6 +12765,13 @@ export interface components {
              * @description A set containing all the different element datatypes in the collection.
              */
             elements_datatypes: string[];
+            /**
+             * Datasets deleted
+             * @description The number of elements in the collection that are marked as deleted.
+             */
+            elements_deleted: number;
+            /** @description A dictionary containing counts for each dataset state in the collection. */
+            elements_states: components["schemas"]["ElementsStatesDict"];
             /**
              * HID
              * @description The index position of this item in the History.
@@ -12287,9 +12891,10 @@ export interface components {
             contents_url: string;
             /**
              * Create Time
+             * Format: date-time
              * @description The time and date this item was created.
              */
-            create_time: string | null;
+            create_time: string;
             /**
              * Deleted
              * @description Whether this item is marked as deleted.
@@ -12305,6 +12910,13 @@ export interface components {
              * @description A set containing all the different element datatypes in the collection.
              */
             elements_datatypes: string[];
+            /**
+             * Datasets deleted
+             * @description The number of elements in the collection that are marked as deleted.
+             */
+            elements_deleted: number;
+            /** @description A dictionary containing counts for each dataset state in the collection. */
+            elements_states: components["schemas"]["ElementsStatesDict"];
             /**
              * HID
              * @description The index position of this item in the History.
@@ -12500,16 +13112,21 @@ export interface components {
         HdcaDataItemsFromTarget: {
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
             /** Collection Type */
             collection_type?: string | null;
+            /** Column Definitions */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
             destination: components["schemas"]["HdcaDestination"];
-            elements_from: components["schemas"]["ElementsFromType"];
             /** Ftp Path */
             ftp_path?: string | null;
+            items_from: components["schemas"]["ElementsFromType"];
             /** Name */
             name?: string | null;
             /** Path */
@@ -12526,12 +13143,17 @@ export interface components {
         HdcaDataItemsTarget: {
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
             /** Collection Type */
             collection_type?: string | null;
+            /** Column Definitions */
+            column_definitions?: components["schemas"]["SampleSheetColumnDefinition"][] | null;
             destination: components["schemas"]["HdcaDestination"];
             /** Elements */
             elements: (
@@ -13315,9 +13937,8 @@ export interface components {
              */
             negate: boolean;
             /**
-             * Type
-             * @default in_range
-             * @constant
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
              */
             type: "in_range";
         };
@@ -13401,6 +14022,21 @@ export interface components {
              */
             type: "data";
         };
+        /** InferredCollectionTypeLogEntry */
+        InferredCollectionTypeLogEntry: {
+            /** From Columns */
+            from_columns: components["schemas"]["ParsedColumn"][];
+            /** Message */
+            message: string;
+        };
+        /** InferredColumnMapping */
+        InferredColumnMapping: {
+            /** Column Index */
+            column_index: number;
+            /** Column Title */
+            column_title: string;
+            parsed_column: components["schemas"]["ParsedColumn"];
+        };
         /** InputDataCollectionStep */
         InputDataCollectionStep: {
             /**
@@ -13430,6 +14066,11 @@ export interface components {
              * @description TODO
              */
             tool_inputs?: unknown;
+            /**
+             * Tool UUID
+             * @description The universal unique identifier of the tool associated with this step. Takes precedence over tool_id if set.
+             */
+            tool_uuid?: string | null;
             /**
              * Tool Version
              * @description The version of the tool associated with this step.
@@ -13473,6 +14114,11 @@ export interface components {
              */
             tool_inputs?: unknown;
             /**
+             * Tool UUID
+             * @description The universal unique identifier of the tool associated with this step. Takes precedence over tool_id if set.
+             */
+            tool_uuid?: string | null;
+            /**
              * Tool Version
              * @description The version of the tool associated with this step.
              */
@@ -13514,6 +14160,11 @@ export interface components {
              * @description TODO
              */
             tool_inputs?: unknown;
+            /**
+             * Tool UUID
+             * @description The universal unique identifier of the tool associated with this step. Takes precedence over tool_id if set.
+             */
+            tool_uuid?: string | null;
             /**
              * Tool Version
              * @description The version of the tool associated with this step.
@@ -13670,7 +14321,10 @@ export interface components {
              * @description Parameter name. Used when referencing parameter in workflows or inside command templating.
              */
             name: string;
-            /** Optional */
+            /**
+             * Optional
+             * @default false
+             */
             optional: boolean;
             /**
              * Parameter Type
@@ -15153,9 +15807,8 @@ export interface components {
              */
             negate: boolean;
             /**
-             * Type
-             * @default length
-             * @constant
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
              */
             type: "length";
         };
@@ -16215,17 +16868,40 @@ export interface components {
         ModelStoreFormat: "tgz" | "tar" | "tar.gz" | "bag.zip" | "bag.tar" | "bag.tgz" | "rocrate.zip" | "bco.json";
         /** NestedElement */
         NestedElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -16235,11 +16911,21 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
@@ -16258,28 +16944,55 @@ export interface components {
                   )
                 | components["schemas"]["NestedElement"]
             )[];
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Name */
             name?: string | number | boolean | null;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -16904,19 +17617,245 @@ export interface components {
          * @default []
          */
         PageSummaryList: components["schemas"]["PageSummary"][];
+        /** ParseFetchWorkbook */
+        ParseFetchWorkbook: {
+            /**
+             * Workbook Content (Base 64 encoded)
+             * @description The workbook content (the contents of the xlsx file) that have been base64 encoded.
+             */
+            content: string;
+            fill_identifiers?: components["schemas"]["FillIdentifiers"] | null;
+        };
+        /** ParseWorkbook */
+        ParseWorkbook: {
+            /**
+             * Collection Type
+             * @enum {string}
+             */
+            collection_type:
+                | "sample_sheet"
+                | "sample_sheet:paired"
+                | "sample_sheet:paired_or_unpaired"
+                | "sample_sheet:record";
+            /**
+             * Column Descriptions
+             * @description A description of the columns expected in the workbook after the first columns described by 'prefix_columns_type'
+             */
+            column_definitions: components["schemas"]["SampleSheetColumnDefinitionModel"][];
+            /**
+             * Workbook Content (Base 64 encoded)
+             * @description The workbook content (the contents of the xlsx file) that have been base64 encoded.
+             */
+            content: string;
+            /**
+             * Prefix Columns Type
+             * @default URI
+             * @enum {string}
+             */
+            prefix_columns_type: "URI" | "ModelObjects";
+        };
+        /** ParseWorkbookForCollectionApi */
+        ParseWorkbookForCollectionApi: {
+            /**
+             * Column Descriptions
+             * @description A description of the columns expected in the workbook after the first columns described by 'prefix_columns_type'
+             */
+            column_definitions: components["schemas"]["SampleSheetColumnDefinitionModel"][];
+            /**
+             * Workbook Content (Base 64 encoded)
+             * @description The workbook content (the contents of the xlsx file) that have been base64 encoded.
+             */
+            content: string;
+        };
+        /** ParsedColumn */
+        ParsedColumn: {
+            /** Title */
+            title: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type:
+                | "list_identifiers"
+                | "paired_identifier"
+                | "paired_or_unpaired_identifier"
+                | "collection_name"
+                | "name_tag"
+                | "tags"
+                | "group_tags"
+                | "name"
+                | "dbkey"
+                | "hash_sha1"
+                | "hash_md5"
+                | "hash_sha256"
+                | "hash_sha512"
+                | "file_type"
+                | "url"
+                | "url_deferred"
+                | "info"
+                | "ftp_path"
+                | "deferred"
+                | "to_posix_lines"
+                | "space_to_tab"
+                | "auto_decompress";
+            /** Type Index */
+            type_index: number;
+        };
+        /** ParsedFetchWorkbookForCollections */
+        ParsedFetchWorkbookForCollections: {
+            /**
+             * Collection Type
+             * @enum {string}
+             */
+            collection_type: "list" | "list:paired" | "list:list" | "list:list:paired" | "list:paired_or_unpaired";
+            /** Columns */
+            columns: components["schemas"]["ParsedColumn"][];
+            /** Parse Log */
+            parse_log: (
+                | components["schemas"]["SplitUpPairedDataLogEntry"]
+                | components["schemas"]["InferredCollectionTypeLogEntry"]
+                | components["schemas"]["InferredColumnMapping"]
+                | components["schemas"]["ContentTypeMessage"]
+                | components["schemas"]["CsvDialectInferenceMessage"]
+            )[];
+            /** Rows */
+            rows: {
+                [key: string]: string | null;
+            }[];
+            /**
+             * Workbook Type
+             * @default collection
+             * @enum {string}
+             */
+            workbook_type: "datasets" | "collection" | "collections";
+        };
+        /** ParsedFetchWorkbookForDatasets */
+        ParsedFetchWorkbookForDatasets: {
+            /** Columns */
+            columns: components["schemas"]["ParsedColumn"][];
+            /** Parse Log */
+            parse_log: (
+                | components["schemas"]["SplitUpPairedDataLogEntry"]
+                | components["schemas"]["InferredCollectionTypeLogEntry"]
+                | components["schemas"]["InferredColumnMapping"]
+                | components["schemas"]["ContentTypeMessage"]
+                | components["schemas"]["CsvDialectInferenceMessage"]
+            )[];
+            /** Rows */
+            rows: {
+                [key: string]: string | null;
+            }[];
+            /**
+             * Workbook Type
+             * @default datasets
+             * @enum {string}
+             */
+            workbook_type: "datasets" | "collection" | "collections";
+        };
+        /** ParsedWorkbook */
+        ParsedWorkbook: {
+            /** Extra Columns */
+            extra_columns: components["schemas"]["ParsedColumn"][];
+            /** Parse Log */
+            parse_log: (
+                | components["schemas"]["InferredColumnMapping"]
+                | components["schemas"]["ContentTypeMessage"]
+                | components["schemas"]["CsvDialectInferenceMessage"]
+            )[];
+            /** Rows */
+            rows: {
+                [key: string]: number | boolean | string | null;
+            }[];
+        };
+        /** ParsedWorkbookCollection */
+        ParsedWorkbookCollection: {
+            /** Id */
+            id: string;
+            /**
+             * Model Class
+             * @default DatasetCollection
+             * @constant
+             */
+            model_class: "DatasetCollection";
+        };
+        /** ParsedWorkbookElement */
+        ParsedWorkbookElement: {
+            /** Element Identifier */
+            element_identifier: string;
+            /** Element Index */
+            element_index: number;
+            /**
+             * Element Type
+             * @enum {string}
+             */
+            element_type: "hda" | "child_collection";
+            /** Object */
+            object: components["schemas"]["ParsedWorkbookHda"] | components["schemas"]["ParsedWorkbookCollection"];
+        };
+        /** ParsedWorkbookForCollection */
+        ParsedWorkbookForCollection: {
+            /** Elements */
+            elements: components["schemas"]["ParsedWorkbookElement"][];
+            /** Extra Columns */
+            extra_columns: components["schemas"]["ParsedColumn"][];
+            /** Parse Log */
+            parse_log: (
+                | components["schemas"]["InferredColumnMapping"]
+                | components["schemas"]["ContentTypeMessage"]
+                | components["schemas"]["CsvDialectInferenceMessage"]
+            )[];
+            /** Rows */
+            rows: {
+                [key: string]: number | boolean | string | null;
+            }[];
+        };
+        /** ParsedWorkbookHda */
+        ParsedWorkbookHda: {
+            /** Id */
+            id: string;
+            /**
+             * Model Class
+             * @default HistoryDatasetAssociation
+             * @constant
+             */
+            model_class: "HistoryDatasetAssociation";
+        };
         /** PastedDataElement */
         PastedDataElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -16926,36 +17865,63 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Name */
             name?: string | number | boolean | null;
             /**
              * Paste Content
-             * @description Content to upload
+             * @description This is the text of the content to import if the 'src' of the item is 'pasted'.
+             *
              */
             paste_content: string | number | boolean;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -16964,10 +17930,21 @@ export interface components {
              * @enum {string}
              */
             src: "pasted";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -16976,11 +17953,6 @@ export interface components {
         PathBasedDynamicToolCreatePayload: {
             /** Active */
             active?: boolean | null;
-            /**
-             * Allow Load
-             * @default true
-             */
-            allow_load: boolean;
             /** Hidden */
             hidden?: boolean | null;
             /** Path */
@@ -16992,22 +17964,43 @@ export interface components {
             src: "from_path";
             /** Tool Directory */
             tool_directory?: string | null;
-            /** Uuid */
-            uuid?: string | null;
         };
         /** PathDataElement */
         PathDataElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -17017,35 +18010,61 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Link Data Only */
             link_data_only?: boolean | null;
             /** Name */
             name?: string | number | boolean | null;
             /** Path */
             path: string;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -17054,10 +18073,21 @@ export interface components {
              * @enum {string}
              */
             src: "path";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -17091,6 +18121,11 @@ export interface components {
              * @description TODO
              */
             tool_inputs?: unknown;
+            /**
+             * Tool UUID
+             * @description The universal unique identifier of the tool associated with this step. Takes precedence over tool_id if set.
+             */
+            tool_uuid?: string | null;
             /**
              * Tool Version
              * @description The version of the tool associated with this step.
@@ -17547,9 +18582,8 @@ export interface components {
              */
             negate: boolean;
             /**
-             * Type
-             * @default regex
-             * @constant
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
              */
             type: "regex";
         };
@@ -17799,6 +18833,25 @@ export interface components {
             /** Markdown */
             markdown: string;
         };
+        /** ReportInvocationErrorPayload */
+        ReportInvocationErrorPayload: {
+            /**
+             * Email
+             * @description Email address for communication with the user. Only required for anonymous users.
+             */
+            email?: string | null;
+            /**
+             * Invocation ID
+             * @description The ID of the invocation related to the error.
+             * @example 0123456789ABCDEF
+             */
+            invocation_id: string;
+            /**
+             * Message
+             * @description The optional message sent with the error report.
+             */
+            message?: string | null;
+        };
         /** ReportJobErrorPayload */
         ReportJobErrorPayload: {
             /**
@@ -17934,8 +18987,8 @@ export interface components {
              */
             url: string;
         };
-        /** RootModel[Dict[str, int]] */
-        RootModel_Dict_str__int__: {
+        /** RootModel[dict[str, int]] */
+        RootModel_dict_str__int__: {
             [key: string]: number;
         };
         /** RulesParameterModel */
@@ -17978,6 +19031,60 @@ export interface components {
              * @enum {string}
              */
             type: "rules";
+        };
+        /** SampleSheetColumnDefinition */
+        SampleSheetColumnDefinition: {
+            /** Default Value */
+            default_value?: number | boolean | string | null;
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name: string;
+            /** Optional */
+            optional: boolean;
+            /** Restrictions */
+            restrictions?: (number | boolean | string | null)[] | null;
+            /** Suggestions */
+            suggestions?: (number | boolean | string | null)[] | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "string" | "int" | "float" | "boolean" | "element_identifier";
+            /** Validators */
+            validators?:
+                | {
+                      [key: string]: unknown;
+                  }[]
+                | null;
+        };
+        /** SampleSheetColumnDefinitionModel */
+        SampleSheetColumnDefinitionModel: {
+            /** Default Value */
+            default_value?: number | boolean | string | null;
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name: string;
+            /** Optional */
+            optional: boolean;
+            /** Restrictions */
+            restrictions?: (number | boolean | string | null)[] | null;
+            /** Suggestions */
+            suggestions?: (number | boolean | string | null)[] | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "string" | "int" | "float" | "boolean" | "element_identifier";
+            /** Validators */
+            validators?:
+                | (
+                      | components["schemas"]["RegexParameterValidatorModel"]
+                      | components["schemas"]["InRangeParameterValidatorModel"]
+                      | components["schemas"]["LengthParameterValidatorModel"]
+                  )[]
+                | null;
         };
         /** SearchJobsPayload */
         SearchJobsPayload: {
@@ -18198,17 +19305,40 @@ export interface components {
         };
         /** ServerDirElement */
         ServerDirElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -18218,35 +19348,61 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Link Data Only */
             link_data_only?: boolean | null;
             /** Name */
             name?: string | number | boolean | null;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /** Server Dir */
             server_dir: string;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -18255,10 +19411,21 @@ export interface components {
              * @enum {string}
              */
             src: "server_dir";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -18760,6 +19927,15 @@ export interface components {
              */
             user_id?: string | null;
         };
+        /** SplitUpPairedDataLogEntry */
+        SplitUpPairedDataLogEntry: {
+            /** Message */
+            message: string;
+            /** New Paired Status Column */
+            new_paired_status_column: number;
+            old_forward_column: components["schemas"]["ParsedColumn"];
+            old_reverse_column: components["schemas"]["ParsedColumn"];
+        };
         /**
          * Src
          * @enum {string}
@@ -19047,6 +20223,11 @@ export interface components {
              * @description TODO
              */
             tool_inputs?: unknown;
+            /**
+             * Tool UUID
+             * @description The universal unique identifier of the tool associated with this step. Takes precedence over tool_id if set.
+             */
+            tool_uuid?: string | null;
             /**
              * Tool Version
              * @description The version of the tool associated with this step.
@@ -19390,6 +20571,24 @@ export interface components {
              */
             values: string;
         };
+        /** ToolLandingRequest */
+        ToolLandingRequest: {
+            /** Request State */
+            request_state?: {
+                [key: string]: unknown;
+            } | null;
+            state: components["schemas"]["LandingRequestState"];
+            /** Tool Id */
+            tool_id: string;
+            /** Tool Version */
+            tool_version?: string | null;
+            /**
+             * UUID
+             * Format: uuid4
+             * @description Universal unique identifier for this dataset.
+             */
+            uuid: string;
+        };
         /** ToolOutputBoolean */
         ToolOutputBoolean: {
             /**
@@ -19558,6 +20757,11 @@ export interface components {
              * @description TODO
              */
             tool_inputs?: unknown;
+            /**
+             * Tool UUID
+             * @description The universal unique identifier of the tool associated with this step. Takes precedence over tool_id if set.
+             */
+            tool_uuid?: string | null;
             /**
              * Tool Version
              * @description The version of the tool associated with this step.
@@ -20162,17 +21366,40 @@ export interface components {
         UploadOption: "upload_file" | "upload_paths" | "upload_directory";
         /** UrlDataElement */
         UrlDataElement: {
-            /** Md5 */
+            /**
+             * Md5
+             * @description The MD5 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on MD5 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/MD5).
+             *
+             */
             MD5?: string | null;
-            /** Sha-1 */
+            /**
+             * Sha-1
+             * @description The SHA1 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA1 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-1).
+             *
+             */
             "SHA-1"?: string | null;
-            /** Sha-256 */
+            /**
+             * Sha-256
+             * @description The SHA-256 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-256 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-256"?: string | null;
-            /** Sha-512 */
+            /**
+             * Sha-512
+             * @description The SHA-512 checksum of the dataset. This is a hash of the dataset contents that can be used to verify the
+             *     integrity of the dataset. More information on SHA-512 checksums can be found on [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+             *
+             */
             "SHA-512"?: string | null;
             /**
              * Auto Decompress
-             * @description Decompress compressed data before sniffing?
+             * @description This is a boolean value that indicates whether the dataset should be automatically decompressed if it is
+             *     compressed. If set to true, Galaxy will attempt to decompress the dataset if it is compressed and it is not
+             *     explicitly set to a compressed datatype.
+             *
              * @default false
              */
             auto_decompress: boolean;
@@ -20182,31 +21409,57 @@ export interface components {
             created_from_basename?: string | null;
             /**
              * Dbkey
+             * @description This identifier is used to associate datasets with specific reference genomes. If set, the dbkey
+             *     is a string that represents the genome assembly, such as "hg19" for human genome version 19 or "mm10"
+             *     for mouse genome version 10. In other parts of of the API this is referred to as the "genome_build".
+             *     The Galaxy user interface also refers to this as "build" or "custom build". The value "?" is used to
+             *     indicate that the dataset does not have a dbkey set.
+             *
              * @default ?
              */
             dbkey: string;
             /**
              * Deferred
+             * @description This is a boolean value that indicates whether the dataset is deferred. Deferred datasets are not
+             *     immediately ingested into Galaxy on data import and may lack some metadata. Given open bugs with deferred
+             *     datasets, most datasets should not be deferred unless you are sure you want to use this feature.
+             *
              * @default false
              */
             deferred: boolean;
             /** Description */
             description?: string | null;
-            elements_from?: components["schemas"]["ElementsFromType"] | null;
             /**
              * Ext
+             * @description The file extension of the dataset. This is shorthand description of the datatype corresponding to this dataset.
+             *     The default "auto" is used to indicate that the datatype should be automatically determined by Galaxy based on
+             *     the contents of the file.
+             *
              * @default auto
              */
             ext: string;
             extra_files?: components["schemas"]["ExtraFiles"] | null;
             /** Hashes */
             hashes?: components["schemas"]["FetchDatasetHash"][] | null;
-            /** Info */
+            /**
+             * Info
+             * @description Free text field that can be used to store arbitrary information about the dataset. This used to be prominently
+             *     displayed in the Galaxy user interface, but now is largely unused.
+             *
+             */
             info?: string | null;
+            items_from?: components["schemas"]["ElementsFromType"] | null;
             /** Name */
             name?: string | number | boolean | null;
+            /** Row */
+            row?: (number | boolean | string | null)[] | null;
             /**
              * Space To Tab
+             * @description This is a boolean value that indicates whether the spaces in the dataset contents should be converted to tabs.
+             *     This should typically be set to false for most applications, but sometimes when pasting data into the Galaxy
+             *     user interface, it is useful to set this to true to ensure that the data is converted to a tabular format
+             *     correctly.
+             *
              * @default false
              */
             space_to_tab: boolean;
@@ -20215,10 +21468,21 @@ export interface components {
              * @enum {string}
              */
             src: "url";
-            /** Tags */
+            /**
+             * Tags
+             * @description Tags are a way to categorize datasets in Galaxy. They are free-form text strings that can be used to
+             *     group datasets together. Tags can be used to filter datasets in the Galaxy user interface and can be
+             *     used to search for datasets in the Galaxy API.
+             *
+             */
             tags?: string[] | null;
             /**
              * To Posix Lines
+             * @description This is a boolean value that indicates whether the line endings in the dataset should be converted to POSIX
+             *     line endings (LF). The Galaxy user interface will typically set this to true so that all datasets default
+             *     to having POSIX line endings as most tools and workflows expect. The actual upload API will default this to false
+             *     though assuming the API user is more likely to be want to be precise about file handling details.
+             *
              * @default false
              */
             to_posix_lines: boolean;
@@ -20354,7 +21618,9 @@ export interface components {
                 | "elabftw"
                 | "inveniordm"
                 | "zenodo"
-                | "rspace";
+                | "rspace"
+                | "dataverse"
+                | "huggingface";
             /** Uri Root */
             uri_root: string;
             /**
@@ -20568,6 +21834,11 @@ export interface components {
              */
             class: "GalaxyUserTool";
             /**
+             * Configfiles
+             * @description A list of config files for this tool.
+             */
+            configfiles?: components["schemas"]["YamlTemplateConfigFile"][] | null;
+            /**
              * Container
              * @description Container image to use for this tool.
              */
@@ -20649,6 +21920,11 @@ export interface components {
              * @constant
              */
             class: "GalaxyUserTool";
+            /**
+             * Configfiles
+             * @description A list of config files for this tool.
+             */
+            configfiles?: components["schemas"]["YamlTemplateConfigFile"][] | null;
             /**
              * Container
              * @description Container image to use for this tool.
@@ -21564,6 +22840,21 @@ export interface components {
              */
             namespace: string;
         };
+        /** YamlTemplateConfigFile */
+        YamlTemplateConfigFile: {
+            /** Content */
+            content: string;
+            /**
+             * Eval Engine
+             * @default ecmascript
+             * @constant
+             */
+            eval_engine: "ecmascript";
+            /** Filename */
+            filename?: string | null;
+            /** Name */
+            name?: string | null;
+        };
         /** Organization */
         galaxy__schema__drs__Organization: {
             /**
@@ -22018,6 +23309,51 @@ export interface operations {
             };
         };
     };
+    create_data_landing_api_data_landings_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDataLandingPayload"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolLandingRequest"];
+                };
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
     content_api_dataset_collection_element__dce_id__get: {
         parameters: {
             query?: never;
@@ -22437,6 +23773,103 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    dataset_collections__workbook_download_for_collection: {
+        parameters: {
+            query?: {
+                /** @description Filename of the workbook download to generate */
+                filename?: string | null;
+            };
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path: {
+                /** @description The ID of the `HDCA`. */
+                hdca_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWorkbookForCollectionApi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    dataset_collections__workbook_parse_for_collection: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path: {
+                /** @description The ID of the `HDCA`. */
+                hdca_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParseWorkbookForCollectionApi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParsedWorkbookForCollection"];
+                };
             };
             /** @description Request Error */
             "4XX": {
@@ -24387,7 +25820,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Request Error */
@@ -25404,8 +26839,13 @@ export interface operations {
                 recursive?: boolean | null;
                 /** @description (This only applies when `format` is `jstree`) The value can be either `folders` or `files` and it will disable the corresponding nodes of the tree. */
                 disable?: components["schemas"]["RemoteFilesDisableMode"] | null;
-                /** @description Whether the query is made with the intention of writing to the source. If set to True, only entries that can be written to will be returned. */
+                /**
+                 * @deprecated
+                 * @description Deprecated, please use `write_intent` instead.
+                 */
                 writeable?: boolean | null;
+                /** @description Whether the query is made with the intention of writing to the source. If set to True, only entries that can be written to will be returned. */
+                write_intent?: boolean | null;
                 /** @description Maximum number of entries to return. */
                 limit?: number | null;
                 /** @description Number of entries to skip. */
@@ -30591,6 +32031,52 @@ export interface operations {
             };
         };
     };
+    report_error_api_invocations__invocation_id__error_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path: {
+                /** @description The encoded database identifier of the Invocation. */
+                invocation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportInvocationErrorPayload"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
     invocation_jobs_summary_api_invocations__invocation_id__jobs_summary_get: {
         parameters: {
             query?: never;
@@ -34988,8 +36474,13 @@ export interface operations {
                 recursive?: boolean | null;
                 /** @description (This only applies when `format` is `jstree`) The value can be either `folders` or `files` and it will disable the corresponding nodes of the tree. */
                 disable?: components["schemas"]["RemoteFilesDisableMode"] | null;
-                /** @description Whether the query is made with the intention of writing to the source. If set to True, only entries that can be written to will be returned. */
+                /**
+                 * @deprecated
+                 * @description Deprecated, please use `write_intent` instead.
+                 */
                 writeable?: boolean | null;
+                /** @description Whether the query is made with the intention of writing to the source. If set to True, only entries that can be written to will be returned. */
+                write_intent?: boolean | null;
                 /** @description Maximum number of entries to return. */
                 limit?: number | null;
                 /** @description Number of entries to skip. */
@@ -35372,6 +36863,97 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoleModelResponse"];
+                };
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    dataset_collections__workbook_download: {
+        parameters: {
+            query?: {
+                /** @description Filename of the workbook download to generate */
+                filename?: string | null;
+            };
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWorkbookRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    dataset_collections__workbook_parse: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParseWorkbook"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParsedWorkbook"];
                 };
             };
             /** @description Request Error */
@@ -36272,6 +37854,143 @@ export interface operations {
             };
         };
     };
+    create_landing_api_tool_landings_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateToolLandingRequestPayload"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolLandingRequest"];
+                };
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    get_landing_api_tool_landings__uuid__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path: {
+                /** @description The UUID used to identify a persisted landing request. */
+                uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolLandingRequest"];
+                };
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    claim_landing_api_tool_landings__uuid__claim_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path: {
+                /** @description The UUID used to identify a persisted landing request. */
+                uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClaimLandingPayload"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolLandingRequest"];
+                };
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
     index_api_tool_shed_repositories_get: {
         parameters: {
             query?: {
@@ -36428,6 +38147,99 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    tools__fetch_workbook_download: {
+        parameters: {
+            query?: {
+                /** @description Generate a workbook for simple datasets or a collection. */
+                type?: "datasets" | "collection" | "collections";
+                /** @description Generate workbook for specified collection type (not all collection types are supported) */
+                collection_type?: "list" | "list:paired" | "list:list" | "list:list:paired" | "list:paired_or_unpaired";
+                /** @description Filename of the workbook download to generate */
+                filename?: string | null;
+            };
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request Error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+            /** @description Server Error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageExceptionModel"];
+                };
+            };
+        };
+    };
+    tools__fetch_workbook_parse: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+                "run-as"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParseFetchWorkbook"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json":
+                        | components["schemas"]["ParsedFetchWorkbookForDatasets"]
+                        | components["schemas"]["ParsedFetchWorkbookForCollections"];
                 };
             };
             /** @description Request Error */
@@ -39254,7 +41066,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RootModel_Dict_str__int__"];
+                    "application/json": components["schemas"]["RootModel_dict_str__int__"];
                 };
             };
             /** @description Request Error */

@@ -817,7 +817,7 @@ execution:
       function: map_tool_to_destination
       rules_module: tpv.rules
       tpv_config_files:
-        - https://gxy.io/tpv/db.yml
+        - https://gxy.io/tpv/db-latest.yml
         # - config/tpv_rules_local.yml
 
     docker_dispatch:
@@ -1069,7 +1069,7 @@ tools:
 - id: bowtie
   handler: handler1
 - id: bar
-  enviroment: dynamic
+  environment: dynamic
 -
   # Next example defines resource group to insert into tool interface
   # and pass to dynamic destination (as resource_params argument).

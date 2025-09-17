@@ -4,6 +4,7 @@
             <GLink class="refactor-button" @click="onRefactor"> Try to automatically fix issues. </GLink>
         </template>
         <LintSection
+            data-description="linting has annotation"
             :okay="checkAnnotation"
             success-message="This workflow has a short description. Ideally, this helps the executors of the workflow
                     understand the purpose and usage of the workflow."
@@ -23,18 +24,21 @@
             attribute-link="Provide Readme for your Workflow."
             @onClick="onAttributes('readme')" />
         <LintSection
+            data-description="linting has creator"
             :okay="checkCreator"
             success-message="This workflow defines creator information."
             :warning-message="bestPracticeWarningCreator"
             attribute-link="Provide Creator Details."
             @onClick="onAttributes('creator')" />
         <LintSection
+            data-description="linting has license"
             :okay="checkLicense"
             success-message="This workflow defines a license."
             :warning-message="bestPracticeWarningLicense"
             attribute-link="Specify a License."
             @onClick="onAttributes('license')" />
         <LintSection
+            data-description="linting formal inputs"
             success-message="Workflow parameters are using formal input parameters."
             warning-message="This workflow uses legacy workflow parameters. They should be replaced with
                 formal workflow inputs. Formal input parameters make tracking workflow provenance, usage within subworkflows,
@@ -44,6 +48,7 @@
             @onMouseLeave="onUnhighlight"
             @onClick="onFixUntypedParameter" />
         <LintSection
+            data-description="linting connected"
             success-message="All non-optional inputs to workflow steps are connected to formal input parameters."
             warning-message="Some non-optional inputs are not connected to formal workflow inputs. Formal input parameters
                 make tracking workflow provenance, usage within subworkflows, and executing the workflow via the API more robust:"
@@ -52,6 +57,7 @@
             @onMouseLeave="onUnhighlight"
             @onClick="onFixDisconnectedInput" />
         <LintSection
+            data-description="linting input metadata"
             success-message="All workflow inputs have labels and annotations."
             warning-message="Some workflow inputs are missing labels and/or annotations:"
             :warning-items="warningMissingMetadata"
@@ -59,6 +65,7 @@
             @onMouseLeave="onUnhighlight"
             @onClick="openAndFocus" />
         <LintSection
+            data-description="linting output labels"
             success-message="This workflow has outputs and they all have valid labels."
             warning-message="The following workflow outputs have no labels, they should be assigned a useful label or
                     unchecked in the workflow editor to mark them as no longer being a workflow output:"
@@ -228,7 +235,7 @@ export default {
         onFixUntypedParameter(item) {
             if (
                 confirm(
-                    "This issue can be fixed automatically by creating an explicit parameter input step. Do you want to proceed?"
+                    "This issue can be fixed automatically by creating an explicit parameter input step. Do you want to proceed?",
                 )
             ) {
                 this.$emit("onRefactor", [fixUntypedParameter(item)]);
@@ -239,7 +246,7 @@ export default {
         onFixDisconnectedInput(item) {
             if (
                 confirm(
-                    "This issue can be fixed automatically by creating an explicit data input step. Do you want to proceed?"
+                    "This issue can be fixed automatically by creating an explicit data input step. Do you want to proceed?",
                 )
             ) {
                 this.$emit("onRefactor", [fixDisconnectedInput(item)]);
@@ -250,7 +257,7 @@ export default {
         onFixUnlabeledOutputs(item) {
             if (
                 confirm(
-                    "This issue can be fixed automatically by removing all unlabeled workflow output. Do you want to proceed?"
+                    "This issue can be fixed automatically by removing all unlabeled workflow output. Do you want to proceed?",
                 )
             ) {
                 this.$emit("onRefactor", [fixUnlabeledOutputs()]);

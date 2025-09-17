@@ -6,8 +6,6 @@ import zipfile
 from io import BytesIO
 from typing import (
     Any,
-    Dict,
-    List,
     Optional,
 )
 from uuid import uuid4
@@ -23,6 +21,8 @@ from galaxy.util import galaxy_root_path
 from galaxy.util.unittest_utils import skip_if_github_down
 from galaxy_test.base import rules_test_data
 from galaxy_test.base.api_asserts import (
+    assert_error_code_is,
+    assert_file_looks_like_xlsx,
     assert_has_keys,
     assert_status_code_is,
 )
@@ -411,6 +411,10 @@ class TestToolsApi(ApiTestCase, TestsTools):
                 history_id, dataset=rval["outputs"][2]
             )
             assert sanitized_address.strip() == cool_name_without_quote
+
+    def test_fetch_workbook_generate(self):
+        workbook_path = self.dataset_populator.download_fetch_workbook()
+        assert_file_looks_like_xlsx(workbook_path)
 
     @skip_without_tool("composite_output")
     def test_test_data_filepath_security(self):
@@ -863,7 +867,7 @@ class TestToolsApi(ApiTestCase, TestsTools):
         filtered_hdca = self.dataset_populator.get_history_collection_details(history_id, hid=filtered_hid, wait=False)
         return filtered_hdca
 
-    def _apply_rules_and_check(self, example: Dict[str, Any]) -> None:
+    def _apply_rules_and_check(self, example: dict[str, Any]) -> None:
         with self.dataset_populator.test_history(require_new=False) as history_id:
             inputs = stage_rules_example(self.galaxy_interactor, history_id, example)
             hdca = inputs["input"]
@@ -875,6 +879,55 @@ class TestToolsApi(ApiTestCase, TestsTools):
             output_hid = output_collections[0]["hid"]
             output_hdca = self.dataset_populator.get_history_collection_details(history_id, hid=output_hid, wait=False)
             example["check"](output_hdca, self.dataset_populator)
+
+    def test_apply_rules_with_error_in_mapping(self):
+        # this would produce a list:paired but the child identifiers are incorrectly spelled
+        example_with_mapping_error = {
+            "rules": {
+                "rules": [
+                    {
+                        "type": "add_column_metadata",
+                        "value": "identifier0",
+                    },
+                    {
+                        "type": "add_column_metadata",
+                        "value": "identifier1",
+                    },
+                ],
+                "mapping": [
+                    {
+                        "type": "list_identifiers",
+                        "columns": [0],
+                    },
+                    {
+                        "type": "paired_identifier",
+                        "columns": [1],
+                    },
+                ],
+            },
+            "test_data": {
+                "type": "list:list",
+                "elements": [
+                    {
+                        "identifier": "sample1",
+                        "elements": [
+                            {"identifier": "floorward", "class": "File", "contents": "TestData123forward"},
+                            {"identifier": "reverb", "class": "File", "contents": "TestData123reverse"},
+                        ],
+                    },
+                ],
+            },
+        }
+        with self.dataset_populator.test_history(require_new=False) as history_id:
+            inputs = stage_rules_example(self.galaxy_interactor, history_id, example_with_mapping_error)
+            hdca = inputs["input"]
+            inputs = {"input": {"src": "hdca", "id": hdca["id"]}, "rules": example_with_mapping_error["rules"]}
+
+            self.dataset_populator.wait_for_history(history_id)
+            response = self._run("__APPLY_RULES__", history_id, inputs, assert_ok=False)
+            assert_status_code_is(response, 400)
+            assert_error_code_is(response, 400008)
+            assert "Unknown indicator of paired status encountered (floorward)" in response.json()["err_msg"]
 
     def test_apply_rules_flatten_paired_unpaired(self):
         self._apply_rules_and_check(rules_test_data.EXAMPLE_FLATTEN_PAIRED_OR_UNPAIRED)
@@ -897,8 +950,17 @@ class TestToolsApi(ApiTestCase, TestsTools):
     def test_apply_rules_6(self):
         self._apply_rules_and_check(rules_test_data.EXAMPLE_6)
 
+    def test_apply_rules_create_paired_or_unpaired_list(self):
+        self._apply_rules_and_check(rules_test_data.EXAMPLE_CREATE_PAIRED_OR_UNPAIRED_COLLECTION)
+
     def test_apply_rules_flatten_with_indices(self):
         self._apply_rules_and_check(rules_test_data.EXAMPLE_FLATTEN_USING_INDICES)
+
+    def test_apply_rules_nested_list_from_sample_sheet(self):
+        self._apply_rules_and_check(rules_test_data.EXAMPLE_SAMPLE_SHEET_SIMPLE_TO_NESTED_LIST)
+
+    def test_apply_rules_nested_list_of_pairs_from_sample_sheet(self):
+        self._apply_rules_and_check(rules_test_data.EXAMPLE_SAMPLE_SHEET_SIMPLE_TO_NESTED_LIST_OF_PAIRS)
 
     @skip_without_tool("galaxy_json_sleep")
     def test_dataset_hidden_after_job_finish(self):
@@ -926,7 +988,7 @@ class TestToolsApi(ApiTestCase, TestsTools):
         # tool test framework filling in a default. Creating a raw request here
         # verifies that currently select parameters don't require a selection.
         with self.dataset_populator.test_history(require_new=False) as history_id:
-            inputs: Dict[str, Any] = {}
+            inputs: dict[str, Any] = {}
             response = self._run("gx_drill_down_exact", history_id, inputs, assert_ok=False)
             self._assert_status_code_is(response, 400)
             assert "an invalid option" in response.text
@@ -1912,7 +1974,7 @@ class TestToolsApi(ApiTestCase, TestsTools):
         def register_job_data(job_data):
             job_data_list.append(job_data)
 
-        def tool_test_case_list(inputs, required_files) -> List[ValidToolTestDict]:
+        def tool_test_case_list(inputs, required_files) -> list[ValidToolTestDict]:
             return [
                 {
                     "inputs": inputs,
@@ -2861,6 +2923,71 @@ class TestToolsApi(ApiTestCase, TestsTools):
         output = outputs[0]
         output_content = self.dataset_populator.get_history_dataset_content(history_id, dataset=output)
         assert output_content.strip() == "123\n456\n456\n0ab"
+
+    @skip_without_tool("cat1")
+    def test_run_deferred_dataset(self, history_id):
+        details = self.dataset_populator.create_deferred_hda(
+            history_id, "https://raw.githubusercontent.com/galaxyproject/galaxy/dev/test-data/1.bed", ext="bed"
+        )
+        inputs = {
+            "input1": dataset_to_param(details),
+        }
+        outputs = self._cat1_outputs(history_id, inputs=inputs)
+        output = outputs[0]
+        details = self.dataset_populator.get_history_dataset_details(
+            history_id, dataset=output, wait=True, assert_ok=True
+        )
+        assert details["state"] == "ok"
+        output_content = self.dataset_populator.get_history_dataset_content(history_id, dataset=output)
+        assert output_content.startswith("chr1	147962192	147962580	CCDS989.1_cds_0_0_chr1_147962193_r	0	-")
+
+    @skip_without_tool("cat1")
+    def test_run_deferred_dataset_cached(self, history_id):
+        content = uuid4().hex
+        details = self.dataset_populator.create_deferred_hda_with_hash(history_id, content)
+        self.dataset_populator.materialize_dataset_instance(history_id, id=details["id"])
+        self.dataset_populator.wait_on_history_length(history_id, wait_on_history_length=2)
+        materialized = self.dataset_populator.get_history_dataset_details(
+            history_id, hid=2, assert_ok=False, wait=False
+        )
+        inputs = {
+            "input1": dataset_to_param(materialized),
+        }
+        # Attempt reusing job, but dataset never materialized before
+        response = self._run_cat1(history_id, inputs, wait_for_job=True, use_cached_job=True).json()
+        job_details = self.dataset_populator.get_job_details(response["jobs"][0]["id"], full=True).json()
+        assert job_details["state"] == "ok"
+        assert not job_details["copied_from_job_id"]
+        # new upload, same content
+        new_dataset = self.dataset_populator.create_deferred_hda_with_hash(history_id, content)
+        self.dataset_populator.materialize_dataset_instance(history_id, id=new_dataset["id"])
+        self.dataset_populator.wait_on_history_length(history_id, wait_on_history_length=5)
+        new_materialized_dataset = self.dataset_populator.get_history_dataset_details(
+            history_id, hid=5, assert_ok=False, wait=False
+        )
+        inputs = {
+            "input1": dataset_to_param(new_materialized_dataset),
+        }
+        # Attempt reusing job, dataset materialized before, so cache should kick in
+        response = self._run_cat1(history_id, inputs, wait_for_job=True, use_cached_job=True).json()
+        new_job_details = self.dataset_populator.get_job_details(response["jobs"][0]["id"], full=True).json()
+        assert new_job_details["state"] == "ok"
+        assert new_job_details["copied_from_job_id"] == job_details["id"]
+
+    @skip_without_tool("metadata_bam")
+    def test_run_deferred_dataset_with_metadata_options_filter(self, history_id):
+        details = self.dataset_populator.create_deferred_hda(
+            history_id, "https://raw.githubusercontent.com/galaxyproject/galaxy/dev/test-data/1.bam", ext="bam"
+        )
+        inputs = {"input_bam": dataset_to_param(details), "ref_names": "chrM"}
+        run_response = self.dataset_populator.run_tool(tool_id="metadata_bam", inputs=inputs, history_id=history_id)
+        output = run_response["outputs"][0]
+        output_details = self.dataset_populator.get_history_dataset_details(
+            history_id, dataset=output, wait=True, assert_ok=True
+        )
+        assert output_details["state"] == "ok"
+        output_content = self.dataset_populator.get_history_dataset_content(history_id, dataset=output)
+        assert output_content.startswith("chrM")
 
     @skip_without_tool("pileup")
     def test_metadata_validator_on_deferred_input(self, history_id):
