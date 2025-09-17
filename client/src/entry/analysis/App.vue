@@ -3,14 +3,14 @@
         <div id="everything">
             <div id="background" />
             <template v-if="!embedded">
-                <!-- <Masthead
+                <Masthead
                     v-if="showMasthead"
                     id="masthead"
                     :brand="config.brand"
                     :logo-url="config.logo_url"
                     :logo-src="theme?.['--masthead-logo-img'] ?? config.logo_src"
                     :logo-src-secondary="theme?.['--masthead-logo-img-secondary'] ?? config.logo_src_secondary"
-                    :window-tab="windowTab" /> -->
+                    :window-tab="windowTab" />
                 <Alert
                     v-if="config.message_box_visible && config.message_box_content"
                     id="messagebox"
@@ -42,7 +42,6 @@
             <UploadModal ref="uploadModal" />
             <BroadcastsOverlay />
             <DragGhost />
-            <TourRunner v-if="currentTour?.id" :key="currentTour.id" :tour-id="currentTour.id" />
         </template>
     </div>
 </template>
@@ -66,13 +65,11 @@ import { useRouteQueryBool } from "@/composables/route";
 import { useEntryPointStore } from "@/stores/entryPointStore";
 import { useHistoryStore } from "@/stores/historyStore";
 import { useNotificationsStore } from "@/stores/notificationsStore";
-import { useTourStore } from "@/stores/tourStore";
 import { useUserStore } from "@/stores/userStore";
 
 import Alert from "@/components/Alert.vue";
 import DragGhost from "@/components/DragGhost.vue";
 import BroadcastsOverlay from "@/components/Notifications/Broadcasts/BroadcastsOverlay.vue";
-import TourRunner from "@/components/Tour/TourRunner.vue";
 import Masthead from "components/Masthead/Masthead.vue";
 import UploadModal from "components/Upload/UploadModal.vue";
 
@@ -85,15 +82,11 @@ export default {
         ConfirmDialog,
         UploadModal,
         BroadcastsOverlay,
-        TourRunner,
     },
     directives: {
         short,
     },
     setup() {
-        const tourStore = useTourStore();
-        const { currentTour } = storeToRefs(tourStore);
-
         const userStore = useUserStore();
         const { currentTheme } = storeToRefs(userStore);
         const { currentHistory } = storeToRefs(useHistoryStore());
@@ -118,7 +111,7 @@ export default {
                     userStore.loadUser();
                 }
             },
-            { immediate: true },
+            { immediate: true }
         );
 
         const confirmation = ref(null);
@@ -131,13 +124,7 @@ export default {
                 if (confirmation.value) {
                     confirmation.value = null;
                 }
-
-                // if we are on a tour route, start a tour if it wasn't already started or change tours
-                if ("tourId" in route.params && route.params.tourId && route.params.tourId !== currentTour.value?.id) {
-                    tourStore.setTour(route.params.tourId);
-                }
-            },
-            { immediate: true },
+            }
         );
 
         return {
@@ -148,7 +135,6 @@ export default {
             currentTheme,
             currentHistory,
             embedded,
-            currentTour,
         };
     },
     data() {

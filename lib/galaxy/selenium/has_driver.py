@@ -7,7 +7,10 @@ attribute.
 import abc
 import threading
 from typing import (
+    Dict,
+    List,
     Optional,
+    Type,
     Union,
 )
 
@@ -36,7 +39,7 @@ UNSPECIFIED_TIMEOUT = object()
 
 HasFindElement = Union[WebDriver, WebElement]
 DEFAULT_AXE_SCRIPT_URL = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.7.1/axe.min.js"
-AXE_SCRIPT_HASH: dict[str, str] = {}
+AXE_SCRIPT_HASH: Dict[str, str] = {}
 AXE_SCRIPT_HASH_LOCK = threading.Lock()
 
 
@@ -50,8 +53,8 @@ def get_axe_script(script_url: str) -> str:
 
 
 class HasDriver:
-    by: type[By] = By
-    keys: type[Keys] = Keys
+    by: Type[By] = By
+    keys: Type[Keys] = Keys
     driver: WebDriver
     axe_script_url: str = DEFAULT_AXE_SCRIPT_URL
     axe_skip: bool = False
@@ -97,7 +100,7 @@ class HasDriver:
     def assert_selector_absent(self, selector: str):
         assert len(self.driver.find_elements(By.CSS_SELECTOR, selector)) == 0
 
-    def find_elements(self, selector_template: Target) -> list[WebElement]:
+    def find_elements(self, selector_template: Target) -> List[WebElement]:
         return self.driver.find_elements(*selector_template.element_locator)
 
     def assert_absent(self, selector_template: Target) -> None:

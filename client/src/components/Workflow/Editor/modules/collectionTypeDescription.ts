@@ -120,6 +120,9 @@ export class CollectionTypeDescription implements CollectionTypeDescriptor {
             if (other.collectionType.endsWith(":paired_or_unpaired")) {
                 return !this.collectionType.endsWith(":paired");
             }
+            if (this.rank == other.rank) {
+                console.log("skipping over this because may be equal rank...");
+            }
             // Cannot map over self...
             return false;
         }
@@ -157,7 +160,7 @@ export class CollectionTypeDescription implements CollectionTypeDescriptor {
                         return new CollectionTypeDescription(thisCollectionType);
                     }
                     return new CollectionTypeDescription(
-                        thisCollectionType.substring(0, thisCollectionType.lastIndexOf(":")),
+                        thisCollectionType.substring(0, thisCollectionType.lastIndexOf(":"))
                     );
                 } else if (thisCollectionType.endsWith(":paired") || thisCollectionType.endsWith(":list")) {
                     // otherCollectionType endswith :paired_or_unpaired
@@ -167,7 +170,7 @@ export class CollectionTypeDescription implements CollectionTypeDescriptor {
                         currentOther = currentOther.substring(0, currentOther.lastIndexOf(":"));
                         currentCollectionType = currentCollectionType.substring(
                             0,
-                            currentCollectionType.lastIndexOf(":"),
+                            currentCollectionType.lastIndexOf(":")
                         );
                     }
                     // and strip the last rank off for the remaining currentOther if
@@ -175,7 +178,7 @@ export class CollectionTypeDescription implements CollectionTypeDescriptor {
                     if (thisCollectionType.endsWith(":paired")) {
                         currentCollectionType = currentCollectionType.substring(
                             0,
-                            currentCollectionType.lastIndexOf(":"),
+                            currentCollectionType.lastIndexOf(":")
                         );
                     } else {
                         // this was a list so paired_or_unpaired will consume the datasets of the
@@ -186,7 +189,7 @@ export class CollectionTypeDescription implements CollectionTypeDescriptor {
             }
             const effectiveCollectionType = thisCollectionType.substring(
                 0,
-                thisCollectionType.length - otherCollectionType.length - 1,
+                thisCollectionType.length - otherCollectionType.length - 1
             );
             return new CollectionTypeDescription(effectiveCollectionType);
         }
@@ -206,8 +209,7 @@ export class CollectionTypeDescription implements CollectionTypeDescriptor {
     }
 }
 
-const collectionTypeRegex =
-    /^((list|paired|paired_or_unpaired|record)(:(list|paired|paired_or_unpaired|record))*|sample_sheet|sample_sheet:paired|sample_sheet:record|sample_sheet:paired_or_unpaired)$/;
+const collectionTypeRegex = /^(list|paired|record)(:(list|paired|record))*$/;
 
 export function isValidCollectionTypeStr(collectionType: string | undefined) {
     if (collectionType) {

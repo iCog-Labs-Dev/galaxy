@@ -1,11 +1,14 @@
 import os
 import re
+import sys
 from typing import (
     Any,
     List,
     Optional,
     Tuple,
 )
+
+import pytest
 
 from galaxy.tool_util.model_factory import parse_tool
 from galaxy.tool_util.parameters import (
@@ -78,6 +81,10 @@ TEST_TOOL_THAT_DO_NOT_VALIDATE = (
 )
 
 MOCK_ID = "thisisafakeid"
+
+
+if sys.version_info < (3, 8):  # noqa: UP036
+    pytest.skip(reason="Pydantic tool parameter models require python3.8 or higher", allow_module_level=True)
 
 
 def test_parameter_test_cases_validate():

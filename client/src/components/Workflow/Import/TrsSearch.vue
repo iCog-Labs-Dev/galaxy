@@ -65,7 +65,7 @@ watch(query, async () => {
 
         try {
             const response = await axios.get(
-                withPrefix(`/api/trs_search?query=${query.value}&trs_server=${trsServer.value}`),
+                withPrefix(`/api/trs_search?query=${query.value}&trs_server=${trsServer.value}`)
             );
             results.value = response.data;
         } catch (e) {

@@ -127,7 +127,7 @@ watchImmediate(
         resetWorkflows();
         fetchKey = filterText.value;
         load();
-    },
+    }
 );
 
 watch(
@@ -136,7 +136,7 @@ watch(
         if (arrived.bottom) {
             load();
         }
-    },
+    }
 );
 
 function scrollToTop() {
@@ -178,7 +178,6 @@ function createNew(event: Event) {
                 :filterable="false"
                 :current-workflow-id="props.currentWorkflowId"
                 editor-view
-                compact
                 @insertWorkflow="(...args) => emit('insertWorkflow', ...args)"
                 @insertWorkflowSteps="(...args) => emit('insertWorkflowSteps', ...args)"
                 @refreshList="refresh" />

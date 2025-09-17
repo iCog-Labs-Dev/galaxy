@@ -14,7 +14,6 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import { computed } from "vue";
 
 import type { UserNotification } from "@/api/notifications";
-import type { CardAction } from "@/components/Common/GCard.types";
 import { useMarkdown } from "@/composables/markdown";
 import { useNotificationsStore } from "@/stores/notificationsStore";
 import { absPath } from "@/utils/redirect";
@@ -68,7 +67,7 @@ const notificationVariant = computed(() => {
 });
 
 const primaryActions = computed(() => {
-    const tmp: CardAction[] = [
+    const tmp = [
         {
             id: "expiration-time-button",
             label: "",
@@ -77,7 +76,7 @@ const primaryActions = computed(() => {
                       parseISO(props.notification.expiration_time),
                       {
                           addSuffix: true,
-                      },
+                      }
                   )}`
                 : "This notification will never be automatically deleted",
             icon: faHourglassHalf,

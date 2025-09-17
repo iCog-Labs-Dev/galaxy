@@ -6,8 +6,8 @@ API operations on a history.
 
 import logging
 from typing import (
-    Annotated,
     Any,
+    List,
     Literal,
     Optional,
     Union,
@@ -24,6 +24,7 @@ from fastapi import (
 )
 from pydantic.fields import Field
 from pydantic.main import BaseModel
+from typing_extensions import Annotated
 
 from galaxy.managers.context import (
     ProvidesHistoryContext,
@@ -151,14 +152,14 @@ class DeleteHistoryPayload(BaseModel):
 
 
 class DeleteHistoriesPayload(BaseModel):
-    ids: Annotated[list[DecodedDatabaseIdField], Field(title="IDs", description="List of history IDs to be deleted.")]
+    ids: Annotated[List[DecodedDatabaseIdField], Field(title="IDs", description="List of history IDs to be deleted.")]
     purge: Annotated[
         bool, Field(default=False, title="Purge", description="Whether to definitely remove this history from disk.")
     ]
 
 
 class UndeleteHistoriesPayload(BaseModel):
-    ids: Annotated[list[DecodedDatabaseIdField], Field(title="IDs", description="List of history IDs to be undeleted.")]
+    ids: Annotated[List[DecodedDatabaseIdField], Field(title="IDs", description="List of history IDs to be undeleted.")]
 
 
 @as_form
@@ -207,7 +208,7 @@ class FastAPIHistories:
             description="Whether to return only deleted items.",
             deprecated=True,  # Marked as deprecated as it seems just like '/api/histories/deleted'
         ),
-    ) -> list[AnyHistoryView]:
+    ) -> List[AnyHistoryView]:
         if search is None:
             return self.service.index(
                 trans, serialization_params, filter_query_params, deleted_only=deleted, all_histories=all
@@ -251,7 +252,7 @@ class FastAPIHistories:
         filter_query_params: FilterQueryParams = Depends(get_filter_query_params),
         serialization_params: SerializationParams = Depends(query_serialization_params),
         all: Optional[bool] = AllHistoriesQueryParam,
-    ) -> list[AnyHistoryView]:
+    ) -> List[AnyHistoryView]:
         return self.service.index(
             trans, serialization_params, filter_query_params, deleted_only=True, all_histories=all
         )
@@ -266,7 +267,7 @@ class FastAPIHistories:
         trans: ProvidesHistoryContext = DependsOnTrans,
         filter_query_params: FilterQueryParams = Depends(get_filter_query_params),
         serialization_params: SerializationParams = Depends(query_serialization_params),
-    ) -> list[AnyHistoryView]:
+    ) -> List[AnyHistoryView]:
         return self.service.published(trans, serialization_params, filter_query_params)
 
     @router.get(
@@ -279,7 +280,7 @@ class FastAPIHistories:
         trans: ProvidesHistoryContext = DependsOnTrans,
         filter_query_params: FilterQueryParams = Depends(get_filter_query_params),
         serialization_params: SerializationParams = Depends(query_serialization_params),
-    ) -> list[AnyHistoryView]:
+    ) -> List[AnyHistoryView]:
         return self.service.shared_with_me(trans, serialization_params, filter_query_params)
 
     @router.get(
@@ -293,7 +294,7 @@ class FastAPIHistories:
         trans: ProvidesHistoryContext = DependsOnTrans,
         serialization_params: SerializationParams = Depends(query_serialization_params),
         filter_query_params: FilterQueryParams = Depends(get_filter_query_params),
-    ) -> list[AnyArchivedHistoryView]:
+    ) -> List[AnyArchivedHistoryView]:
         """Get a list of all archived histories for the current user.
 
         Archived histories are histories are not part of the active histories of the user but they can be accessed using this endpoint.
@@ -370,7 +371,7 @@ class FastAPIHistories:
         self,
         history_id: HistoryIDPathParam,
         trans: ProvidesHistoryContext = DependsOnTrans,
-    ) -> list[Any]:
+    ) -> List[Any]:
         return self.service.citations(trans, history_id)
 
     @router.post(
@@ -424,7 +425,7 @@ class FastAPIHistories:
         serialization_params: SerializationParams = Depends(query_serialization_params),
         purge: bool = Query(default=False),
         payload: DeleteHistoriesPayload = Body(...),
-    ) -> list[AnyHistoryView]:
+    ) -> List[AnyHistoryView]:
         if payload:
             purge = payload.purge
         results = []
@@ -456,7 +457,7 @@ class FastAPIHistories:
         trans: ProvidesHistoryContext = DependsOnTrans,
         serialization_params: SerializationParams = Depends(query_serialization_params),
         payload: UndeleteHistoriesPayload = Body(...),
-    ) -> list[AnyHistoryView]:
+    ) -> List[AnyHistoryView]:
         results = []
         for history_id in payload.ids:
             result = self.service.undelete(trans, history_id, serialization_params)

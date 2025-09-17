@@ -5,12 +5,7 @@ import flushPromises from "flush-promises";
 import { setActivePinia } from "pinia";
 import VueRouter from "vue-router";
 
-import { useServerMock } from "@/api/client/__mocks__";
-import { testDatatypesMapper } from "@/components/Datatypes/test_fixtures";
-
 import DatasetView from "./DatasetView.vue";
-
-const { server, http } = useServerMock();
 
 // Mock the datatypeVisualizationsStore
 jest.mock("@/stores/datatypeVisualizationsStore", () => ({
@@ -52,40 +47,23 @@ const pausedDataset = { ...mockDataset, state: "paused" };
 // Dataset with preferred visualization
 const h5Dataset = { ...mockDataset, file_ext: "h5" };
 
-function setupPinia(datasetStore) {
+/**
+ * Mount the DatasetView component with the specified tab and dataset options
+ */
+async function mountDatasetView(tab = "preview", options = {}) {
     const pinia = createTestingPinia({
         initialState: {
-            datasetStore: datasetStore,
-            datatypeStore: {
-                datatypeDetails: {
-                    txt: {
-                        id: "txt",
-                        name: "Text",
-                        display_type: "txt",
-                    },
+            datasetStore: {
+                storedDatasets: {
+                    [DATASET_ID]: options.dataset || mockDataset,
                 },
-            },
-            datatypesMapperStore: {
-                datatypesMapper: testDatatypesMapper,
+                loadingDatasets: {},
             },
         },
         stubActions: false,
         createSpy: jest.fn,
     });
     setActivePinia(pinia);
-    return pinia;
-}
-
-/**
- * Mount the DatasetView component with the specified tab and dataset options
- */
-async function mountDatasetView(tab = "preview", options = {}) {
-    const datasetStore = {
-        storedDatasets: {
-            [DATASET_ID]: options.dataset || mockDataset,
-        },
-    };
-    const pinia = setupPinia(datasetStore);
 
     const router = new VueRouter();
     router.push = jest.fn();
@@ -146,10 +124,19 @@ async function mountDatasetView(tab = "preview", options = {}) {
  * Mount the DatasetView component in loading state
  */
 async function mountLoadingDatasetView() {
-    const datasetStore = {
-        storedDatasets: {},
-    };
-    const pinia = setupPinia(datasetStore);
+    const pinia = createTestingPinia({
+        initialState: {
+            datasetStore: {
+                storedDatasets: {},
+                loadingDatasets: {
+                    [DATASET_ID]: true,
+                },
+            },
+        },
+        stubActions: false,
+        createSpy: jest.fn,
+    });
+    setActivePinia(pinia);
 
     const router = new VueRouter();
     router.push = jest.fn();
@@ -182,14 +169,6 @@ async function mountLoadingDatasetView() {
 }
 
 describe("DatasetView", () => {
-    beforeEach(() => {
-        server.use(
-            http.get("/api/datasets/:dataset_id", ({ response }) => {
-                return response(200).json(mockDataset);
-            }),
-        );
-    });
-
     describe("Component mounting and basic functionality", () => {
         it("mounts with correct props", async () => {
             const wrapper = await mountDatasetView();

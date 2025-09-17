@@ -1,5 +1,5 @@
 <template>
-    <div class="mb-2" :data-lint-status="isOkay ? 'ok' : 'warning'">
+    <div class="mb-2">
         <div v-if="isOkay">
             <FontAwesomeIcon icon="check" class="text-success" />
             <span>{{ successMessage }}</span>
@@ -16,12 +16,7 @@
                     @mouseover="onMouseOver(item)"
                     @focusout="onMouseLeave(item)"
                     @mouseleave="onMouseLeave(item)">
-                    <a
-                        href="#"
-                        class="scrolls"
-                        :data-item-index="idx"
-                        v-bind="dataAttributes(item)"
-                        @click="onClick(item)">
+                    <a href="#" class="scrolls" @click="onClick(item)">
                         <FontAwesomeIcon v-if="item.autofix" icon="magic" class="mr-1" />
                         <FontAwesomeIcon v-else icon="search" class="mr-1" />
                         {{ item.stepLabel }}: {{ item.warningLabel }}
@@ -41,8 +36,6 @@ import { faCheck, faExclamationTriangle, faMagic, faPencilAlt, faSearch } from "
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import BootstrapVue from "bootstrap-vue";
 import Vue from "vue";
-
-import { dataAttributes } from "./modules/linting";
 
 Vue.use(BootstrapVue);
 
@@ -87,7 +80,6 @@ export default {
         },
     },
     methods: {
-        dataAttributes: dataAttributes,
         onMouseOver(id) {
             this.$emit("onMouseOver", id);
         },

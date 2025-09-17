@@ -10,13 +10,16 @@ import os
 import random
 import re
 import sys
-from collections.abc import Iterator
 from contextlib import contextmanager
 from json import loads
 from typing import (
     Any,
+    Dict,
     IO,
+    Iterator,
+    List,
     Optional,
+    Tuple,
     Union,
 )
 
@@ -54,7 +57,7 @@ IntWebParam = Union[str, int]
 # Can be removed once https://github.com/pysam-developers/pysam/issues/939 is resolved.
 pysam.set_verbosity(0)
 
-PAYLOAD_LIST_TYPE = list[Optional[Union[str, int, float, list[tuple[int, int]]]]]
+PAYLOAD_LIST_TYPE = List[Optional[Union[str, int, float, List[Tuple[int, int]]]]]
 
 
 def float_nan(n):
@@ -174,7 +177,7 @@ class GenomeDataProvider(BaseDataProvider):
     # filters. Key is column name, value is a dict with mandatory key 'index'
     # and optional key 'name'. E.g. this defines column 4:
     # col_name_data_attr_mapping = {4 : { index: 5, name: 'Score' } }
-    col_name_data_attr_mapping: dict[Union[str, int], dict] = {}
+    col_name_data_attr_mapping: Dict[Union[str, int], Dict] = {}
 
     def __init__(
         self,
@@ -358,7 +361,7 @@ class TabixDataProvider(GenomeDataProvider, FilterableMixin):
 
     dataset_type = "tabix"
 
-    col_name_data_attr_mapping: dict[Union[str, int], dict] = {4: {"index": 4, "name": "Score"}}
+    col_name_data_attr_mapping: Dict[Union[str, int], Dict] = {4: {"index": 4, "name": "Score"}}
 
     @contextmanager
     def open_data_file(self):
@@ -622,7 +625,7 @@ class VcfDataProvider(GenomeDataProvider):
 
     """
 
-    col_name_data_attr_mapping: dict[Union[str, int], dict] = {"Qual": {"index": 6, "name": "Qual"}}
+    col_name_data_attr_mapping: Dict[Union[str, int], Dict] = {"Qual": {"index": 6, "name": "Qual"}}
 
     dataset_type = "variant"
 
@@ -700,7 +703,7 @@ class VcfDataProvider(GenomeDataProvider):
 
             if samples_data:
                 # Process and pack samples' genotype and count alleles across samples.
-                alleles_seen: dict[int, bool] = {}
+                alleles_seen: Dict[int, bool] = {}
                 has_alleles = False
 
                 for sample in samples_data:
@@ -760,21 +763,22 @@ class RawVcfDataProvider(VcfDataProvider):
         with open(self.original_dataset.get_file_name()) as f:
             yield f
 
-    def get_iterator(self, data_file, chrom, start, end, **kwargs) -> Iterator[str]:
+    def get_iterator(self, data_file, chrom, start, end, **kwargs):
         # Skip comments.
-        line: Optional[str] = None
+        line = None
         for line in data_file:
             if not line.startswith("#"):
                 break
 
         # If last line is a comment, there are no data lines.
-        if not line or line.startswith("#"):
-            return iter([])
+        if line.startswith("#"):
+            return []
 
         # Match chrom naming format.
-        dataset_chrom = line.split()[0]
-        if not _chrom_naming_matches(chrom, dataset_chrom):
-            chrom = _convert_between_ucsc_and_ensemble_naming(chrom)
+        if line:
+            dataset_chrom = line.split()[0]
+            if not _chrom_naming_matches(chrom, dataset_chrom):
+                chrom = _convert_between_ucsc_and_ensemble_naming(chrom)
 
         def line_in_region(vcf_line, chrom, start, end):
             """Returns true if line is in region."""
@@ -943,7 +947,7 @@ class BamDataProvider(GenomeDataProvider, FilterableMixin):
         # Encode reads as list of lists.
         #
         results = []
-        paired_pending: dict[str, dict[str, Any]] = {}
+        paired_pending: Dict[str, Dict[str, Any]] = {}
         unmapped = 0
         message = None
         count = 0
@@ -1107,7 +1111,7 @@ class BBIDataProvider(GenomeDataProvider):
     dataset_type = "bigwig"
 
     @abc.abstractmethod
-    def _get_dataset(self) -> tuple[IO[bytes], Union[BigBedFile, BigWigFile]]: ...
+    def _get_dataset(self) -> Tuple[IO[bytes], Union[BigBedFile, BigWigFile]]: ...
 
     def valid_chroms(self):
         # No way to return this info as of now
@@ -1383,12 +1387,12 @@ class GtfTabixDataProvider(TabixDataProvider):
         # TODO: extend this code or use code in gff_util to process GFF/3 as well
         # and then create a generic GFFDataProvider that can be used with both
         # raw and tabix datasets.
-        features: dict[str, list[GFFInterval]] = {}
+        features: Dict[str, List[GFFInterval]] = {}
 
         for line in iterator:
             line_attrs = parse_gff_attributes(line.split("\t")[8])
             transcript_id = line_attrs["transcript_id"]
-            feature_list: list[GFFInterval]
+            feature_list: List[GFFInterval]
             if transcript_id in features:
                 feature_list = features[transcript_id]
             else:

@@ -478,8 +478,7 @@ class RucioObjectStore(CachingConcreteObjectStore):
         arg_user = kwargs.get("user", None)
         try:
             if not arg_user:
-                trans = kwargs.get("trans")
-                assert trans
+                trans = kwargs.get("trans", None)
                 user = trans.user
             else:
                 user = arg_user

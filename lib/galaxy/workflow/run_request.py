@@ -3,6 +3,8 @@ import logging
 import uuid
 from typing import (
     Any,
+    Dict,
+    List,
     Optional,
     TYPE_CHECKING,
     Union,
@@ -79,18 +81,18 @@ class WorkflowRunConfig:
     def __init__(
         self,
         target_history: "History",
-        replacement_dict: Optional[dict[str, Any]] = None,
-        inputs: Optional[dict[int, Any]] = None,
-        param_map: Optional[dict[int, Any]] = None,
+        replacement_dict: Optional[Dict[str, Any]] = None,
+        inputs: Optional[Dict[int, Any]] = None,
+        param_map: Optional[Dict[int, Any]] = None,
         allow_tool_state_corrections: bool = False,
         copy_inputs_to_history: bool = False,
         use_cached_job: bool = False,
-        resource_params: Optional[dict[int, Any]] = None,
+        resource_params: Optional[Dict[int, Any]] = None,
         requires_materialization: bool = False,
         preferred_object_store_id: Optional[str] = None,
         preferred_outputs_object_store_id: Optional[str] = None,
         preferred_intermediate_object_store_id: Optional[str] = None,
-        effective_outputs: Optional[list[EffectiveOutput]] = None,
+        effective_outputs: Optional[List[EffectiveOutput]] = None,
     ) -> None:
         self.target_history = target_history
         self.replacement_dict = replacement_dict or {}
@@ -108,8 +110,8 @@ class WorkflowRunConfig:
 
 
 def _normalize_inputs(
-    steps: list["WorkflowStep"], inputs: dict[str, dict[str, Any]], inputs_by: str
-) -> dict[int, dict[str, Any]]:
+    steps: List["WorkflowStep"], inputs: Dict[str, Dict[str, Any]], inputs_by: str
+) -> Dict[int, Dict[str, Any]]:
     normalized_inputs = {}
     for step in steps:
         if step.type not in INPUT_STEP_TYPES:
@@ -154,8 +156,8 @@ def _normalize_inputs(
 
 
 def _normalize_step_parameters(
-    steps: list["WorkflowStep"], param_map: dict, legacy: bool = False, already_normalized: bool = False
-) -> dict:
+    steps: List["WorkflowStep"], param_map: Dict, legacy: bool = False, already_normalized: bool = False
+) -> Dict:
     """Take a complex param_map that can reference parameters by
     step_id in the new flexible way or in the old one-parameter
     per step fashion or by tool id and normalize the parameters so
@@ -172,7 +174,7 @@ def _normalize_step_parameters(
                 raise exceptions.RequestParameterInvalidException(
                     "Specifying subworkflow step parameters requires already_normalized to be specified as true."
                 )
-            subworkflow_param_dict: dict[str, dict[str, str]] = {}
+            subworkflow_param_dict: Dict[str, Dict[str, str]] = {}
             for key, value in param_dict.items():
                 step_index, param_name = key.split("|", 1)
                 if step_index not in subworkflow_param_dict:
@@ -187,7 +189,7 @@ def _normalize_step_parameters(
     return normalized_param_map
 
 
-def _step_parameters(step: "WorkflowStep", param_map: dict, legacy: bool = False) -> dict:
+def _step_parameters(step: "WorkflowStep", param_map: Dict, legacy: bool = False) -> Dict:
     """
     Update ``step`` parameters based on the user-provided ``param_map`` dict.
 
@@ -231,7 +233,7 @@ def _step_parameters(step: "WorkflowStep", param_map: dict, legacy: bool = False
     return new_params
 
 
-def _flatten_step_params(param_dict: dict, prefix: str = "") -> dict:
+def _flatten_step_params(param_dict: Dict, prefix: str = "") -> Dict:
     # TODO: Temporary work around until tool code can process nested data
     # structures. This should really happen in there so the tools API gets
     # this functionality for free and so that repeats can be handled
@@ -255,8 +257,8 @@ def _flatten_step_params(param_dict: dict, prefix: str = "") -> dict:
 def _get_target_history(
     trans: "GalaxyWebTransaction",
     workflow: "Workflow",
-    payload: dict[str, Any],
-    param_keys: Optional[list[list]] = None,
+    payload: Dict[str, Any],
+    param_keys: Optional[List[List]] = None,
     index: int = 0,
 ) -> History:
     param_keys = param_keys or []
@@ -298,8 +300,8 @@ def _get_target_history(
 
 
 def build_workflow_run_configs(
-    trans: "GalaxyWebTransaction", workflow: "Workflow", payload: dict[str, Any]
-) -> list[WorkflowRunConfig]:
+    trans: "GalaxyWebTransaction", workflow: "Workflow", payload: Dict[str, Any]
+) -> List[WorkflowRunConfig]:
     app = trans.app
     allow_tool_state_corrections = payload.get("allow_tool_state_corrections", False)
     use_cached_job = payload.get("use_cached_job", False)
@@ -548,7 +550,7 @@ def workflow_run_config_to_request(
         if step.type == "subworkflow":
             subworkflow = step.subworkflow
             assert subworkflow
-            effective_outputs: Optional[list[EffectiveOutput]] = None
+            effective_outputs: Optional[List[EffectiveOutput]] = None
             if run_config.preferred_intermediate_object_store_id or run_config.preferred_outputs_object_store_id:
                 step_outputs = step.workflow_outputs
                 effective_outputs = []
@@ -628,7 +630,7 @@ def workflow_request_to_run_config(
     param_types = WorkflowRequestInputParameter.types
     history = workflow_invocation.history
     replacement_dict = {}
-    inputs: dict[
+    inputs: Dict[
         int, Union[HistoryDatasetAssociation, HistoryDatasetCollectionAssociation, str, int, float, bool, None]
     ] = {}
     param_map = {}

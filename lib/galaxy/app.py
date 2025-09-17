@@ -9,7 +9,10 @@ import time
 from typing import (
     Any,
     Callable,
+    Dict,
+    List,
     Optional,
+    Tuple,
 )
 
 from beaker.cache import CacheManager
@@ -39,8 +42,10 @@ from galaxy.files import (
     ConfiguredFileSourcesConf,
     UserDefinedFileSources,
 )
-from galaxy.files.models import FileSourcePluginsConfig
-from galaxy.files.plugins import FileSourcePluginLoader
+from galaxy.files.plugins import (
+    FileSourcePluginLoader,
+    FileSourcePluginsConfig,
+)
 from galaxy.files.templates import ConfiguredFileSourceTemplates
 from galaxy.job_metrics import JobMetrics
 from galaxy.jobs.manager import JobManager
@@ -183,7 +188,7 @@ app = None
 
 
 class HaltableContainer(Container):
-    haltables: list[tuple[str, Callable]]
+    haltables: List[Tuple[str, Callable]]
 
     def __init__(self) -> None:
         super().__init__()
@@ -588,7 +593,7 @@ class GalaxyManagerApplication(MinimalManagerApp, MinimalGalaxyApplication):
         self.job_config = self._register_singleton(jobs.JobConfiguration)
 
         # Setup infrastructure for short term storage manager.
-        short_term_storage_config_kwds: dict[str, Any] = {}
+        short_term_storage_config_kwds: Dict[str, Any] = {}
         short_term_storage_config_kwds["short_term_storage_directory"] = self.config.short_term_storage_dir
         short_term_storage_default_duration = self.config.short_term_storage_default_duration
         short_term_storage_maximum_duration = self.config.short_term_storage_maximum_duration
@@ -783,6 +788,7 @@ class UniverseApplication(StructuredApp, GalaxyManagerApplication, InstallationT
         self.datatypes_registry.load_external_metadata_tool(self.toolbox)
         # Load history import/export tools.
         load_lib_tools(self.toolbox)
+        self.toolbox.persist_cache(register_postfork=True)
         # visualizations registry: associates resources with visualizations, controls how to render
         self.visualizations_registry = self._register_singleton(
             VisualizationsRegistry,

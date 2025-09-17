@@ -92,7 +92,9 @@ export async function watchHistoryOnce(app) {
         collectionElementsStore.saveCollections(payload);
         // trigger changes in legacy handler
         if (app) {
-            app.user.loadFromApi(app.user.id || "current");
+            app.user.fetch({
+                url: `${app.user.urlRoot()}/${app.user.id || "current"}`,
+            });
         }
     }
 }

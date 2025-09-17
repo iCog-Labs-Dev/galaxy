@@ -4,7 +4,11 @@ import re
 import shutil
 from typing import (
     Any,
+    cast,
+    Dict,
+    List,
     Optional,
+    Tuple,
     TYPE_CHECKING,
     Union,
 )
@@ -41,7 +45,7 @@ def check_for_updates(
     tool_shed_registry: Registry,
     install_model_context: install_model_scoped_session,
     repository_id: Optional[int] = None,
-) -> tuple[str, str]:
+) -> Tuple[str, str]:
     message = ""
     status = "ok"
     if repository_id is None:
@@ -86,7 +90,7 @@ def check_for_updates(
 
 def _check_or_update_tool_shed_status_for_installed_repository(
     tool_shed_registry: Registry, install_model_context: install_model_scoped_session, repository: ToolShedRepository
-) -> tuple[bool, bool]:
+) -> Tuple[bool, bool]:
     updated = False
     tool_shed_status_dict = get_tool_shed_status_for(tool_shed_registry, repository)
     if tool_shed_status_dict:
@@ -244,14 +248,14 @@ def get_absolute_path_to_file_in_repository(repo_files_dir, file_name):
 
 def get_installed_repository(
     app: "InstallationTarget",
-    tool_shed: Optional[str] = None,
-    name: Optional[str] = None,
-    owner: Optional[str] = None,
-    changeset_revision: Optional[str] = None,
-    installed_changeset_revision: Optional[str] = None,
-    repository_id: Optional[int] = None,
-    from_cache: bool = False,
-) -> ToolShedRepository:
+    tool_shed=None,
+    name=None,
+    owner=None,
+    changeset_revision=None,
+    installed_changeset_revision=None,
+    repository_id=None,
+    from_cache=False,
+):
     """
     Return a tool shed repository database record defined by the combination of a toolshed, repository name,
     repository owner and either current or originally installed changeset_revision.
@@ -303,7 +307,7 @@ def get_installed_tool_shed_repository(app: "InstallationTarget", id):
     return rval[0]
 
 
-def get_prior_import_or_install_required_dict(app: "InstallationTarget", tsr_ids: list[str], repo_info_dicts):
+def get_prior_import_or_install_required_dict(app: "InstallationTarget", tsr_ids: List[str], repo_info_dicts):
     """
     This method is used in the Tool Shed when exporting a repository and its dependencies,
     and in Galaxy when a repository and its dependencies are being installed.  Return a
@@ -312,7 +316,7 @@ def get_prior_import_or_install_required_dict(app: "InstallationTarget", tsr_ids
     must be imported or installed prior to the repository associated with the tsr_id key.
     """
     # Initialize the dictionary.
-    prior_import_or_install_required_dict: dict[str, list[str]] = {}
+    prior_import_or_install_required_dict: Dict[str, List[str]] = {}
     for tsr_id in tsr_ids:
         prior_import_or_install_required_dict[tsr_id] = []
     # Inspect the repository dependencies for each repository about to be installed and populate the dictionary.
@@ -332,15 +336,16 @@ def get_prior_import_or_install_required_dict(app: "InstallationTarget", tsr_ids
     return prior_import_or_install_required_dict
 
 
-ToolDependenciesDictT = dict[str, Union[dict[str, Any], list[dict[str, Any]]]]
-OldRepositoryTupleT = tuple[str, str, str, str, str, ToolDependenciesDictT]
-RepositoryTupleT = tuple[str, str, str, str, str, Optional[Any], ToolDependenciesDictT]
+ToolDependenciesDictT = Dict[str, Union[Dict[str, Any], List[Dict[str, Any]]]]
+OldRepositoryTupleT = Tuple[str, str, str, str, str, ToolDependenciesDictT]
+RepositoryTupleT = Tuple[str, str, str, str, str, Optional[Any], ToolDependenciesDictT]
 AnyRepositoryTupleT = Union[OldRepositoryTupleT, RepositoryTupleT]
 
 
 def get_repo_info_tuple_contents(repo_info_tuple: AnyRepositoryTupleT) -> RepositoryTupleT:
     """Take care in handling the repo_info_tuple as it evolves over time as new tool shed features are introduced."""
     if len(repo_info_tuple) == 6:
+        old_repo_info = cast(OldRepositoryTupleT, repo_info_tuple)
         (
             description,
             repository_clone_url,
@@ -348,9 +353,10 @@ def get_repo_info_tuple_contents(repo_info_tuple: AnyRepositoryTupleT) -> Reposi
             ctx_rev,
             repository_owner,
             tool_dependencies,
-        ) = repo_info_tuple
+        ) = old_repo_info
         repository_dependencies = None
     elif len(repo_info_tuple) == 7:
+        repo_info = cast(RepositoryTupleT, repo_info_tuple)
         (
             description,
             repository_clone_url,
@@ -359,7 +365,7 @@ def get_repo_info_tuple_contents(repo_info_tuple: AnyRepositoryTupleT) -> Reposi
             repository_owner,
             repository_dependencies,
             tool_dependencies,
-        ) = repo_info_tuple
+        ) = repo_info
     return (
         description,
         repository_clone_url,
@@ -477,7 +483,7 @@ def get_repository_for_dependency_relationship(app: "InstallationTarget", tool_s
 
 
 def get_repository_ids_requiring_prior_import_or_install(
-    app: "InstallationTarget", tsr_ids: list[str], repository_dependencies
+    app: "InstallationTarget", tsr_ids: List[str], repository_dependencies
 ):
     """
     This method is used in the Tool Shed when exporting a repository and its dependencies,
@@ -489,7 +495,7 @@ def get_repository_ids_requiring_prior_import_or_install(
     and whose associated repositories must be imported / installed prior to the dependent
     repository associated with the received repository_dependencies.
     """
-    prior_tsr_ids: list[str] = []
+    prior_tsr_ids: List[str] = []
     if repository_dependencies:
         for key, rd_tups in repository_dependencies.items():
             if key in ["description", "root_key"]:
@@ -555,7 +561,7 @@ def get_tool_shed_repository_by_id(app, repository_id) -> ToolShedRepository:
 def get_tool_shed_status_for(tool_shed_registry: Registry, repository: ToolShedRepository):
     tool_shed_url = tool_shed_registry.get_tool_shed_url(str(repository.tool_shed))
     assert tool_shed_url
-    params: dict[str, Any] = dict(
+    params: Dict[str, Any] = dict(
         name=repository.name, owner=repository.owner, changeset_revision=repository.changeset_revision
     )
     pathspec = ["repository", "status_for_installed_repository"]

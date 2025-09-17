@@ -18,9 +18,3 @@ export type StepJobSummary =
     | components["schemas"]["InvocationStepJobsResponseCollectionJobsModel"];
 
 export type WorkflowInvocation = components["schemas"]["WorkflowInvocationResponse"];
-
-export function isWorkflowInvocationElementView(
-    item: WorkflowInvocation | null,
-): item is WorkflowInvocationElementView {
-    return item !== null && "steps" in item;
-}

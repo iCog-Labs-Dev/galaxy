@@ -7,8 +7,9 @@ import logging
 import os
 from io import BytesIO
 from typing import (
-    Annotated,
     Any,
+    Dict,
+    List,
     Optional,
     Union,
 )
@@ -26,6 +27,7 @@ from pydantic import (
     UUID4,
 )
 from starlette.responses import StreamingResponse
+from typing_extensions import Annotated
 
 from galaxy import (
     exceptions,
@@ -61,7 +63,6 @@ from galaxy.schema.invocation import (
     InvocationStepJobsResponseJobModel,
     InvocationStepJobsResponseStepModel,
     InvocationUpdatePayload,
-    ReportInvocationErrorPayload,
     WorkflowInvocationRequestModel,
     WorkflowInvocationResponse,
 )
@@ -536,7 +537,7 @@ class WorkflowsAPIController(
             # tool state not sent, use the manually constructed inputs
             payload["tool_state"] = payload["inputs"]
         module = module_factory.from_dict(trans, payload, from_tool_form=from_tool_form)
-        module_state: dict[str, Any] = {}
+        module_state: Dict[str, Any] = {}
         errors: ParameterValidationErrorsT = {}
         if from_tool_form:
             populate_state(trans, module.get_inputs(), inputs, module_state, errors=errors, check=True)
@@ -932,7 +933,7 @@ class FastAPIWorkflows:
         offset: Optional[int] = OffsetQueryParam,
         search: Optional[str] = SearchQueryParam,
         skip_step_counts: bool = SkipStepCountsQueryParam,
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Lists stored workflows viewable by the user."""
         payload = WorkflowIndexPayload.model_construct(
             show_published=show_published,
@@ -1092,7 +1093,7 @@ class FastAPIWorkflows:
         payload: InvokeWorkflowBody,
         workflow_id: MultiTypeWorkflowIDPathParam,
         trans: ProvidesHistoryContext = DependsOnTrans,
-    ) -> Union[WorkflowInvocationResponse, list[WorkflowInvocationResponse]]:
+    ) -> Union[WorkflowInvocationResponse, List[WorkflowInvocationResponse]]:
         return self.service.invoke_workflow(trans, workflow_id, payload)
 
     @router.get(
@@ -1310,7 +1311,7 @@ class FastAPIInvocations:
         self,
         payload: CreateInvocationsFromStoreBody,
         trans: ProvidesHistoryContext = DependsOnTrans,
-    ) -> list[WorkflowInvocationResponse]:
+    ) -> List[WorkflowInvocationResponse]:
         """
         Input can be an archive describing a Galaxy model store containing an
         workflow invocation - for instance one created with with write_store
@@ -1342,7 +1343,7 @@ class FastAPIInvocations:
         step_details: StepDetailQueryParam = False,
         include_nested_invocations: bool = True,
         trans: ProvidesUserContext = DependsOnTrans,
-    ) -> list[WorkflowInvocationResponse]:
+    ) -> List[WorkflowInvocationResponse]:
         if not trans.user:
             # Anon users don't have accessible invocations (currently, though published invocations should be a thing)
             response.headers["total_matches"] = "0"
@@ -1395,7 +1396,7 @@ class FastAPIInvocations:
         view: SerializationViewQueryParam = None,
         step_details: StepDetailQueryParam = False,
         trans: ProvidesUserContext = DependsOnTrans,
-    ) -> list[WorkflowInvocationResponse]:
+    ) -> List[WorkflowInvocationResponse]:
         invocations = self.index_invocations(
             response=response,
             workflow_id=workflow_id,
@@ -1446,24 +1447,6 @@ class FastAPIInvocations:
             payload,
         )
         return rval
-
-    @router.post(
-        "/api/invocations/{invocation_id}/error",
-        summary="Submits a bug report for a workflow run via the API.",
-        status_code=status.HTTP_204_NO_CONTENT,
-    )
-    def report_error(
-        self,
-        payload: ReportInvocationErrorPayload,
-        invocation_id: InvocationIDPathParam,
-        trans: ProvidesUserContext = DependsOnTrans,
-    ):
-        self.invocations_service.report_error(
-            trans,
-            invocation_id,
-            payload,
-        )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     @router.get("/api/invocations/{invocation_id}", summary="Get detailed description of a workflow invocation.")
     def show_invocation(
@@ -1699,7 +1682,7 @@ class FastAPIInvocations:
         self,
         invocation_id: InvocationIDPathParam,
         trans: ProvidesUserContext = DependsOnTrans,
-    ) -> list[
+    ) -> List[
         Union[
             InvocationStepJobsResponseStepModel,
             InvocationStepJobsResponseJobModel,
@@ -1740,7 +1723,7 @@ class FastAPIInvocations:
         workflow_id: StoredWorkflowIDPathParam,
         invocation_id: InvocationIDPathParam,
         trans: ProvidesUserContext = DependsOnTrans,
-    ) -> list[
+    ) -> List[
         Union[
             InvocationStepJobsResponseStepModel,
             InvocationStepJobsResponseJobModel,
@@ -1791,5 +1774,5 @@ class FastAPIInvocations:
         self,
         invocation_id: InvocationIDPathParam,
         trans: ProvidesHistoryContext = DependsOnTrans,
-    ) -> list[WorkflowJobMetric]:
+    ) -> List[WorkflowJobMetric]:
         return self.invocations_service.show_invocation_metrics(trans=trans, invocation_id=invocation_id)

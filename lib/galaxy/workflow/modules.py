@@ -7,12 +7,16 @@ import logging
 import math
 import re
 from collections import defaultdict
-from collections.abc import Iterable
 from typing import (
     Any,
     cast,
+    Dict,
     get_args,
+    Iterable,
+    List,
     Optional,
+    Tuple,
+    Type,
     TYPE_CHECKING,
     Union,
 )
@@ -40,7 +44,6 @@ from galaxy.model import (
 from galaxy.model.base import ensure_object_added_to_session
 from galaxy.model.dataset_collections import matching
 from galaxy.model.dataset_collections.query import HistoryQuery
-from galaxy.model.dataset_collections.type_description import COLLECTION_TYPE_DESCRIPTION_FACTORY
 from galaxy.schema.invocation import (
     CancelReason,
     FailureReason,
@@ -134,7 +137,7 @@ RUNTIME_STEP_META_STATE_KEY = "__STEP_META_STATE__"
 # ones.
 RUNTIME_POST_JOB_ACTIONS_KEY = "__POST_JOB_ACTIONS__"
 
-POSSIBLE_PARAMETER_TYPES: tuple[INPUT_PARAMETER_TYPES] = get_args(INPUT_PARAMETER_TYPES)
+POSSIBLE_PARAMETER_TYPES: Tuple[INPUT_PARAMETER_TYPES] = get_args(INPUT_PARAMETER_TYPES)
 
 
 class OptionDict(TypedDict):
@@ -249,7 +252,7 @@ def evaluate_value_from_expressions(progress, step, execution_state, extra_step_
     if not value_from_expressions and when_expression is None:
         return {}
 
-    hda_references: list[model.HistoryDatasetAssociation] = []
+    hda_references: List[model.HistoryDatasetAssociation] = []
 
     step_state = {}
     for key, value in extra_step_state.items():
@@ -392,13 +395,7 @@ class WorkflowModule:
         if inputs := self.get_inputs():
             self.state.decode(state, Bunch(inputs=inputs), self.trans.app)
         else:
-            inputs = safe_loads(state) or {}
-            self.validate_state(inputs)
-            self.state.inputs = inputs
-
-    def validate_state(self, inputs: dict[str, Any]) -> None:
-        """If get_inputs() return None, validate the inputs dictionary directly bypassing ToolForm stuff."""
-        return None
+            self.state.inputs = safe_loads(state) or {}
 
     def step_state_to_tool_state(self, state):
         return state
@@ -555,7 +552,7 @@ class WorkflowModule:
 
         progress.set_step_outputs(invocation_step, outputs, already_persisted=True)
 
-    def get_informal_replacement_parameters(self, step) -> list[str]:
+    def get_informal_replacement_parameters(self, step) -> List[str]:
         """Return a list of informal replacement parameters.
 
         If replacement is handled via formal workflow inputs - do not include it in this list.
@@ -672,12 +669,12 @@ class SubWorkflowModule(WorkflowModule):
     # - Second pass actually turn RuntimeInputs into inputs if possible.
     type = "subworkflow"
     name = "Subworkflow"
-    _modules: Optional[list[Any]] = None
+    _modules: Optional[List[Any]] = None
     subworkflow: Workflow
 
     def __init__(self, trans, content_id=None, **kwds):
         super().__init__(trans, content_id, **kwds)
-        self.post_job_actions: Optional[dict[str, Any]] = None
+        self.post_job_actions: Optional[Dict[str, Any]] = None
 
     @classmethod
     def from_dict(Class, trans, d, **kwds):
@@ -835,7 +832,7 @@ class SubWorkflowModule(WorkflowModule):
                 assert len(progress.when_values) == 1, "Got more than 1 when value, this shouldn't be possible"
             iteration_elements_iter = [(None, progress.when_values[0] if progress.when_values else None)]
 
-        when_values: list[Union[bool, None]] = []
+        when_values: List[Union[bool, None]] = []
         for iteration_elements, when_value in iteration_elements_iter:
             if when_value is False or not step.when_expression:
                 # We're skipping this step (when==False) or we keep
@@ -920,7 +917,7 @@ class SubWorkflowModule(WorkflowModule):
 
         return inputs
 
-    def get_informal_replacement_parameters(self, step) -> list[str]:
+    def get_informal_replacement_parameters(self, step) -> List[str]:
         """Return a list of replacement parameters."""
         replacement_parameters = set()
 
@@ -985,7 +982,7 @@ def format_param(trans, formats):
 
 class InputModuleState(TypedDict, total=False):
     optional: bool
-    format: list[str]
+    format: List[str]
     tag: str
 
 
@@ -1056,7 +1053,7 @@ class InputModule(WorkflowModule):
             optional = self.default_optional
         rval["optional"] = optional
         if "format" in inputs:
-            formats: Optional[list[str]] = listify(inputs["format"])
+            formats: Optional[List[str]] = listify(inputs["format"])
         else:
             formats = None
         if formats:
@@ -1157,17 +1154,6 @@ class InputDataCollectionModule(InputModule):
         # migrated to frontend
         return {}
 
-    def validate_state(self, state: dict[str, Any]) -> None:
-        collection_type = state.get("collection_type")
-        fields = state.get("fields")
-        if collection_type:
-            collection_type_description = COLLECTION_TYPE_DESCRIPTION_FACTORY.for_collection_type(
-                collection_type,
-                fields=fields,
-            )
-            collection_type_description.validate()
-        return None
-
     def get_runtime_inputs(self, step, connections: Optional[Iterable[WorkflowStepConnection]] = None):
         parameter_def = self._parse_state_into_dict()
         collection_type = parameter_def["collection_type"]
@@ -1181,13 +1167,8 @@ class InputDataCollectionModule(InputModule):
             tag=tag,
             optional=optional,
         )
-        if "column_definitions" in parameter_def:
-            collection_param_source["column_definitions"] = parameter_def["column_definitions"]
-        if "fields" in parameter_def:
-            collection_param_source["fields"] = parameter_def["fields"]
         if formats := parameter_def.get("format"):
             collection_param_source["format"] = ",".join(listify(formats))
-        # TODO: this needs to land up part of DataCollectionToolParameter
         input_param = DataCollectionToolParameter(None, collection_param_source, self.trans)
         return dict(input=input_param)
 
@@ -1215,17 +1196,13 @@ class InputDataCollectionModule(InputModule):
             collection_type = inputs["collection_type"]
         else:
             collection_type = self.default_collection_type
-        if "column_definitions" in inputs:
-            column_definitions = inputs["column_definitions"]
-        else:
-            column_definitions = None
+        state_as_dict["collection_type"] = collection_type
         if "fields" in inputs:
             fields = inputs["fields"]
         else:
             fields = None
         state_as_dict["collection_type"] = collection_type
         state_as_dict["fields"] = fields
-        state_as_dict["column_definitions"] = column_definitions
         return state_as_dict
 
 
@@ -1360,7 +1337,7 @@ class InputParameterModule(WorkflowModule):
                     **when_this_type.inputs,
                 }
 
-                restrict_how_source: dict[str, Union[str, list[dict[str, Union[str, bool]]]]] = dict(
+                restrict_how_source: Dict[str, Union[str, List[Dict[str, Union[str, bool]]]]] = dict(
                     name="how", label="Restrict Text Values?", type="select"
                 )
                 restrict_how_source["options"] = [
@@ -1484,13 +1461,13 @@ class InputParameterModule(WorkflowModule):
 
     def get_config_form(self, step=None):
         """Serializes input parameters of a module into input dictionaries."""
-        group_inputs: list[dict[str, Any]] = []
+        group_inputs: List[Dict[str, Any]] = []
         populate_model(self.trans, self.get_inputs(), self.state.inputs, group_inputs)
         return {"title": self.name, "inputs": group_inputs}
 
     def restrict_options(self, step, connections: Iterable[WorkflowStepConnection], default_value):
         try:
-            static_options: list[list[ParameterOption]] = []
+            static_options: List[List[ParameterOption]] = []
             # Retrieve possible runtime options for 'select' type inputs
             for connection in connections:
                 # Well this isn't a great assumption...
@@ -1516,7 +1493,7 @@ class InputParameterModule(WorkflowModule):
                                 ].static_options
                             )
 
-            options: Optional[list[OptionDict]] = None
+            options: Optional[List[OptionDict]] = None
             if static_options and len(static_options) == 1:
                 # If we are connected to a single option, just use it as is so order is preserved cleanly and such.
                 options = [
@@ -1554,7 +1531,7 @@ class InputParameterModule(WorkflowModule):
             raise ValueError("Invalid parameter type for workflow parameters encountered.")
 
         # Optional parameters for tool input source definition.
-        parameter_kwds: dict[str, Union[str, list[dict[str, Any]]]] = {}
+        parameter_kwds: Dict[str, Union[str, List[Dict[str, Any]]]] = {}
         if "multiple" in parameter_def:
             parameter_kwds["multiple"] = parameter_def["multiple"]
 
@@ -1929,15 +1906,15 @@ class ToolModule(WorkflowModule):
                         f"Exact tool specified during workflow module creation for [{tool_id}] but couldn't find correct version [{tool_version}]."
                     )
                     self.tool = None
-        self.post_job_actions: dict[str, Any] = {}
-        self.runtime_post_job_actions: dict[str, Any] = {}
-        self.workflow_outputs: list[dict[str, Any]] = []
-        self.version_changes: list[str] = []
+        self.post_job_actions: Dict[str, Any] = {}
+        self.runtime_post_job_actions: Dict[str, Any] = {}
+        self.workflow_outputs: List[Dict[str, Any]] = []
+        self.version_changes: List[str] = []
 
     # ---- Creating modules from various representations ---------------------
 
     @classmethod
-    def from_dict(Class, trans: "ProvidesUserContext", d, **kwds):
+    def from_dict(Class, trans, d, **kwds):
         tool_id = d.get("content_id") or d.get("tool_id")
         tool_version = d.get("tool_version")
         if tool_version:
@@ -1949,7 +1926,7 @@ class ToolModule(WorkflowModule):
                 create_request = DynamicToolCreatePayload(src="representation", representation=tool_representation)
                 if not trans.user_is_admin:
                     raise exceptions.AdminRequiredException("Only admin users can create tools dynamically.")
-                dynamic_tool = trans.app.dynamic_tool_manager.create_tool(create_request)
+                dynamic_tool = trans.app.dynamic_tool_manager.create_tool(trans, create_request, allow_load=False)
                 tool_uuid = dynamic_tool.uuid
         if tool_id is None and tool_uuid is None:
             raise exceptions.RequestParameterInvalidException(f"No content id could be located for for step [{d}]")
@@ -2127,7 +2104,7 @@ class ToolModule(WorkflowModule):
             for name, tool_output in self.tool.outputs.items():
                 if filter_output(self.tool, tool_output, self.state.inputs):
                     continue
-                extra_kwds: dict[str, Any] = {}
+                extra_kwds: Dict[str, Any] = {}
                 if isinstance(tool_output, ToolExpressionOutput):
                     extra_kwds["parameter"] = True
                 if isinstance(tool_output, ToolOutputCollection):
@@ -2142,7 +2119,7 @@ class ToolModule(WorkflowModule):
                                 collection_type = rule_set.collection_type
                     extra_kwds["collection_type"] = collection_type
                     extra_kwds["collection_type_source"] = tool_output.structure.collection_type_source
-                    formats: list[Optional[str]] = ["input"]  # TODO: fix
+                    formats: List[Optional[str]] = ["input"]  # TODO: fix
                 elif (
                     isinstance(tool_output, (ToolOutput, ToolExpressionOutput, ToolOutputCollection))
                     and tool_output.format_source is not None
@@ -2175,7 +2152,7 @@ class ToolModule(WorkflowModule):
     def get_config_form(self, step=None):
         if self.tool:
             self.add_dummy_datasets(connections=step and step.input_connections)
-            incoming: dict[str, str] = {}
+            incoming: Dict[str, str] = {}
             params_to_incoming(incoming, self.tool.inputs, self.state.inputs, self.trans.app)
             return self.tool.to_json(self.trans, incoming, workflow_building_mode=True)
 
@@ -2467,7 +2444,7 @@ class ToolModule(WorkflowModule):
             param_combinations.append(execution_state.inputs)
 
         complete = False
-        completed_jobs: dict[int, Optional[Job]] = tool.completed_jobs(
+        completed_jobs: Dict[int, Optional[Job]] = tool.completed_jobs(
             trans,
             use_cached_job,
             param_combinations,
@@ -2508,7 +2485,7 @@ class ToolModule(WorkflowModule):
             raise DelayedWorkflowEvaluation(why=delayed_why)
 
         progress.record_executed_job_count(len(execution_tracker.successful_jobs))
-        step_outputs: dict[str, Union[model.HistoryDatasetCollectionAssociation, model.HistoryDatasetAssociation]] = {}
+        step_outputs: Dict[str, Union[model.HistoryDatasetCollectionAssociation, model.HistoryDatasetAssociation]] = {}
         if collection_info:
             step_outputs.update(execution_tracker.implicit_collections)
         else:
@@ -2601,7 +2578,7 @@ class ToolModule(WorkflowModule):
             action_arguments = None
         return PostJobAction(value["action_type"], step, output_name, action_arguments)
 
-    def get_informal_replacement_parameters(self, step: WorkflowStep) -> list[str]:
+    def get_informal_replacement_parameters(self, step: WorkflowStep) -> List[str]:
         """Return a list of replacement parameters."""
         replacement_parameters = set()
         for pja in step.post_job_actions:
@@ -2614,7 +2591,7 @@ class ToolModule(WorkflowModule):
 
 
 class WorkflowModuleFactory:
-    def __init__(self, module_types: dict[str, type[WorkflowModule]]):
+    def __init__(self, module_types: Dict[str, Type[WorkflowModule]]):
         self.module_types = module_types
 
     def from_dict(self, trans, d, **kwargs) -> WorkflowModule:
@@ -2645,6 +2622,24 @@ module_types = dict(
     subworkflow=SubWorkflowModule,
 )
 module_factory = WorkflowModuleFactory(module_types)
+
+
+def load_module_sections(trans):
+    """Get abstract description of the workflow modules this Galaxy instance
+    is configured with.
+    """
+    module_sections = {}
+
+    if trans.app.config.enable_beta_workflow_modules:
+        module_sections["experimental"] = {
+            "name": "experimental",
+            "title": "Experimental",
+            "modules": [
+                {"name": "pause", "title": "Pause Workflow for Dataset Review", "description": "Pause for Review"}
+            ],
+        }
+
+    return module_sections
 
 
 class DelayedWorkflowEvaluation(Exception):

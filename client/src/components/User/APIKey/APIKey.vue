@@ -6,8 +6,6 @@ import { ref } from "vue";
 import APIKeyItem from "./APIKeyItem";
 import svc from "./model/service";
 
-import BreadcrumbHeading from "@/components/Common/BreadcrumbHeading.vue";
-
 const apiKey = ref(null);
 const loading = ref(false);
 const errorMessage = ref(null);
@@ -31,13 +29,11 @@ const createNewAPIKey = () => {
 };
 
 getAPIKey();
-
-const breadcrumbItems = [{ title: "User Preferences", to: "/user" }, { title: "Manage API Key" }];
 </script>
 
 <template>
-    <section>
-        <BreadcrumbHeading :items="breadcrumbItems" />
+    <section class="api-key d-flex flex-column">
+        <h1 v-localize class="h-lg">Manage API Key</h1>
 
         <span v-localize class="mb-2">
             An API key will allow you to access via web API. Please note that this key acts as an alternate means to

@@ -1,18 +1,14 @@
 import logging
 from datetime import datetime
 from typing import (
-    Any,
+    List,
     Optional,
     Union,
 )
 
 from pydantic import BaseModel
 
-from galaxy.exceptions import (
-    MessageException,
-    ObjectNotFound,
-    RequestParameterInvalidException,
-)
+from galaxy.exceptions import ObjectNotFound
 from galaxy.managers.context import (
     ProvidesHistoryContext,
     ProvidesUserContext,
@@ -66,7 +62,7 @@ class UnprivilegedToolsApi:
     dynamic_tools_manager: DynamicToolManager = depends(DynamicToolManager)
 
     @router.get("/api/unprivileged_tools", response_model_exclude_defaults=True)
-    def index(self, active: bool = True, trans: ProvidesUserContext = DependsOnTrans) -> list[UnprivilegedToolResponse]:
+    def index(self, active: bool = True, trans: ProvidesUserContext = DependsOnTrans) -> List[UnprivilegedToolResponse]:
         if not trans.user:
             return []
         return [t.to_dict() for t in self.dynamic_tools_manager.list_unprivileged_tools(trans.user, active=active)]
@@ -138,25 +134,18 @@ class DynamicToolApi:
         return dynamic_tool.to_dict()
 
     @router.post("/api/dynamic_tools", require_admin=True)
-    def create(self, payload: DynamicToolPayload):
-        try:
-            dynamic_tool = self.dynamic_tools_manager.create_tool(payload)
-        except MessageException:
-            raise
-        except Exception as e:
-            raise RequestParameterInvalidException(str(e))
+    def create(self, payload: DynamicToolPayload, trans: ProvidesUserContext = DependsOnTrans):
+        dynamic_tool = self.dynamic_tools_manager.create_tool(trans, payload, allow_load=payload.allow_load)
         return dynamic_tool.to_dict()
 
     @router.delete("/api/dynamic_tools/{dynamic_tool_id}", require_admin=True)
-    def delete(self, dynamic_tool_id: DatabaseIdOrUUID) -> dict[str, Any]:
+    def delete(self, dynamic_tool_id: DatabaseIdOrUUID):
         """
         DELETE /api/dynamic_tools/{encoded_dynamic_tool_id|tool_uuid}
 
         Deactivate the specified dynamic tool. Deactivated tools will not
         be loaded into the toolbox.
         """
-        dynamic_tool = self.dynamic_tools_manager.get_tool_by_id_or_uuid(dynamic_tool_id)
-        if dynamic_tool is None:
-            raise ObjectNotFound()
+        dynamic_tool = dynamic_tool = self.dynamic_tools_manager.get_tool_by_id_or_uuid(dynamic_tool_id)
         updated_dynamic_tool = self.dynamic_tools_manager.deactivate(dynamic_tool)
         return updated_dynamic_tool.to_dict()

@@ -7,6 +7,8 @@ reproduce a specific view in a Galaxy visualization.
 
 import logging
 from typing import (
+    Dict,
+    Tuple,
     TYPE_CHECKING,
     Union,
 )
@@ -78,7 +80,7 @@ class VisualizationManager(sharable.SharableModelManager[model.Visualization]):
 
     def index_query(
         self, trans: ProvidesUserContext, payload: VisualizationIndexQueryPayload, include_total_count: bool = False
-    ) -> tuple["ScalarResult[model.Visualization]", Union[int, None]]:
+    ) -> Tuple["ScalarResult[model.Visualization]", Union[int, None]]:
         show_deleted = payload.deleted
         show_own = payload.show_own
         show_published = payload.show_published
@@ -194,7 +196,7 @@ class VisualizationSerializer(sharable.SharableModelSerializer):
 
     def add_serializers(self):
         super().add_serializers()
-        serializers: dict[str, base.Serializer] = {}
+        serializers: Dict[str, base.Serializer] = {}
         self.serializers.update(serializers)
 
 

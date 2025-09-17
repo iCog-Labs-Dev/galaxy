@@ -1,5 +1,6 @@
 import os
 from typing import (
+    List,
     NamedTuple,
 )
 
@@ -23,7 +24,7 @@ def get_skiplist():
         return skiplist
 
 
-def get_cases() -> list[ToolTest]:
+def get_cases() -> List[ToolTest]:
     atc = ApiTestCase()
     atc._test_driver = GalaxyTestDriver()
     atc._test_driver.setup()

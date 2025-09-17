@@ -1,11 +1,14 @@
 import logging
 import os
 import re
-from collections.abc import Iterable
 from typing import (
     Any,
     cast,
+    Dict,
+    Iterable,
+    List,
     Optional,
+    Set,
     TYPE_CHECKING,
     Union,
 )
@@ -82,7 +85,7 @@ from galaxy.schema.schema import (
     BulkOperationItemError,
     ChangeDatatypeOperationParams,
     ChangeDbkeyOperationParams,
-    CollectionSourceType,
+    ColletionSourceType,
     CreateNewCollectionPayload,
     DatasetAssociationRoles,
     DeleteHistoryContentPayload,
@@ -129,7 +132,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-DatasetDetailsType = Union[set[DecodedDatabaseIdField], Literal["all"]]
+DatasetDetailsType = Union[Set[DecodedDatabaseIdField], Literal["all"]]
 
 
 class HistoryContentsIndexParams(Model):
@@ -142,8 +145,8 @@ class HistoryContentsIndexParams(Model):
 class LegacyHistoryContentsIndexParams(Model):
     """Query parameters exclusively used by the *legacy version* of `index` operation."""
 
-    ids: Optional[list[DecodedDatabaseIdField]]
-    types: list[HistoryContentType]
+    ids: Optional[List[DecodedDatabaseIdField]]
+    types: List[HistoryContentType]
     dataset_details: Optional[DatasetDetailsType]
     deleted: Optional[bool]
     visible: Optional[bool]
@@ -157,8 +160,8 @@ class LegacyHistoryContentsIndexParams(Model):
 class HistoryContentsIndexJobsSummaryParams(Model):
     """Query parameters exclusively used by the `index_jobs_summary` operation."""
 
-    ids: list[DecodedDatabaseIdField] = []
-    types: list[JobSourceType] = []
+    ids: List[DecodedDatabaseIdField] = []
+    types: List[JobSourceType] = []
 
 
 class CreateHistoryContentPayloadBase(Model):
@@ -194,7 +197,7 @@ class CollectionElementIdentifier(Model):
         title="Name",
         description="The name of the element.",
     )
-    src: CollectionSourceType = Field(
+    src: ColletionSourceType = Field(
         ...,
         title="Source",
         description="The source of the element.",
@@ -204,12 +207,12 @@ class CollectionElementIdentifier(Model):
         title="ID",
         description="The encoded ID of the element.",
     )
-    tags: list[str] = Field(
+    tags: List[str] = Field(
         default=[],
         title="Tags",
         description="The list of tags associated with the element.",
     )
-    element_identifiers: Optional[list["CollectionElementIdentifier"]] = Field(
+    element_identifiers: Optional[List["CollectionElementIdentifier"]] = Field(
         default=None,
         title="Element Identifiers",
         description="List of elements that should be in the new nested collection.",
@@ -414,7 +417,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         self,
         trans,
         params: HistoryContentsIndexJobsSummaryParams,
-    ) -> list[AnyJobStateSummary]:
+    ) -> List[AnyJobStateSummary]:
         """
         Return job state summary info for jobs, implicit groups jobs for collections or workflow invocations
 
@@ -507,7 +510,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         history_id: DecodedDatabaseIdField,
         payload: CreateHistoryContentPayload,
         serialization_params: SerializationParams,
-    ) -> Union[AnyHistoryContentItem, list[AnyHistoryContentItem]]:
+    ) -> Union[AnyHistoryContentItem, List[AnyHistoryContentItem]]:
         """
         Create a new HDA or HDCA.
 
@@ -534,14 +537,14 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         history_id: DecodedDatabaseIdField,
         payload: CreateHistoryContentFromStore,
         serialization_params: SerializationParams,
-    ) -> list[AnyHistoryContentItem]:
+    ) -> List[AnyHistoryContentItem]:
         history = self.history_manager.get_mutable(history_id, trans.user, current_history=trans.history)
         object_tracker = self.create_objects_from_store(
             trans,
             payload,
             history=history,
         )
-        rval: list[AnyHistoryContentItem] = []
+        rval: List[AnyHistoryContentItem] = []
         serialization_params.default_view = "detailed"
         for hda in object_tracker.hdas_by_key.values():
             if hda.visible:
@@ -608,7 +611,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         trans,
         history_id: Optional[DecodedDatabaseIdField],
         id: DecodedDatabaseIdField,
-        payload: dict[str, Any],
+        payload: Dict[str, Any],
         serialization_params: SerializationParams,
         contents_type: HistoryContentType,
     ):
@@ -647,7 +650,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         history_id: DecodedDatabaseIdField,
         payload: UpdateHistoryContentsBatchPayload,
         serialization_params: SerializationParams,
-    ) -> list[AnyHistoryContentItem]:
+    ) -> List[AnyHistoryContentItem]:
         """
         PUT /api/histories/{history_id}/contents
 
@@ -664,8 +667,8 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         """
         history = self.history_manager.get_mutable(history_id, trans.user, current_history=trans.history)
         items = payload.items
-        hda_ids: list[DecodedDatabaseIdField] = []
-        hdca_ids: list[DecodedDatabaseIdField] = []
+        hda_ids: List[DecodedDatabaseIdField] = []
+        hdca_ids: List[DecodedDatabaseIdField] = []
         for item in items:
             contents_type = item.history_content_type
             if contents_type == HistoryContentType.dataset:
@@ -699,7 +702,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         history = self.history_manager.get_mutable(history_id, trans.user, current_history=trans.history)
         filters = self.history_contents_filters.parse_query_filters(filter_query_params)
         self._validate_bulk_operation_params(payload, trans.user, trans)
-        contents: list[HistoryItem]
+        contents: List[HistoryItem]
         if payload.items:
             contents = self._get_contents_by_item_list(
                 trans,
@@ -885,7 +888,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         rval["async_result"] = async_result is not None
         return rval
 
-    def __update_dataset_collection(self, trans, id: DecodedDatabaseIdField, payload: dict[str, Any]):
+    def __update_dataset_collection(self, trans, id: DecodedDatabaseIdField, payload: Dict[str, Any]):
         return self.dataset_collection_manager.update(trans, "history", id, payload)
 
     def __update_dataset(
@@ -893,7 +896,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         trans,
         history: History,
         id: DecodedDatabaseIdField,
-        payload: dict[str, Any],
+        payload: Dict[str, Any],
         serialization_params: SerializationParams,
     ):
         # anon user: ensure that history ids match up and the history is the current,
@@ -907,7 +910,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         return {}
 
     def __datasets_for_update(
-        self, trans, history: History, hda_ids: list[DecodedDatabaseIdField], payload: dict[str, Any]
+        self, trans, history: History, hda_ids: List[DecodedDatabaseIdField], payload: Dict[str, Any]
     ):
         anonymous_user = not trans.user_is_admin and trans.user is None
         if anonymous_user:
@@ -928,7 +931,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
 
         return hdas
 
-    def __deserialize_dataset(self, trans, hda, payload: dict[str, Any]):
+    def __deserialize_dataset(self, trans, hda, payload: Dict[str, Any]):
         # TODO: when used in batch it would be a lot faster if we set flush=false
         # and the caller flushes only at the end or when a given chunk size is reached.
         self.hda_deserializer.deserialize(hda, payload, user=trans.user, trans=trans, flush=True)
@@ -1344,8 +1347,8 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         operation: HistoryContentItemOperation,
         params: Optional[AnyBulkOperationParams],
         trans: ProvidesHistoryContext,
-    ) -> list[BulkOperationItemError]:
-        errors: list[BulkOperationItemError] = []
+    ) -> List[BulkOperationItemError]:
+        errors: List[BulkOperationItemError] = []
         for item in contents:
             error = self._apply_operation_to_item(operation, item, params, trans)
             if error:
@@ -1369,9 +1372,9 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
             )
 
     def _get_contents_by_item_list(
-        self, trans, history: History, items: list[HistoryContentItem]
-    ) -> list["HistoryItem"]:
-        contents: list[HistoryItem] = []
+        self, trans, history: History, items: List[HistoryContentItem]
+    ) -> List["HistoryItem"]:
+        contents: List[HistoryItem] = []
 
         dataset_items = filter(lambda item: item.history_content_type == HistoryContentType.dataset, items)
         datasets_ids = (dataset.id for dataset in dataset_items)
@@ -1409,7 +1412,7 @@ class HistoryItemOperator:
         self.hdca_manager = hdca_manager
         self.dataset_collection_manager = dataset_collection_manager
         self.flush = False
-        self._operation_map: dict[HistoryContentItemOperation, ItemOperation] = {
+        self._operation_map: Dict[HistoryContentItemOperation, ItemOperation] = {
             HistoryContentItemOperation.hide: lambda item, params, trans: self._hide(item),
             HistoryContentItemOperation.unhide: lambda item, params, trans: self._unhide(item),
             HistoryContentItemOperation.delete: lambda item, params, trans: self._delete(item, trans),

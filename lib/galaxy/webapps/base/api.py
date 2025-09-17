@@ -1,11 +1,13 @@
 import os
 import stat
 import uuid
-from collections.abc import Mapping
 from logging import getLogger
 from typing import (
     Any,
+    Dict,
+    Mapping,
     Optional,
+    Tuple,
     TYPE_CHECKING,
     Union,
 )
@@ -52,7 +54,7 @@ log = getLogger(__name__)
 
 
 # Copied from https://github.com/tiangolo/fastapi/issues/1240#issuecomment-1055396884
-def _get_range_header(range_header: str, file_size: int) -> tuple[int, int]:
+def _get_range_header(range_header: str, file_size: int) -> Tuple[int, int]:
     def _invalid_range():
         return HTTPException(
             status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
@@ -194,7 +196,7 @@ def get_error_response_for_request(request: Request, exc: MessageException) -> J
         content = error_dict
 
     retry_after: Optional[int] = getattr(exc, "retry_after", None)
-    headers: dict[str, str] = {}
+    headers: Dict[str, str] = {}
     if retry_after:
         headers["Retry-After"] = str(retry_after)
     return JSONResponse(status_code=status_code, content=content, headers=headers)
@@ -246,7 +248,7 @@ def add_request_id_middleware(app: FastAPI):
 
 
 def include_all_package_routers(app: FastAPI, package_name: str):
-    responses: dict[Union[int, str], dict[str, Any]] = {
+    responses: Dict[Union[int, str], Dict[str, Any]] = {
         "4XX": {
             "description": "Request Error",
             "model": MessageExceptionModel,

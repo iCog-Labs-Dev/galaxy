@@ -6,10 +6,7 @@ may change often.
 """
 
 import logging
-from typing import (
-    Annotated,
-    Optional,
-)
+from typing import Optional
 
 from fastapi import (
     Body,
@@ -18,6 +15,7 @@ from fastapi import (
     Response,
     status,
 )
+from typing_extensions import Annotated
 
 from galaxy.managers.context import ProvidesUserContext
 from galaxy.model import User

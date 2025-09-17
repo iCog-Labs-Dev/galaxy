@@ -1,18 +1,12 @@
 import os
 from abc import abstractmethod
-from typing import (
-    Optional,
-    TYPE_CHECKING,
-)
+from typing import Optional
 from urllib.parse import urljoin
 
 import yaml
 
 from .driver_factory import ConfiguredDriver
 from .navigates_galaxy import NavigatesGalaxy
-
-if TYPE_CHECKING:
-    from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class GalaxySeleniumContext(NavigatesGalaxy):
@@ -28,7 +22,7 @@ class GalaxySeleniumContext(NavigatesGalaxy):
         return urljoin(base, url)
 
     @property
-    def driver(self) -> "WebDriver":  # type: ignore[override]
+    def driver(self):
         return self.configured_driver.driver
 
     def screenshot(self, label: str):

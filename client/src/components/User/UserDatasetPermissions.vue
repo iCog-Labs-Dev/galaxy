@@ -5,7 +5,6 @@ import { computed, ref } from "vue";
 import { initRefs, updateRefs, useCallbacks } from "@/composables/datasetPermissions";
 import { withPrefix } from "@/utils/redirect";
 
-import BreadcrumbHeading from "@/components/Common/BreadcrumbHeading.vue";
 import DatasetPermissionsForm from "@/components/Dataset/DatasetPermissionsForm.vue";
 
 interface UserDatasetPermissionsProps {
@@ -35,8 +34,6 @@ async function init() {
 }
 
 const title = "Set Dataset Permissions for New Histories";
-
-const breadcrumbItems = [{ title: "User Preferences", to: "/user" }, { title: title }];
 
 const formConfig = computed(() => {
     return {
@@ -68,15 +65,11 @@ const { onSuccess, onError } = useCallbacks(init);
 </script>
 
 <template>
-    <div>
-        <BreadcrumbHeading :items="breadcrumbItems" />
-
-        <DatasetPermissionsForm
-            :loading="loading"
-            :simple-permissions="simplePermissions"
-            :title="title"
-            :form-config="formConfig"
-            :checked="checked"
-            @change="change" />
-    </div>
+    <DatasetPermissionsForm
+        :loading="loading"
+        :simple-permissions="simplePermissions"
+        :title="title"
+        :form-config="formConfig"
+        :checked="checked"
+        @change="change" />
 </template>

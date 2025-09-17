@@ -21,11 +21,14 @@ const toolStore = useToolStore();
 
 const userStore = useUserStore();
 const props = defineProps({
+    dataManagers: { type: Array, default: null },
+    moduleSections: { type: Array, default: null },
     useSearchWorker: { type: Boolean, default: true },
     workflow: { type: Boolean, default: false },
 });
 
 const emit = defineEmits<{
+    (e: "onInsertModule", moduleName: string, moduleTitle: string | undefined): void;
     (e: "onInsertTool", toolId: string, toolName: string): void;
     (e: "onInsertWorkflow", workflowLatestId: string | undefined, workflowName: string): void;
     (e: "onInsertWorkflowSteps", workflowId: string, workflowStepCount: number | undefined): void;
@@ -89,10 +92,7 @@ async function initializePanel() {
         await toolStore.fetchTools();
         await toolStore.initializePanel();
     } catch (error) {
-        if (process.env.NODE_ENV != "test") {
-            console.error(`ToolPanel::initializePanel - ${error}`);
-        }
-
+        console.error(`ToolPanel::initializePanel - ${error}`);
         errorMessage.value = errorMessageAsString(error);
     } finally {
         panelsFetched.value = true;
@@ -103,6 +103,10 @@ async function updatePanelView(panelView: string) {
     panelName.value = panels.value[panelView]?.name || "";
     await toolStore.setPanel(panelView);
     panelName.value = "";
+}
+
+function onInsertModule(moduleName: string, moduleTitle: string | undefined) {
+    emit("onInsertModule", moduleName, moduleTitle);
 }
 
 function onInsertTool(toolId: string, toolName: string) {
@@ -121,7 +125,7 @@ watch(
     () => query.value,
     (newQuery) => {
         showFavorites.value = newQuery.includes("#favorites");
-    },
+    }
 );
 
 // if currentPanelView ever becomes null || "", load tools
@@ -132,7 +136,7 @@ watch(
         if ((!newVal || !toolSections.value[newVal]) && panelsFetched.value) {
             await initializePanel();
         }
-    },
+    }
 );
 
 initializePanel();
@@ -184,8 +188,11 @@ initializePanel();
             :workflow="props.workflow"
             :panel-query.sync="query"
             :show-advanced.sync="showAdvanced"
+            :data-managers="dataManagers"
+            :module-sections="moduleSections"
             :use-search-worker="useSearchWorker"
             @onInsertTool="onInsertTool"
+            @onInsertModule="onInsertModule"
             @onInsertWorkflow="onInsertWorkflow"
             @onInsertWorkflowSteps="onInsertWorkflowSteps" />
         <div v-else-if="errorMessage" data-description="tool panel error message">

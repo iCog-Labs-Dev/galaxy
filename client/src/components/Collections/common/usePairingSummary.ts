@@ -5,10 +5,7 @@ import { type AutoPairingResult, type HasName, splitIntoPairedAndUnpaired } from
 import type { SupportedPairedOrPairedBuilderCollectionTypes } from "./useCollectionCreator";
 
 interface PropsWithCollectionType {
-    collectionType:
-        | SupportedPairedOrPairedBuilderCollectionTypes
-        | "sample_sheet:paired"
-        | "sample_sheet:paired_or_unpaired";
+    collectionType: SupportedPairedOrPairedBuilderCollectionTypes;
 }
 
 export function usePairingSummary<T extends HasName>(props: PropsWithCollectionType) {

@@ -61,12 +61,8 @@ interface RowElement extends SelectionItem, Element {
     _rowVariant: SelectionState;
 }
 
-function paramsToKey(query: {
-    target?: string | null;
-    recursive?: string | null;
-    write_intent?: string | null;
-}): string {
-    return `${query.target}?recursive=${query.recursive}&write_intent=${query.write_intent ?? "false"}`;
+function paramsToKey(query: { target?: string | null; recursive?: string | null; writeable?: string | null }): string {
+    return `${query.target}?recursive=${query.recursive}&writeable=${query.writeable ?? "false"}`;
 }
 
 const mockedOkApiRoutesMap = new Map<string, RemoteFilesList>([
@@ -97,7 +93,7 @@ const initComponent = async (props: { multiple: boolean; mode?: string }, hasTem
             const responseKey = paramsToKey({
                 target: query.get("target"),
                 recursive: query.get("recursive"),
-                write_intent: query.get("write_intent"),
+                writeable: query.get("writeable"),
             });
             if (mockedErrorApiRoutesMap.has(responseKey)) {
                 return response("4XX").json({ err_msg: someErrorText, err_code: 400 }, { status: 400 });
@@ -113,7 +109,7 @@ const initComponent = async (props: { multiple: boolean; mode?: string }, hasTem
         http.get("/api/file_source_templates", ({ response }) => {
             const fileSourceTemplates = hasTemplates ? [{ id: "test_template" } as FileSourceTemplateSummary] : [];
             return response(200).json(fileSourceTemplates);
-        }),
+        })
     );
 
     const testingPinia = createTestingPinia({ stubActions: false });

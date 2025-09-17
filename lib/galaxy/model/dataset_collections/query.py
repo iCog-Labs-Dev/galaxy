@@ -1,5 +1,6 @@
 import logging
 from typing import (
+    List,
     Optional,
 )
 
@@ -20,7 +21,7 @@ class HdcaLike(Protocol):
 class DataCollectionParameterLike(Protocol):
 
     @property
-    def collection_types(self) -> Optional[list[str]]:
+    def collection_types(self) -> Optional[List[str]]:
         """Return a list of collection type strings the parameter accepts."""
 
 
@@ -38,7 +39,7 @@ class HistoryQuery:
         return HistoryQuery(**kwargs)
 
     @staticmethod
-    def from_collection_types(collection_types: Optional[list[str]], collection_type_descriptions):
+    def from_collection_types(collection_types: Optional[List[str]], collection_type_descriptions):
         if collection_types:
             collection_type_descriptions = [
                 collection_type_descriptions.for_collection_type(t) for t in collection_types

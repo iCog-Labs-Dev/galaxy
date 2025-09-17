@@ -36,10 +36,10 @@ watch(
     () => props.preferredObjectStoreId,
     async () => {
         fetch();
-    },
+    }
 );
 fetch();
-const loadingMessage = localize("Loading Galaxy storage details");
+const loadingMessage = localize("Loading storage location details");
 </script>
 
 <template>

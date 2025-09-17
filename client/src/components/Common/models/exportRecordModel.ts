@@ -9,10 +9,10 @@ import type {
 } from "@/api";
 
 export interface ExportParams {
-    modelStoreFormat: ModelStoreFormat;
-    includeFiles: boolean;
-    includeDeleted: boolean;
-    includeHidden: boolean;
+    readonly modelStoreFormat: ModelStoreFormat;
+    readonly includeFiles: boolean;
+    readonly includeDeleted: boolean;
+    readonly includeHidden: boolean;
 }
 
 export interface ExportRecord {
@@ -30,7 +30,7 @@ export interface ExportRecord {
     readonly isStsDownload: boolean;
     readonly canDownload: boolean;
     readonly modelStoreFormat: ModelStoreFormat;
-    readonly exportParams?: Readonly<ExportParams>;
+    readonly exportParams?: ExportParams;
     readonly duration?: number | null;
     readonly canExpire: boolean;
     readonly isPermanent: boolean;

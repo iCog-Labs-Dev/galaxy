@@ -43,18 +43,13 @@ from galaxy.util import (
 )
 
 
-class UnsafeValidatorConfiguredInUntrustedContext(AssertionError):
-    pass
-
-
 def parse_dict_validators(validator_dicts: List[Dict[str, Any]], trusted: bool) -> List[AnyValidatorModel]:
     validator_models = []
     for validator_dict in validator_dicts:
         validator = DiscriminatedAnyValidatorModel.validate_python(validator_dict)
         if not trusted:
             # Don't risk instantiating unsafe validators for user-defined code
-            if not validator._safe:
-                raise UnsafeValidatorConfiguredInUntrustedContext()
+            assert validator._safe
         validator_models.append(validator)
     return validator_models
 

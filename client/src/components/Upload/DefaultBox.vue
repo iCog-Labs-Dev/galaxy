@@ -75,7 +75,7 @@ const selectedItemsForModal = ref<HDASummary[]>([]);
 
 const counterNonRunning = computed(() => counterAnnounce.value + counterSuccess.value + counterError.value);
 const creatingPairedType = computed(
-    () => props.isCollection && ["list:paired", "paired"].includes(collectionType.value),
+    () => props.isCollection && ["list:paired", "paired"].includes(collectionType.value)
 );
 const enableBuild = computed(
     () =>
@@ -84,7 +84,7 @@ const enableBuild = computed(
         counterSuccess.value > 0 &&
         uploadedHistoryItemsReady.value &&
         uploadedHistoryItemsOk.value.length > 0 &&
-        (!creatingPairedType.value || uploadedHistoryItemsOk.value.length % 2 === 0),
+        (!creatingPairedType.value || uploadedHistoryItemsOk.value.length % 2 === 0)
 );
 const enableReset = computed(() => !isRunning.value && counterNonRunning.value > 0);
 const enableStart = computed(() => !isRunning.value && counterAnnounce.value > 0);
@@ -100,7 +100,7 @@ const { uploadedHistoryItemsOk, uploadedHistoryItemsReady, historyItemsStateInfo
     uploadValues as Ref<UploadItem[]>,
     historyId,
     enableStart,
-    creatingPairedType,
+    creatingPairedType
 );
 
 function createUploadQueue() {
@@ -144,19 +144,13 @@ function addFileFromInput(eventTarget: EventTarget | null) {
 /** A new file has been announced to the upload queue */
 function eventAnnounce(index: string, file: UploadFile) {
     counterAnnounce.value++;
-    const mode = file.mode || "local";
-    let deferred: boolean | undefined = false;
-    if (mode === "local") {
-        deferred = undefined;
-    }
     const uploadModel = {
         ...defaultModel,
         id: index,
         dbKey: dbKey.value,
         extension: extension.value,
         fileData: file,
-        fileMode: mode,
-        deferred: deferred,
+        fileMode: file.mode || "local",
         fileName: file.name,
         filePath: file.path,
         fileSize: file.size,
@@ -263,14 +257,14 @@ function eventRemoteFiles() {
                         path: item.url,
                     };
                     return rval;
-                }),
+                })
             );
         },
         { multiple: true },
         (route: string) => {
             router.push(route);
             emit("dismiss");
-        },
+        }
     );
 }
 
@@ -488,7 +482,7 @@ defineExpose({
                 :disabled="!enableSources"
                 @click="eventRemoteFiles">
                 <FontAwesomeIcon :icon="faFolderOpen" />
-                <span v-localize>Choose from repository</span>
+                <span v-localize>Choose remote files</span>
             </GButton>
             <GButton id="btn-new" :size="size" title="Paste/Fetch data" :disabled="!enableSources" @click="eventCreate">
                 <FontAwesomeIcon :icon="faEdit" />
@@ -554,7 +548,6 @@ defineExpose({
             v-if="isCollection && historyId"
             :history-id="historyId"
             :collection-type="collectionType"
-            :extended-collection-type="{}"
             :selected-items="selectedItemsForModal"
             :show.sync="collectionModalShow"
             default-hide-source-items />

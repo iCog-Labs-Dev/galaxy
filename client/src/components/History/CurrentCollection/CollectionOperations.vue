@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { faDownload, faInfoCircle, faRedo } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { computed } from "vue";
 import { useRouter } from "vue-router/composables";
 
@@ -15,10 +13,10 @@ const props = defineProps<{
 
 const downloadUrl = computed(() => `${getAppRoot()}api/dataset_collections/${props.dsc.id}/download`);
 const rerunUrl = computed(() =>
-    props.dsc.job_source_type == "Job" ? `/root?job_id=${props.dsc.job_source_id}` : null,
+    props.dsc.job_source_type == "Job" ? `/root?job_id=${props.dsc.job_source_id}` : null
 );
 const showCollectionDetailsUrl = computed(() =>
-    props.dsc.job_source_type == "Job" ? `/jobs/${props.dsc.job_source_id}/view` : null,
+    props.dsc.job_source_type == "Job" ? `/jobs/${props.dsc.job_source_id}/view` : null
 );
 const disableDownload = props.dsc.populated_state !== "ok";
 
@@ -38,7 +36,7 @@ function onDownload() {
                     variant="link"
                     :href="downloadUrl"
                     @click="onDownload">
-                    <FontAwesomeIcon class="mr-1" :icon="faDownload" />
+                    <Icon class="mr-1" icon="download" />
                     <span>Download</span>
                 </b-button>
                 <b-button
@@ -49,7 +47,7 @@ function onDownload() {
                     variant="link"
                     :href="showCollectionDetailsUrl"
                     @click.prevent.stop="router.push(showCollectionDetailsUrl)">
-                    <FontAwesomeIcon class="mr-1" :icon="faInfoCircle" />
+                    <icon icon="info-circle" />
                     <span>Show Details</span>
                 </b-button>
                 <b-button
@@ -60,7 +58,7 @@ function onDownload() {
                     variant="link"
                     :href="rerunUrl"
                     @click.prevent.stop="router.push(rerunUrl)">
-                    <FontAwesomeIcon class="mr-1" :icon="faRedo" />
+                    <Icon class="mr-1" icon="redo" />
                     <span>Run Job Again</span>
                 </b-button>
             </b-button-group>

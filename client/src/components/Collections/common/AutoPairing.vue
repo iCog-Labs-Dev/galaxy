@@ -3,7 +3,6 @@ import { BButton } from "bootstrap-vue";
 import { computed, ref } from "vue";
 
 import type { HistoryItemSummary } from "@/api";
-import type { HasName } from "@/components/Collections/pairing";
 import localize from "@/utils/localization";
 
 import { useExtensionFiltering } from "./useExtensionFilter";
@@ -11,16 +10,9 @@ import { usePairingSummary } from "./usePairingSummary";
 
 import PairingFilterInputGroup from "./PairingFilterInputGroup.vue";
 
-type ElementType = HistoryItemSummary | HasName;
-type ElementsType = HistoryItemSummary[] | HasName[];
-
 interface Props {
-    elements: ElementsType;
-    collectionType:
-        | "list:paired"
-        | "list:paired_or_unpaired"
-        | "sample_sheet:paired"
-        | "sample_sheet:paired_or_unpaired";
+    elements: HistoryItemSummary[];
+    collectionType: "list:paired" | "list:paired_or_unpaired";
     forwardFilter?: string;
     reverseFilter?: string;
     removeExtensions: boolean;
@@ -39,7 +31,7 @@ const props = defineProps<Props>();
 
 const currentForwardFilter = ref(props.forwardFilter || "");
 const currentReverseFilter = ref(props.reverseFilter || "");
-const { currentSummary, summaryText, autoPair } = usePairingSummary<ElementType>(props);
+const { currentSummary, summaryText, autoPair } = usePairingSummary<HistoryItemSummary>(props);
 
 const { showElementExtension } = useExtensionFiltering(props);
 
@@ -68,14 +60,6 @@ const whereIsTheBuilder = computed(() => {
     }
 });
 
-function getHid(element: ElementType): string {
-    if ("hid" in element) {
-        return element.hid.toString();
-    } else {
-        return "";
-    }
-}
-
 function onApply() {
     emit("on-apply", currentForwardFilter.value, currentReverseFilter.value);
 }
@@ -100,9 +84,9 @@ function onApply() {
                 <li v-for="(pair, index) of currentSummary?.pairs" :key="`paired_${index}`">
                     <span v-if="index > 0">,</span>
                     <span class="pair-name">{{ pair.name }}</span> (<span class="direction">FORWARD</span
-                    ><span v-if="showHid" class="dataset-hid">{{ getHid(pair.forward) }}: </span
+                    ><span v-if="showHid" class="dataset-hid">{{ pair.forward.hid }}: </span
                     ><span class="dataset-name">{{ pair.forward.name }}</span> | <span class="direction">REVERSE</span
-                    ><span v-if="showHid" class="dataset-hid">{{ getHid(pair.reverse) }}: </span
+                    ><span v-if="showHid" class="dataset-hid">{{ pair.reverse.hid }}: </span
                     ><span class="dataset-name">{{ pair.reverse.name }}</span
                     >)
                 </li>
@@ -112,7 +96,7 @@ function onApply() {
                 <div class="summary-list-description">
                     These datasets were not paired automatically. This builder will allow you to match any of pairs of
                     these manually {{ whereIsTheBuilder }}.
-                    <span v-if="collectionType == 'list:paired' || collectionType == 'sample_sheet:paired'">
+                    <span v-if="collectionType == 'list:paired'">
                         All unmatched datasets will not be included in the final list of paired datasets.
                     </span>
                     <span v-else>
@@ -122,14 +106,10 @@ function onApply() {
                 <ol class="summary-list">
                     <li v-for="(unpairedDataset, index) of currentSummary?.unpaired" :key="`unpaired_${index}`">
                         <span v-if="index > 0">,</span>
-                        <span v-if="showHid" class="dataset-hid">{{ getHid(unpairedDataset) }}: </span>
+                        <span v-if="showHid" class="dataset-hid">{{ unpairedDataset.hid }}: </span>
                         <span class="unpaired-dataset-name dataset-name">{{ unpairedDataset.name }}</span>
                         <span
-                            v-if="
-                                typeof unpairedDataset !== 'string' &&
-                                'extension' in unpairedDataset &&
-                                showElementExtension(unpairedDataset)
-                            "
+                            v-if="'extension' in unpairedDataset && showElementExtension(unpairedDataset)"
                             class="dataset-extension-wrapper"
                             >(
                             <span class="dataset-extension">{{ unpairedDataset.extension }}</span>

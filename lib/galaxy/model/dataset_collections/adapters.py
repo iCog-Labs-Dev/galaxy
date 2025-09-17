@@ -1,12 +1,11 @@
-from collections import defaultdict
 from typing import (
+    List,
     TYPE_CHECKING,
 )
 
 from pydantic import ValidationError
 from typing_extensions import Self
 
-from galaxy.model import CollectionStateSummary
 from galaxy.tool_util_models.parameters import (
     AdaptedDataCollectionPromoteCollectionElementToCollectionRequestInternal,
     AdaptedDataCollectionPromoteDatasetsToCollectionRequestInternal,
@@ -90,11 +89,11 @@ class DCECollectionAdapter(CollectionAdapter):
             return self._dce.child_collection.dataset_states_and_extensions_summary
         else:
             hda = self._dce.dataset_instance
-            dbkeys = [hda.dbkey] if hda.dbkey else []
-            extensions = [hda.extension] if hda.extension else []
-            states = {hda.dataset.state: 1} if hda.dataset.state else {}
-            deleted = 1 if hda.deleted or (hda.dataset and hda.dataset.deleted) else 0
-            return CollectionStateSummary(dbkeys=dbkeys, extensions=extensions, states=states, deleted=deleted)
+            extensions = set()
+            states = set()
+            states.add(hda.dataset.state)
+            extensions.add(hda.extension)
+            return (states, extensions)
 
     @property
     def dataset_instances(self):
@@ -163,11 +162,11 @@ class PromoteDatasetToCollection(CollectionAdapter):
     @property
     def dataset_states_and_extensions_summary(self):
         hda = self._hda
-        dbkeys = [hda.dbkey] if hda.dbkey else []
-        extensions = [hda.extension] if hda.extension else []
-        states = {hda.dataset.state: 1} if hda.dataset.state else {}
-        deleted = 1 if hda.deleted or (hda.dataset and hda.dataset.deleted) else 0
-        return CollectionStateSummary(dbkeys=dbkeys, extensions=extensions, states=states, deleted=deleted)
+        extensions = set()
+        states = set()
+        states.add(hda.dataset.state)
+        extensions.add(hda.extension)
+        return (states, extensions)
 
     @property
     def dataset_instances(self):
@@ -191,9 +190,9 @@ class PromoteDatasetToCollection(CollectionAdapter):
 
 class PromoteDatasetsToCollection(CollectionAdapter):
     _collection_type: str
-    _elements: list["TransientCollectionAdapterDatasetInstanceElement"]
+    _elements: List["TransientCollectionAdapterDatasetInstanceElement"]
 
-    def __init__(self, elements: list["TransientCollectionAdapterDatasetInstanceElement"], collection_type: str):
+    def __init__(self, elements: List["TransientCollectionAdapterDatasetInstanceElement"], collection_type: str):
         assert collection_type in ["paired", "paired_or_unpaired"]
         self._collection_type = collection_type
         self._elements = elements
@@ -236,22 +235,12 @@ class PromoteDatasetsToCollection(CollectionAdapter):
 
     @property
     def dataset_states_and_extensions_summary(self):
-        dbkeys = set()
         extensions = set()
-        states: dict[str, int] = defaultdict(int)
-        deleted = 0
+        states = set()
         for hda in self.dataset_instances:
-            if hda.dbkey:
-                dbkeys.add(hda.dbkey)
-            if hda.extension:
-                extensions.add(hda.extension)
-            if hda.dataset.state:
-                states[hda.dataset.state] += 1
-            if hda.deleted or (hda.dataset and hda.dataset.deleted):
-                deleted += 1
-        return CollectionStateSummary(
-            dbkeys=sorted(dbkeys), extensions=sorted(extensions), states=states, deleted=deleted
-        )
+            states.add(hda.dataset.state)
+            extensions.add(hda.extension)
+        return (states, extensions)
 
     @property
     def adapting(self):
@@ -279,10 +268,6 @@ class TransientCollectionAdapterDatasetInstanceElement:
     @property
     def is_collection(self):
         return False
-
-    @property
-    def columns(self):
-        return None
 
 
 def recover_adapter(wrapped_object, adapter_model):

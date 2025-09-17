@@ -8,8 +8,11 @@ import sys
 from io import StringIO
 from typing import (
     Any,
+    Dict,
+    List,
     NamedTuple,
     Optional,
+    Tuple,
     Union,
 )
 
@@ -48,15 +51,15 @@ class ExampleTests(BaseModel):
 
 
 class DatasetsDeclaration(BaseModel):
-    datasets: list[str]
+    datasets: List[str]
 
     def as_latex(self) -> str:
         return ", ".join([f"$ {d} $" for d in self.datasets])
 
 
 class ToolDefinition(BaseModel):
-    inputs: dict[str, str] = Field(alias="in")
-    outputs: dict[str, str] = Field(alias="out")
+    inputs: Dict[str, str] = Field(alias="in")
+    outputs: Dict[str, str] = Field(alias="out")
 
     def as_latex(self) -> str:
         inputs = ", ".join([f"{k}: \\text{{ {v} }}" for (k, v) in self.inputs.items()])
@@ -71,7 +74,7 @@ class ToolDeclaration(BaseModel):
         return self.tool.as_latex()
 
 
-def elements_to_latex(elements: dict[str, Any]):
+def elements_to_latex(elements: Dict[str, Any]):
     elements_as_strings = []
     for identifier, value in elements.items():
         if value is None:
@@ -88,7 +91,7 @@ def elements_to_latex(elements: dict[str, Any]):
 
 class CollectionDefinition(NamedTuple):
     collection_type: str
-    elements: dict[str, Any]
+    elements: Dict[str, Any]
 
     def as_latex(self) -> str:
         collection_type = self.collection_type.replace("_", "\\_")
@@ -96,7 +99,7 @@ class CollectionDefinition(NamedTuple):
 
 
 class CollectionDeclarations(BaseModel):
-    collections: dict[str, CollectionDefinition]
+    collections: Dict[str, CollectionDefinition]
 
 
 Expression = Union[str, DatasetsDeclaration, ToolDeclaration, CollectionDeclarations]
@@ -104,7 +107,7 @@ Expression = Union[str, DatasetsDeclaration, ToolDeclaration, CollectionDeclarat
 
 class Example(BaseModel):
     label: str
-    assumptions: Optional[list[Expression]] = None
+    assumptions: Optional[List[Expression]] = None
     then: Optional[str] = None
     is_valid: bool = True
     tests: Optional[ExampleTests] = None
@@ -114,7 +117,7 @@ class ExampleEntry(BaseModel):
     example: Example
 
 
-YAMLRootModel = RootModel[list[Union[DocEntry, ExampleEntry]]]
+YAMLRootModel = RootModel[List[Union[DocEntry, ExampleEntry]]]
 
 
 WORDS_TO_TEXTIFY = ["list", "forward", "reverse", "mapOver"]
@@ -134,11 +137,11 @@ def expression_to_latex(expression: str, wrap: bool = True):
         return f"{expression}"
 
 
-def collect_docs_with_examples(root: YAMLRootModel) -> list[tuple[DocEntry, list[ExampleEntry]]]:
+def collect_docs_with_examples(root: YAMLRootModel) -> List[Tuple[DocEntry, List[ExampleEntry]]]:
     docs_with_examples = []
 
     current_doc: Optional[DocEntry] = None
-    current_examples: list[ExampleEntry] = []
+    current_examples: List[ExampleEntry] = []
     for entry in root.root:
         if isinstance(entry, DocEntry):
             if current_doc:

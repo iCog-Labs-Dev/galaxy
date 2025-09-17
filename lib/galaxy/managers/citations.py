@@ -1,7 +1,9 @@
 import functools
 import logging
 from typing import (
+    Dict,
     Optional,
+    Type,
     Union,
 )
 
@@ -173,7 +175,7 @@ class DoiCitation(BaseCitation):
             return str(self.raw_bibtex)
 
 
-CITATION_CLASSES: dict[str, type[CitationT]] = dict(
+CITATION_CLASSES: Dict[str, Type[CitationT]] = dict(
     bibtex=BibtexCitation,
     doi=DoiCitation,
 )

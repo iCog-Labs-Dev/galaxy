@@ -18,16 +18,11 @@ jest.mock("vue-router/composables");
 const localVue = getLocalVue();
 localVue.use(PiniaVuePlugin);
 
-const testIcon = "copy";
-const operationIcon1 = "cog";
-const operationIcon2 = "filter";
-const operationIcon3 = "folder";
-
 const testGrid = {
     actions: [
         {
             title: "test",
-            icon: testIcon,
+            icon: "test-icon",
             handler: jest.fn(),
         },
     ],
@@ -50,19 +45,19 @@ const testGrid = {
             operations: [
                 {
                     title: "operation-title-1",
-                    icon: operationIcon1,
+                    icon: "operation-icon-1",
                     condition: (_, config) => config.value.enabled,
                     handler: jest.fn(),
                 },
                 {
                     title: "operation-title-2",
-                    icon: operationIcon2,
+                    icon: "operation-icon-2",
                     condition: (_, config) => config.value.disabled,
                     handler: jest.fn(),
                 },
                 {
                     title: "operation-title-3",
-                    icon: operationIcon3,
+                    icon: "operation-icon-3",
                     condition: (_, config) => config.value.enabled,
                     handler: () => ({
                         status: "success",
@@ -117,7 +112,7 @@ describe("GridList", () => {
         expect(testGrid.actions[0].handler).toHaveBeenCalledTimes(1);
         expect(testGrid.getData).toHaveBeenCalledTimes(1);
         expect(testGrid.getData.mock.calls[0]).toEqual([0, 25, "", "id", true]);
-        expect(findAction.find(`[icon='${testIcon}']`).exists()).toBeTruthy();
+        expect(findAction.find("[icon='test-icon']").exists()).toBeTruthy();
         await wrapper.vm.$nextTick();
         expect(wrapper.find("[data-description='grid title']").text()).toBe("Test");
         expect(wrapper.find("[data-description='grid cell 0-0']").text()).toBe("id-1");

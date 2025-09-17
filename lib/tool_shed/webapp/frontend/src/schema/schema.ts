@@ -1954,10 +1954,7 @@ export interface components {
              * @description Parameter name. Used when referencing parameter in workflows or inside command templating.
              */
             name: string
-            /**
-             * Optional
-             * @default false
-             */
+            /** Optional */
             optional: boolean
             /**
              * Parameter Type

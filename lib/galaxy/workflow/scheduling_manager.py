@@ -4,7 +4,10 @@ from datetime import (
     timedelta,
 )
 from functools import partial
-from typing import Optional
+from typing import (
+    Dict,
+    Optional,
+)
 
 from sqlalchemy.orm import Session
 
@@ -307,7 +310,7 @@ class WorkflowRequestMonitor(Monitors):
             name="WorkflowRequestMonitor.monitor_thread", target=self.__monitor, config=app.config
         )
         self.invocation_grabber = None
-        self.update_time_tracking_dict: dict[int, datetime] = {}
+        self.update_time_tracking_dict: Dict[int, datetime] = {}
         backfill_seconds = (
             min(app.config.maximum_workflow_invocation_duration, DEFAULT_SCHEDULER_BACKFILL_SECONDS)
             if app.config.maximum_workflow_invocation_duration > 0

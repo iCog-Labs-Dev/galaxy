@@ -5,7 +5,10 @@ Manager and Serializer for Library Folders.
 import logging
 from dataclasses import dataclass
 from typing import (
+    List,
     Optional,
+    Set,
+    Tuple,
     TYPE_CHECKING,
     Union,
 )
@@ -62,7 +65,7 @@ log = logging.getLogger(__name__)
 class SecurityParams:
     """Contains security data bundled for reusability."""
 
-    user_role_ids: list[model.Role]
+    user_role_ids: List[model.Role]
     security_agent: RBACAgent
     is_admin: bool
 
@@ -325,7 +328,7 @@ class FolderManager:
             )
         )
 
-        def make_tuples(roles: set):
+        def make_tuples(roles: Set):
             tuples = []
             for role in roles:
                 # use role name for non-private roles, and user.email from private rules
@@ -406,7 +409,7 @@ class FolderManager:
         trans,
         folder: LibraryFolder,
         payload: LibraryFolderContentsIndexQueryPayload,
-    ) -> tuple[list[Union[LibraryFolder, LibraryDataset]], int]:
+    ) -> Tuple[List[Union[LibraryFolder, LibraryDataset]], int]:
         """Retrieves the contents of the given folder that match the provided filters and pagination parameters.
         Returns a tuple with the list of paginated contents and the total number of items contained in the folder."""
         limit = payload.limit
@@ -418,7 +421,7 @@ class FolderManager:
             is_admin=trans.user_is_admin,
         )
 
-        content_items: list[Union[LibraryFolder, LibraryDataset]] = []
+        content_items: List[Union[LibraryFolder, LibraryDataset]] = []
         sub_folders_stmt = self._get_sub_folders_statement(sa_session, folder, security_params, payload)
         total_sub_folders = get_count(sa_session, sub_folders_stmt)
         if payload.order_by in FOLDER_SORT_COLUMN_MAP:
@@ -551,7 +554,7 @@ class FolderManager:
 
     def build_folder_path(
         self, sa_session: galaxy_scoped_session, folder: model.LibraryFolder
-    ) -> list[tuple[int, Optional[str]]]:
+    ) -> List[Tuple[int, Optional[str]]]:
         """
         Returns the folder path from root to the given folder.
 

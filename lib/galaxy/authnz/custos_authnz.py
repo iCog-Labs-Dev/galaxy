@@ -10,6 +10,7 @@ from datetime import (
     timedelta,
 )
 from typing import (
+    List,
     Optional,
 )
 from urllib.parse import quote
@@ -58,9 +59,9 @@ class CustosAuthnzConfiguration:
     redirect_uri: str
     ca_bundle: Optional[str]
     pkce_support: bool
-    accepted_audiences: list[str]
+    accepted_audiences: List[str]
     extra_params: Optional[dict]
-    extra_scopes: list[str]
+    extra_scopes: List[str]
     authorization_endpoint: Optional[str]
     token_endpoint: Optional[str]
     end_session_endpoint: Optional[str]
@@ -580,7 +581,7 @@ class CustosAuthFactory:
         oidc_backend_config: dict
         idphint: str
 
-    _CustosAuthBasedProvidersCache: list[_CustosAuthBasedProviderCacheItem] = []
+    _CustosAuthBasedProvidersCache: List[_CustosAuthBasedProviderCacheItem] = []
 
     @staticmethod
     def GetCustosBasedAuthProvider(provider, oidc_config, oidc_backend_config, idphint=None):

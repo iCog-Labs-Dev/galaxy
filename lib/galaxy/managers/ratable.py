@@ -3,6 +3,7 @@ Mixins for Ratable model managers and serializers.
 """
 
 import logging
+from typing import Type
 
 from sqlalchemy import select
 from sqlalchemy.sql.expression import func
@@ -14,7 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class RatableManagerMixin:
-    rating_assoc: type[ItemRatingAssociation]
+    rating_assoc: Type[ItemRatingAssociation]
 
     def rating(self, item, user, as_int=True):
         """Returns the integer rating given to this item by the user.

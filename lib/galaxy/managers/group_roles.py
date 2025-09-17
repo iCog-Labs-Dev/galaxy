@@ -1,5 +1,6 @@
 import logging
 from typing import (
+    List,
     Optional,
 )
 
@@ -21,7 +22,7 @@ class GroupRolesManager:
     def __init__(self, app: MinimalManagerApp) -> None:
         self._app = app
 
-    def index(self, trans: ProvidesAppContext, group_id: int) -> list[model.GroupRoleAssociation]:
+    def index(self, trans: ProvidesAppContext, group_id: int) -> List[model.GroupRoleAssociation]:
         """
         Returns a collection roles associated with the given group.
         """

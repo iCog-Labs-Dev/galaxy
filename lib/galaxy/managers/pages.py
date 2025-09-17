@@ -13,6 +13,7 @@ from html.parser import HTMLParser
 from typing import (
     Callable,
     Optional,
+    Tuple,
     TYPE_CHECKING,
     Union,
 )
@@ -143,7 +144,7 @@ class PageManager(sharable.SharableModelManager[model.Page], UsesAnnotations):
 
     def index_query(
         self, trans: ProvidesUserContext, payload: PageIndexQueryPayload, include_total_count: bool = False
-    ) -> tuple["ScalarResult[model.Page]", Union[int, None]]:
+    ) -> Tuple["ScalarResult[model.Page]", Union[int, None]]:
         show_deleted = payload.deleted
         show_own = payload.show_own
         show_published = payload.show_published

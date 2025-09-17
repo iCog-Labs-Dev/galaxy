@@ -1,4 +1,5 @@
 from typing import (
+    List,
     Optional,
     TYPE_CHECKING,
 )
@@ -152,7 +153,7 @@ class SmartTarget:
         return self._has_driver.axe_eval(context=self._target.element_locator[1])
 
     def assert_no_axe_violations_with_impact_of_at_least(
-        self, impact: Impact, excludes: Optional[list[str]] = None
+        self, impact: Impact, excludes: Optional[List[str]] = None
     ) -> None:
         self.wait_for_visible()
         self.axe_eval().assert_no_violations_with_impact_of_at_least(impact, excludes=excludes)

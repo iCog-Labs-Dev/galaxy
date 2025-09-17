@@ -15,9 +15,8 @@ const selectors = {
     invocationSummary: ".invocation-overview",
     bAlertStub: "balert-stub",
     spanElement: "span",
-    invocationDebugTab: ".invocation-debug-tab",
-    invocationReportTab: ".invocation-report-tab",
-    invocationExportTab: ".invocation-export-tab",
+    invocationReportTab: '[titleitemclass="invocation-report-tab"]',
+    invocationExportTab: '[titleitemclass="invocation-export-tab"]',
     fullPageHeading: "anonymous-stub[h1='true']",
 };
 
@@ -37,14 +36,6 @@ const invocationById = {
     "non-terminal-populated-state": {
         ...invocationData,
         id: "non-terminal-populated-state",
-    },
-    "non-terminal-error-jobs": {
-        ...invocationData,
-        id: "non-terminal-error-jobs",
-    },
-    "terminal-error-jobs": {
-        ...invocationData,
-        id: "terminal-error-jobs",
     },
 };
 
@@ -68,20 +59,6 @@ const invocationJobsSummaryById = {
         ...invocationDataJobsSummary,
         populated_state: "new",
     },
-    "non-terminal-error-jobs": {
-        ...invocationDataJobsSummary,
-        states: {
-            running: 1,
-            error: 1,
-        },
-    },
-    "terminal-error-jobs": {
-        ...invocationDataJobsSummary,
-        states: {
-            ok: 1,
-            error: 1,
-        },
-    },
 };
 
 // Mock the invocation store to return the expected invocation data given the invocation ID
@@ -102,18 +79,6 @@ jest.mock("@/stores/invocationStore", () => {
             }),
             getInvocationJobsSummaryById: jest.fn().mockImplementation((invocationId) => {
                 return invocationJobsSummaryById[invocationId];
-            }),
-            getInvocationStepJobsSummaryById: jest.fn().mockImplementation(() => {
-                return [
-                    {
-                        id: "job-id",
-                        model: "Job",
-                        populated_state: "ok",
-                        states: {
-                            ok: 1,
-                        },
-                    },
-                ];
             }),
             fetchInvocationById: mockFetchInvocationById,
             fetchInvocationJobsSummaryForId: mockFetchInvocationJobsSummaryForId,
@@ -244,20 +209,6 @@ describe("WorkflowInvocationState check 'Report' and 'Export' tab disabled state
         expect(reportTab.attributes("disabled")).toBeUndefined();
         const exportTab = wrapper.find(selectors.invocationExportTab);
         expect(exportTab.attributes("disabled")).toBeUndefined();
-    });
-});
-
-describe("WorkflowInvocationState check 'Debug' tab", () => {
-    it("does not exist for non-terminal invocation", async () => {
-        const wrapper = await mountWorkflowInvocationState("non-terminal-error-jobs");
-        expect(isInvocationAndJobTerminal(wrapper)).toBe(false);
-        expect(wrapper.find(selectors.invocationDebugTab).exists()).toBe(false);
-    });
-
-    it("exists for terminal invocation", async () => {
-        const wrapper = await mountWorkflowInvocationState("terminal-error-jobs");
-        expect(isInvocationAndJobTerminal(wrapper)).toBe(true);
-        expect(wrapper.find(selectors.invocationDebugTab).exists()).toBe(true);
     });
 });
 

@@ -41,10 +41,10 @@ export async function createWorkflow(workflowName: string, workflowAnnotation: s
 }
 
 export async function getWorkflowFull(workflowId: string, version?: number) {
-    const params: { style: string; version?: number } = { style: "editor" };
-    if (Number.isInteger(version)) {
-        params.version = version;
+    let url = `/workflow/load_workflow?_=true&id=${workflowId}`;
+    if (version !== undefined) {
+        url += `&version=${version}`;
     }
-    const { data } = await axios.get(withPrefix(`/api/workflows/${workflowId}/download`), { params });
+    const { data } = await axios.get(withPrefix(url));
     return data;
 }

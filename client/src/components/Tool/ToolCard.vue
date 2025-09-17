@@ -1,11 +1,9 @@
 <script setup>
-import { faHdd } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { BModal } from "bootstrap-vue";
 import Heading from "components/Common/Heading";
 import FormMessage from "components/Form/FormMessage";
 import ToolFooter from "components/Tool/ToolFooter";
 import ToolHelp from "components/Tool/ToolHelp";
+import { getAppRoot } from "onload/loadConfig";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 
@@ -84,7 +82,7 @@ watch(
     () => props.id,
     () => {
         errorText.value = null;
-    },
+    }
 );
 
 function onSetError(e) {
@@ -100,12 +98,13 @@ const showVersions = computed(() => props.options.versions?.length > 1);
 
 const storageLocationModalTitle = computed(() => {
     if (isOnlyPreference.value) {
-        return "Tool Execution Preferred Storage";
+        return "Tool Execution Preferred Storage Location";
     } else {
-        return "Tool Execution Storage";
+        return "Tool Execution Storage Location";
     }
 });
 
+const root = computed(() => getAppRoot());
 const showPreferredObjectStoreModal = ref(false);
 const toolPreferredObjectStoreId = ref(props.preferredObjectStoreId);
 
@@ -114,6 +113,7 @@ function onShowObjectStoreSelect() {
 }
 
 function onUpdatePreferredObjectStoreId(selectedToolPreferredObjectStoreId) {
+    showPreferredObjectStoreModal.value = false;
     toolPreferredObjectStoreId.value = selectedToolPreferredObjectStoreId;
     emit("updatePreferredObjectStoreId", selectedToolPreferredObjectStoreId);
 }
@@ -148,27 +148,24 @@ const showHelpForum = computed(() => isConfigLoaded.value && config.value.enable
                     size="sm"
                     class="float-right tool-storage"
                     @click="onShowObjectStoreSelect">
-                    <FontAwesomeIcon :icon="faHdd" />
+                    <span class="fa fa-hdd" />
                 </b-button>
                 <ToolTargetPreferredObjectStorePopover
                     v-if="allowObjectStoreSelection"
                     :tool-preferred-object-store-id="toolPreferredObjectStoreId"
                     :user="currentUser" />
-                <BModal
-                    id="modal-select-preferred-object-store"
+                <b-modal
                     v-model="showPreferredObjectStoreModal"
                     :title="storageLocationModalTitle"
-                    scrollable
-                    centered
                     modal-class="tool-preferred-object-store-modal"
                     title-tag="h3"
-                    size="lg"
-                    ok-only
-                    ok-title="Close">
+                    size="sm"
+                    hide-footer>
                     <ToolSelectPreferredObjectStore
                         :tool-preferred-object-store-id="toolPreferredObjectStoreId"
+                        :root="root"
                         @updated="onUpdatePreferredObjectStoreId" />
-                </BModal>
+                </b-modal>
             </b-button-group>
             <slot name="buttons" />
         </template>

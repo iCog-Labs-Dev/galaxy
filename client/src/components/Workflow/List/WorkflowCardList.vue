@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, type Ref, ref } from "vue";
+import { reactive, ref } from "vue";
 
 import type { WorkflowSummary } from "@/api/workflows";
 
@@ -18,12 +18,8 @@ interface Props {
     filterable?: boolean;
     publishedView?: boolean;
     editorView?: boolean;
-    compact?: boolean;
     currentWorkflowId?: string;
     selectedWorkflowIds?: SelectedWorkflow[];
-    itemRefs?: Record<string, Ref<InstanceType<typeof WorkflowCard> | null>>;
-    rangeSelectAnchor?: WorkflowSummary;
-    clickable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,11 +28,8 @@ const props = withDefaults(defineProps<Props>(), {
     filterable: true,
     publishedView: false,
     editorView: false,
-    compact: false,
     currentWorkflowId: "",
     selectedWorkflowIds: () => [],
-    itemRefs: () => ({}),
-    rangeSelectAnchor: undefined,
 });
 
 const emit = defineEmits<{
@@ -46,8 +39,6 @@ const emit = defineEmits<{
     (e: "updateFilter", key: string, value: any): void;
     (e: "insertWorkflow", id: string, name: string): void;
     (e: "insertWorkflowSteps", id: string, stepCount: number): void;
-    (e: "on-key-down", workflow: WorkflowSummary, event: KeyboardEvent): void;
-    (e: "on-workflow-card-click", workflow: WorkflowSummary, event: Event): void;
 }>();
 
 const modalOptions = reactive({
@@ -95,9 +86,7 @@ const workflowPublished = ref<InstanceType<typeof WorkflowPublished>>();
     <div class="workflow-card-list d-flex flex-wrap overflow-auto">
         <WorkflowCard
             v-for="workflow in workflows"
-            :ref="props.itemRefs[workflow.id]"
             :key="workflow.id"
-            tabindex="0"
             :workflow="workflow"
             :selectable="!publishedView && !editorView"
             :selected="props.selectedWorkflowIds.some((w) => w.id === workflow.id)"
@@ -106,11 +95,7 @@ const workflowPublished = ref<InstanceType<typeof WorkflowPublished>>();
             :filterable="props.filterable"
             :published-view="props.publishedView"
             :editor-view="props.editorView"
-            :compact="props.compact"
             :current="workflow.id === props.currentWorkflowId"
-            :clickable="props.clickable"
-            class="workflow-card-in-list"
-            :class="{ 'range-select-anchor-workfow': props.rangeSelectAnchor?.id === workflow.id }"
             @select="(...args) => emit('select', ...args)"
             @tagClick="(...args) => emit('tagClick', ...args)"
             @refreshList="(...args) => emit('refreshList', ...args)"
@@ -118,9 +103,7 @@ const workflowPublished = ref<InstanceType<typeof WorkflowPublished>>();
             @rename="onRename"
             @preview="onPreview"
             @insert="onInsert(workflow)"
-            @insertSteps="onInsertSteps(workflow)"
-            @on-key-down="(...args) => emit('on-key-down', ...args)"
-            @on-workflow-card-click="(...args) => emit('on-workflow-card-click', ...args)" />
+            @insertSteps="onInsertSteps(workflow)" />
 
         <WorkflowRename
             :id="modalOptions.rename.id"
@@ -165,17 +148,9 @@ const workflowPublished = ref<InstanceType<typeof WorkflowPublished>>();
 </style>
 
 <style scoped lang="scss">
-@import "theme/blue.scss";
 @import "_breakpoints.scss";
 
 .workflow-card-list {
     container: cards-list / inline-size;
-    .workflow-card-in-list {
-        &.range-select-anchor-workfow {
-            &:deep(.g-card-content) {
-                box-shadow: 0 0 0 0.2rem transparentize($brand-primary, 0.75);
-            }
-        }
-    }
 }
 </style>

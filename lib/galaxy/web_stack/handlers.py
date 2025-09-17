@@ -8,6 +8,7 @@ import logging
 import os
 import random
 from enum import Enum
+from typing import Tuple
 
 from sqlalchemy.orm import object_session
 
@@ -38,7 +39,7 @@ class HandlerAssignmentSkip(Exception):
 
 class ConfiguresHandlers:
     DEFAULT_HANDLER_TAG = "_default_"
-    DEFAULT_BASE_HANDLER_POOLS: tuple[str, ...] = ()
+    DEFAULT_BASE_HANDLER_POOLS: Tuple[str, ...] = ()
 
     def add_handler(self, handler_id, tags):
         if handler_id not in self.handlers:

@@ -31,6 +31,7 @@ function buildBadges(): CardBadge[] {
             label: "RO-Crate",
             title: "This archive contains an RO-Crate. A Research Object Crate (RO-Crate) is a structured package for sharing research data.",
             variant: "info",
+            visible: true,
         },
     ];
     if (isGalaxyZipExport(props.explorer)) {
@@ -40,6 +41,7 @@ function buildBadges(): CardBadge[] {
                 label: "Galaxy History",
                 title: "This archive contains the exported datasets of a Galaxy History.",
                 variant: "info",
+                visible: true,
             });
         } else {
             badges.push({
@@ -47,6 +49,7 @@ function buildBadges(): CardBadge[] {
                 label: "Galaxy Workflow Run",
                 title: "This archive contains the exported results of a Galaxy workflow invocation or run.",
                 variant: "info",
+                visible: true,
             });
         }
     }
