@@ -288,7 +288,7 @@ defineExpose({
                     height="56"
                     />
             </div>
-            <b-nav vertical class="flex-nowrap h-100 vertical-overflow" style="margin-top: 24pxx; align-items: center;">
+            <b-nav vertical class="flex-nowrap h-100 vertical-overflow" style="margin-top: 24px; align-items: center;">
                 <draggable
                     v-model="activities"
                     :class="{ 'activity-popper-disabled': isDragging }"
