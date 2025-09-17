@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import type { HDCASummary } from "@/api";
+import { JobStateSummary } from "@/components/History/Content/Collection/JobStateSummary.js";
 
 import CollectionDescription from "@/components/History/Content/Collection/CollectionDescription.vue";
 import DetailsLayout from "@/components/History/Layout/DetailsLayout.vue";
@@ -9,7 +12,11 @@ interface Props {
     writeable: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const jobState = computed(() => {
+    return new JobStateSummary(props.dsc);
+});
 </script>
 
 <template>
@@ -21,7 +28,11 @@ defineProps<Props>();
         :show-annotation="false"
         @save="$emit('update:dsc', $event)">
         <template v-slot:description>
-            <CollectionDescription :hdca="dsc" />
+            <CollectionDescription
+                :job-state-summary="jobState"
+                :collection-type="dsc.collection_type"
+                :element-count="dsc.element_count ?? undefined"
+                :elements-datatypes="dsc.elements_datatypes" />
         </template>
     </DetailsLayout>
 </template>

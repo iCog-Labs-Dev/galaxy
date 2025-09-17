@@ -3,6 +3,7 @@ import os
 from json import dumps
 from typing import (
     Any,
+    Dict,
     Optional,
 )
 
@@ -79,10 +80,10 @@ class SetMetadataToolAction(ToolAction):
         self,
         tool,
         trans,
-        incoming: Optional[dict[str, Any]],
+        incoming: Optional[Dict[str, Any]],
         overwrite: bool = True,
         history: Optional[History] = None,
-        job_params: Optional[dict[str, Any]] = None,
+        job_params: Optional[Dict[str, Any]] = None,
     ):
         trans.check_user_activation()
         session = trans.get_galaxy_session()
@@ -108,10 +109,10 @@ class SetMetadataToolAction(ToolAction):
         session_id: Optional[int],
         history_id: Optional[int],
         user: Optional[User] = None,
-        incoming: Optional[dict[str, Any]] = None,
+        incoming: Optional[Dict[str, Any]] = None,
         overwrite: bool = True,
         history: Optional[History] = None,
-        job_params: Optional[dict[str, Any]] = None,
+        job_params: Optional[Dict[str, Any]] = None,
     ):
         """
         Execute using application.

@@ -1,6 +1,8 @@
 import json
 from typing import (
     Any,
+    Dict,
+    List,
     Optional,
     Union,
 )
@@ -43,7 +45,7 @@ class JobInputSummary(Model):
 # TODO: Use Tuple again when `make update-client-api-schema` supports them
 class JobErrorSummary(Model):
     # messages: List[Union[Tuple[str, str], List[str]]]
-    messages: list[list[str]] = Field(
+    messages: List[List[str]] = Field(
         default=...,
         title="Error messages",
         description="The error messages for the specified job.",
@@ -103,7 +105,7 @@ class SearchJobsPayload(Model):
         title="Tool ID",
         description="The tool ID related to the job.",
     )
-    inputs: dict[str, Any] = Field(
+    inputs: Dict[str, Any] = Field(
         default=...,
         title="Inputs",
         description="The inputs of the job.",
@@ -168,12 +170,12 @@ class EncodedJobDetails(JobSummary):
             "The specific parameters depend on the tool itself."
         ),
     )
-    inputs: dict[str, EncodedDatasetJobInfo] = Field(
+    inputs: Dict[str, EncodedDatasetJobInfo] = Field(
         {},
         title="Inputs",
         description="Dictionary mapping all the tool inputs (by name) to the corresponding data references.",
     )
-    outputs: dict[str, EncodedDatasetJobInfo] = Field(
+    outputs: Dict[str, EncodedDatasetJobInfo] = Field(
         {},
         title="Outputs",
         description="Dictionary mapping all the tool outputs (by name) to the corresponding data references.",
@@ -183,7 +185,7 @@ class EncodedJobDetails(JobSummary):
         title="Copied from Job-ID",
         description="Reference to cached job if job execution was cached.",
     )
-    output_collections: dict[str, EncodedHdcaSourceId] = Field(
+    output_collections: Dict[str, EncodedHdcaSourceId] = Field(
         default={},
         title="Output collections",
         description="",
@@ -227,20 +229,20 @@ class JobParameter(Model):
         title="Depth",
         description="The depth of the job parameter.",
     )
-    value: Optional[Union[list[Optional[EncodedJobParameterHistoryItem]], float, int, bool, str]] = Field(
+    value: Optional[Union[List[Optional[EncodedJobParameterHistoryItem]], float, int, bool, str]] = Field(
         default=None, title="Value", description="The values of the job parameter", union_mode="left_to_right"
     )
     notes: Optional[str] = Field(default=None, title="Notes", description="Notes associated with the job parameter.")
 
 
 class JobDisplayParametersSummary(Model):
-    parameters: list[JobParameter] = Field(
+    parameters: List[JobParameter] = Field(
         default=..., title="Parameters", description="The parameters of the job in a nested format."
     )
     has_parameter_errors: bool = Field(
         default=..., title="Has parameter errors", description="The job has parameter errors"
     )
-    outputs: dict[str, list[JobOutput]] = Field(
+    outputs: Dict[str, List[JobOutput]] = Field(
         default=...,
         title="Outputs",
         description="Dictionary mapping all the tool outputs (by name) with the corresponding dataset information in a nested format.",

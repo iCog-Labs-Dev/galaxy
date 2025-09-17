@@ -115,7 +115,7 @@ function inputRemoteFiles() {
                 fileSize: item.size,
             });
         },
-        { multiple: false },
+        { multiple: false }
     );
 }
 
@@ -163,7 +163,7 @@ function onDrop(evt) {
                     </BDropdownItem>
                     <BDropdownItem v-if="hasRemoteFiles" @click="inputRemoteFiles">
                         <FontAwesomeIcon icon="fa-folder-open" />
-                        <span v-localize>Choose from repository</span>
+                        <span v-localize>Choose remote file</span>
                     </BDropdownItem>
                     <BDropdownItem @click="inputPaste">
                         <FontAwesomeIcon icon="fa-edit" />

@@ -23,4 +23,13 @@ const helpTarget = ref();
     </span>
 </template>
 
-<style scoped src="@/components/Help/help-text.scss" />
+<style scoped>
+/* Give visual indication of mouseover info */
+.help-text {
+    text-decoration-line: underline;
+    text-decoration-style: dashed;
+}
+.title-help-text {
+    text-decoration-thickness: 1px;
+}
+</style>

@@ -2,7 +2,6 @@
 import { faDatabase, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import { computed } from "vue";
 
-import type { CardBadge } from "@/components/Common/GCard.types";
 import type { ImportableFile } from "@/composables/zipExplorer";
 import localize from "@/utils/localization";
 import { bytesToString } from "@/utils/utils";
@@ -40,12 +39,13 @@ const sizeLimitExceededMessage = computed(() => {
     return localize("File is too large to extract. Please extract on your computer or upload the entire zip file.");
 });
 
-const badges: CardBadge[] = [
+const badges = [
     {
         id: "file-size",
         label: bytesToString(props.file.size, true, undefined),
         title: sizeLimitExceeded.value ? sizeLimitExceededMessage.value : "File size",
         icon: sizeLimitExceeded.value ? faExclamationTriangle : faDatabase,
+        visible: true,
         variant: sizeLimitExceeded.value ? "danger" : undefined,
     },
 ];

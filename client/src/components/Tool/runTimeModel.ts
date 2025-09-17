@@ -7,6 +7,7 @@ async function fetchRuntimeSchema(toolSource: any) {
     const { data, error } = await GalaxyApi().POST("/api/unprivileged_tools/runtime_model", {
         body: {
             active: true,
+            allow_load: false,
             hidden: false,
             representation: toolSource,
             src: "representation",

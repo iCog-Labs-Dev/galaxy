@@ -22,8 +22,8 @@ const emit = defineEmits(["select"]);
             <b>An Existing Collection</b>
         </BCardTitle>
         <div>
-            <!-- TODO: replace collection with an english expression -->
-            Fill in sample sheet data from an existing collection.
+            The "Apply Rules" tool allows you to transform an existing collection using the same set of rules as can be
+            used to import new data.
         </div>
     </BCard>
 </template>

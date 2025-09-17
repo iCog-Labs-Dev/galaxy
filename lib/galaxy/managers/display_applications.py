@@ -1,5 +1,6 @@
 import logging
 from typing import (
+    List,
     Optional,
 )
 
@@ -20,13 +21,13 @@ class DisplayApplication(BaseModel):
     name: str
     version: str
     filename_: str
-    links: list[Link]
+    links: List[Link]
 
 
 class ReloadFeedback(BaseModel):
     message: str
-    reloaded: list[Optional[str]]
-    failed: list[Optional[str]]
+    reloaded: List[Optional[str]]
+    failed: List[Optional[str]]
 
 
 class DisplayApplicationsManager:
@@ -39,7 +40,7 @@ class DisplayApplicationsManager:
     def datatypes_registry(self) -> Registry:
         return self._app.datatypes_registry
 
-    def index(self) -> list[DisplayApplication]:
+    def index(self) -> List[DisplayApplication]:
         """
         Returns the list of display applications.
 
@@ -59,7 +60,7 @@ class DisplayApplicationsManager:
             )
         return rval
 
-    def reload(self, ids: list[str]) -> ReloadFeedback:
+    def reload(self, ids: List[str]) -> ReloadFeedback:
         """
         Reloads the list of display applications.
 

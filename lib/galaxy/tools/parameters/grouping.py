@@ -6,11 +6,13 @@ import io
 import logging
 import os
 import unicodedata
-from collections.abc import Mapping
 from math import inf
 from typing import (
     Any,
     Callable,
+    Dict,
+    List,
+    Mapping,
     Optional,
     TYPE_CHECKING,
 )
@@ -233,7 +235,7 @@ class Section(Group):
     def get_initial_value(self, trans, context):
         if self.inputs is None:
             raise Exception("Must set 'inputs' attribute to use.")
-        rval: dict[str, Any] = {}
+        rval: Dict[str, Any] = {}
         child_context = ExpressionContext(rval, context)
         for child_input in self.inputs.values():
             rval[child_input.name] = child_input.get_initial_value(trans, child_context)
@@ -256,9 +258,9 @@ class Dataset(Bunch):
     file_type: str
     dbkey: str
     datatype: data.Data
-    warnings: list[str]
-    metadata: dict[str, str]
-    composite_files: dict[str, Optional[str]]
+    warnings: List[str]
+    metadata: Dict[str, str]
+    composite_files: Dict[str, Optional[str]]
     uuid: Optional[str]
     tag_using_filenames: Optional[str]
     tags: Optional[str]
@@ -637,7 +639,7 @@ class UploadDataset(Group):
         force_composite = asbool(context.get("force_composite", "False"))
         writable_files = d_type.writable_files
         writable_files_offset = 0
-        groups_incoming: list = [None for _ in range(file_count)]
+        groups_incoming = [None for _ in range(file_count)]
         for i, group_incoming in enumerate(context.get(self.name, [])):
             i = int(group_incoming.get("__index__", i))
             groups_incoming[i] = group_incoming
@@ -715,7 +717,6 @@ class UploadDataset(Group):
                     dataset.warnings.extend(warnings)
                     if file_bunch.path:
                         if force_composite:
-                            assert group_incoming
                             key = group_incoming.get("NAME") or i
                         dataset.composite_files[key] = file_bunch.__dict__
                     elif not force_composite:
@@ -743,7 +744,7 @@ class UploadDataset(Group):
 class Conditional(Group):
     type = "conditional"
     value_from: Callable[[ExpressionContext, "Conditional", "Tool"], Mapping[str, str]]
-    cases: list["ConditionalWhen"]
+    cases: List["ConditionalWhen"]
 
     def __init__(self, name: str):
         Group.__init__(self, name)
@@ -770,7 +771,7 @@ class Conditional(Group):
     def value_to_basic(self, value, app, use_security=False):
         if self.test_param is None:
             raise Exception("Must set 'test_param' attribute to use.")
-        rval: dict[str, Any] = {}
+        rval: Dict[str, Any] = {}
         rval[self.test_param.name] = self.test_param.value_to_basic(value[self.test_param.name], app)
         current_case = rval["__current_case__"] = self.get_current_case(value[self.test_param.name])
         for input in self.cases[current_case].inputs.values():

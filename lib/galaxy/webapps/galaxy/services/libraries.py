@@ -1,6 +1,8 @@
 import logging
 from typing import (
     Any,
+    Dict,
+    List,
     Optional,
     Union,
 )
@@ -92,7 +94,7 @@ class LibrariesService(ServiceBase, ConsumesModelStores):
         library = self.library_manager.create(trans, payload.name, payload.description, payload.synopsis)
         return self._to_summary(trans, library)
 
-    def create_from_store(self, trans, payload: CreateLibrariesFromStore) -> list[LibrarySummary]:
+    def create_from_store(self, trans, payload: CreateLibrariesFromStore) -> List[LibrarySummary]:
         object_tracker = self.create_objects_from_store(
             trans,
             payload,
@@ -186,7 +188,7 @@ class LibrariesService(ServiceBase, ConsumesModelStores):
             )
 
     def set_permissions(
-        self, trans, id: DecodedDatabaseIdField, payload: dict[str, Any]
+        self, trans, id: DecodedDatabaseIdField, payload: Dict[str, Any]
     ) -> Union[LibraryLegacySummary, LibraryCurrentPermissions]:  # Old legacy response
         """Set permissions of the given library to the given role ids.
 
@@ -316,7 +318,7 @@ class LibrariesService(ServiceBase, ConsumesModelStores):
         roles = self.library_manager.get_current_roles(trans, library)
         return LibraryCurrentPermissions.model_construct(**roles)
 
-    def set_permissions_old(self, trans, library, payload: dict[str, Any]) -> LibraryLegacySummary:
+    def set_permissions_old(self, trans, library, payload: Dict[str, Any]) -> LibraryLegacySummary:
         """
         *** old implementation for backward compatibility ***
 

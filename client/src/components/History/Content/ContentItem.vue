@@ -17,9 +17,11 @@ import { getGalaxyInstance } from "@/app";
 import type { ItemUrls } from "@/components/History/Content/Dataset/index";
 import { updateContentFields } from "@/components/History/model/queries";
 import { useEntryPointStore } from "@/stores/entryPointStore";
+import { useEventStore } from "@/stores/eventStore";
 import { clearDrag } from "@/utils/setDrag";
 
-import { getContentItemState, type State, STATES } from "./model/states";
+import { JobStateSummary } from "./Collection/JobStateSummary";
+import { getContentItemState, type StateMap, STATES } from "./model/states";
 import type { RouterPushOptions } from "./router-push-options";
 
 import CollectionDescription from "./Collection/CollectionDescription.vue";
@@ -48,8 +50,6 @@ interface Props {
     filterable?: boolean;
     isPlaceholder?: boolean;
     isSubItem?: boolean;
-    getItemKey?: (item: any) => string;
-    selectClickHandler?: (item: any, event: Event) => boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,18 +65,17 @@ const props = withDefaults(defineProps<Props>(), {
     filterable: false,
     isPlaceholder: false,
     isSubItem: false,
-    getItemKey: (item: any) => {
-        return `${item.history_content_type}-${item.id}`;
-    },
-    selectClickHandler: (item: any, event: Event) => {
-        return true;
-    },
 });
 
 const emit = defineEmits<{
     (e: "update:selected", selected: boolean): void;
     (e: "update:expand-dataset", expand: boolean): void;
+    (e: "shift-arrow-select", direction: string): void;
     (e: "init-key-selection"): void;
+    (e: "arrow-navigate", direction: string): void;
+    (e: "hide-selection"): void;
+    (e: "select-all"): void;
+    (e: "selected-to"): void;
     (e: "delete", item: any, recursive: boolean): void;
     (e: "undelete"): void;
     (e: "unhide"): void;
@@ -85,20 +84,26 @@ const emit = defineEmits<{
     (e: "tag-change", item: any, newTags: Array<string>): void;
     (e: "tag-click", tag: string): void;
     (e: "toggleHighlights", item: any): void;
-    (e: "on-key-down", event: KeyboardEvent): void;
 }>();
 
 const entryPointStore = useEntryPointStore();
+const eventStore = useEventStore();
 
 const contentItem = ref<HTMLElement | null>(null);
 const subItemsVisible = ref(false);
 
+const jobState = computed(() => {
+    return new JobStateSummary(props.item);
+});
+
 const itemIsRunningInteractiveTool = computed(() => {
-    // If our dataset id is in the entrypOintStore it's a running it
+    // If our datset id is in the entrypOintStore it's a running it
     return !isCollection.value && entryPointStore.entryPointsForHda(props.item.id).length > 0;
 });
 
-const contentId = computed(() => props.getItemKey(props.item));
+const contentId = computed(() => {
+    return `dataset-${props.item.id}`;
+});
 
 const contentCls = computed(() => {
     const status = contentState.value && contentState.value.status;
@@ -133,7 +138,7 @@ const hasStateIcon = computed(() => {
     return contentState.value && contentState.value.icon;
 });
 
-const state = computed<State>(() => {
+const state = computed<keyof StateMap>(() => {
     if (props.isPlaceholder) {
         return "placeholder";
     }
@@ -159,7 +164,7 @@ const tagsDisabled = computed(() => {
 });
 
 const isCollection = computed(() => {
-    return "collection_type" in props.item || props.item.element_type === "dataset_collection";
+    return "collection_type" in props.item;
 });
 
 const itemUrls = computed<ItemUrls>(() => {
@@ -187,6 +192,13 @@ const itemUrls = computed<ItemUrls>(() => {
     };
 });
 
+/** Based on the user's keyboard platform, checks if it is the
+ * typical key for selection (ctrl for windows/linux, cmd for mac)
+ */
+function isSelectKey(event: KeyboardEvent) {
+    return eventStore.isMac ? event.metaKey : event.ctrlKey;
+}
+
 function onKeyDown(event: KeyboardEvent) {
     const classList = (event.target as HTMLElement)?.classList;
     if (!classList.contains("content-item") || classList.contains("sub-item")) {
@@ -196,15 +208,45 @@ function onKeyDown(event: KeyboardEvent) {
     if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         onClick();
-    } else {
-        emit("on-key-down", event);
+    } else if ((event.key === "ArrowUp" || event.key === "ArrowDown") && !event.shiftKey) {
+        event.preventDefault();
+        emit("arrow-navigate", event.key);
+    }
+
+    if (props.writable) {
+        if (event.key === "Tab") {
+            emit("init-key-selection");
+        } else {
+            event.preventDefault();
+            if ((event.key === "ArrowUp" || event.key === "ArrowDown") && event.shiftKey) {
+                emit("shift-arrow-select", event.key);
+            } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                emit("init-key-selection");
+            } else if (event.key === "Delete" && !props.selected && !props.item.deleted) {
+                onDelete(event.shiftKey);
+                emit("arrow-navigate", "ArrowDown");
+            } else if (event.key === "Escape") {
+                emit("hide-selection");
+            } else if (event.key === "a" && isSelectKey(event)) {
+                emit("select-all");
+            }
+        }
     }
 }
 
 function onClick(e?: Event) {
     const event = e as KeyboardEvent;
-    if (event && props.writable && !props.selectClickHandler(props.item, event)) {
-        return;
+    if (event && props.writable) {
+        if (isSelectKey(event)) {
+            emit("init-key-selection");
+            emit("update:selected", !props.selected);
+            return;
+        } else if (event.shiftKey) {
+            emit("selected-to");
+            return;
+        } else {
+            emit("init-key-selection");
+        }
     }
     if (props.isPlaceholder) {
         return;
@@ -421,7 +463,13 @@ function unexpandedClick(event: Event) {
         </div>
         <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
         <span @click.stop="unexpandedClick">
-            <CollectionDescription v-if="!isDataset" class="px-2 pb-2 cursor-pointer" :hdca="item" />
+            <CollectionDescription
+                v-if="!isDataset"
+                class="px-2 pb-2 cursor-pointer"
+                :job-state-summary="jobState"
+                :collection-type="item.collection_type"
+                :element-count="item.element_count"
+                :elements-datatypes="item.elements_datatypes" />
             <StatelessTags
                 v-if="!tagsDisabled || hasTags"
                 class="px-2 pb-2"

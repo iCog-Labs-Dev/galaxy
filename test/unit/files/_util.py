@@ -10,7 +10,6 @@ from galaxy.files import (
     DictFileSourcesUserContext,
     OptionalUserContext,
 )
-from galaxy.files.models import AnyRemoteEntry
 from galaxy.files.plugins import FileSourcePluginsConfig
 
 TEST_USERNAME = "alice"
@@ -23,15 +22,15 @@ def serialize_and_recover(file_sources_o: ConfiguredFileSources, user_context: O
     return file_sources
 
 
-def find_file_a(dir_list: list[AnyRemoteEntry]) -> Optional[AnyRemoteEntry]:
+def find_file_a(dir_list):
     return find(dir_list, class_="File", name="a")
 
 
-def find(dir_list: list[AnyRemoteEntry], class_=None, name=None) -> Optional[AnyRemoteEntry]:
+def find(dir_list, class_=None, name=None):
     for ent in dir_list:
-        if class_ is not None and ent.class_ != class_:
+        if class_ is not None and ent["class"] != class_:
             continue
-        if name is not None and ent.name == name:
+        if name is not None and ent["name"] == name:
             return ent
 
     return None

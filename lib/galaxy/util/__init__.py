@@ -100,9 +100,6 @@ try:
         def findall(self, path: str, namespaces: Optional[Mapping[str, str]] = None) -> List[Self]:  # type: ignore[override]
             return cast(List[Self], super().findall(path, namespaces))
 
-        def iterfind(self, path: str, namespaces: Optional[Mapping[str, str]] = None) -> Iterator[Self]:
-            return cast(Iterator[Self], super().iterfind(path, namespaces))
-
     def SubElement(parent: Element, tag: str, attrib: Optional[Dict[str, str]] = None, **extra) -> Element:
         return cast(Element, etree.SubElement(parent, tag, attrib, **extra))
 
@@ -198,14 +195,6 @@ def str_removeprefix(s: str, prefix: str):
         return s[len(prefix) :]
     else:
         return s
-
-
-@overload
-def remove_protocol_from_url(url: None) -> None: ...
-
-
-@overload
-def remove_protocol_from_url(url: str) -> str: ...
 
 
 def remove_protocol_from_url(url):
@@ -1977,14 +1966,14 @@ class classproperty:
 
 
 class ExecutionTimer:
-    def __init__(self) -> None:
+    def __init__(self):
         self.begin = time.time()
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"({self.elapsed * 1000:0.3f} ms)"
 
     @property
-    def elapsed(self) -> float:
+    def elapsed(self):
         return time.time() - self.begin
 
 

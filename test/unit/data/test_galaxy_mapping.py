@@ -2,6 +2,7 @@ import os
 import random
 import uuid
 from tempfile import NamedTemporaryFile
+from typing import List
 
 import pytest
 from sqlalchemy import (
@@ -112,8 +113,8 @@ class TestMappings(BaseModelTestCase):
         random.shuffle(elements)
         for item in elements:
             self.persist(item)
-        forward_hdas: list[model.HistoryDatasetAssociation] = []
-        reverse_hdas: list[model.HistoryDatasetAssociation] = []
+        forward_hdas: List[model.HistoryDatasetAssociation] = []
+        reverse_hdas: List[model.HistoryDatasetAssociation] = []
         for i, dataset_instance in enumerate(list_pair.dataset_instances):
             if i % 2:
                 reverse_hdas.append(dataset_instance)
@@ -188,11 +189,7 @@ class TestMappings(BaseModelTestCase):
         assert c2.dataset_elements == [dce1, dce2]
         assert c2.dataset_action_tuples == []
         assert c2.populated_optimized
-        summary = c2.dataset_states_and_extensions_summary
-        extensions = summary.extensions
-        states = summary.states
-        assert states == {"new": 2}
-        assert extensions == ["bam", "txt"]
+        assert c2.dataset_states_and_extensions_summary == ({"new"}, {"txt", "bam"})
         assert c2.element_identifiers_extensions_paths_and_metadata_files == [
             [
                 ("inner_list", "forward"),
@@ -204,11 +201,7 @@ class TestMappings(BaseModelTestCase):
         ]
         assert c3.dataset_instances == []
         assert c3.dataset_elements == []
-        summary_c3 = c3.dataset_states_and_extensions_summary
-        dbkeys_c3 = summary_c3.dbkeys
-        extensions_c3 = summary_c3.extensions
-        assert not dbkeys_c3
-        assert not extensions_c3
+        assert c3.dataset_states_and_extensions_summary == (set(), set())
 
         stmt = c4._build_nested_collection_attributes_stmt(element_attributes=("element_identifier",))
         result = self.model.session.execute(stmt).all()

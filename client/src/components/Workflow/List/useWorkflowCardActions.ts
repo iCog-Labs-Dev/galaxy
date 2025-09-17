@@ -18,7 +18,7 @@ import { computed, type Ref } from "vue";
 import type { WorkflowSummary } from "@/api/workflows";
 import { undeleteWorkflow } from "@/api/workflows";
 import { getFullAppUrl } from "@/app/utils";
-import type { CardAction } from "@/components/Common/GCard.types";
+import type { CardAttributes } from "@/components/Common/GCard.types";
 import {
     copyWorkflow as copyWorkflowService,
     deleteWorkflow as deleteWorkflowService,
@@ -36,7 +36,7 @@ export function useWorkflowCardActions(
     editorView: boolean,
     refreshCallback: () => void,
     insertSteps: () => void,
-    insert: () => void,
+    insert: () => void
 ) {
     const userStore = useUserStore();
     const { isAnonymous } = storeToRefs(userStore);
@@ -164,16 +164,17 @@ export function useWorkflowCardActions(
         toast.success("Workflow imported successfully");
     }
 
-    const _workflowRunAction: CardAction = {
+    const _workflowRunAction: CardAttributes = {
         id: "workflow-run",
         label: editorView ? "Run" : "",
         icon: faPlay,
         title: runButtonTitle.value,
         disabled: isAnonymous.value || workflow.value.deleted,
         to: `/workflows/run?id=${workflow.value.id}`,
+        visible: true,
     };
 
-    const _workflowCommonActions: CardAction[] = [
+    const _workflowCommonActions: CardAttributes[] = [
         {
             id: "workflow-link",
             label: "Link to Workflow",
@@ -208,7 +209,7 @@ export function useWorkflowCardActions(
         },
     ];
 
-    const workflowCardExtraActions: CardAction[] = [
+    const workflowCardExtraActions: CardAttributes[] = [
         {
             id: "workflow-delete",
             label: "Delete",
@@ -245,7 +246,7 @@ export function useWorkflowCardActions(
         },
     ];
 
-    const workflowCardSecondaryActions: CardAction[] = [
+    const workflowCardSecondaryActions: CardAttributes[] = [
         {
             id: "workflow-restore",
             label: "Restore",
@@ -274,7 +275,7 @@ export function useWorkflowCardActions(
         },
     ];
 
-    const workflowCardPrimaryActions: CardAction[] = [
+    const workflowCardPrimaryActions: CardAttributes[] = [
         {
             id: "workflow-edit",
             label: "Edit",
@@ -314,6 +315,5 @@ export function useWorkflowCardActions(
         workflowCardSecondaryActions,
         workflowCardPrimaryActions,
         toggleBookmark,
-        deleteWorkflow,
     };
 }

@@ -44,7 +44,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    deferred: undefined,
+    deferred: false,
     info: "",
     listDbKeys: undefined,
     listExtensions: undefined,

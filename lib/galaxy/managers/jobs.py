@@ -1,6 +1,5 @@
 import json
 import logging
-from collections.abc import Iterable
 from datetime import (
     date,
     datetime,
@@ -9,8 +8,11 @@ from pathlib import Path
 from typing import (
     Any,
     cast,
+    Dict,
+    Iterable,
+    List,
     Optional,
-    TYPE_CHECKING,
+    Set,
     Union,
 )
 
@@ -89,9 +91,6 @@ from galaxy.util.search import (
     parse_filters_structured,
     RawTextTerm,
 )
-
-if TYPE_CHECKING:
-    from sqlalchemy.sql.expression import Select
 
 log = logging.getLogger(__name__)
 
@@ -227,7 +226,7 @@ class JobManager:
                     elif key == "runner":
                         stmt = stmt.where(text_column_filter(Job.job_runner_name, term))
                 elif isinstance(term, RawTextTerm):
-                    columns: list = [Job.tool_id]
+                    columns: List = [Job.tool_id]
                     if user_details:
                         columns.append(User.email)
                     if is_admin:
@@ -486,7 +485,7 @@ class JobSearch:
 
         stmt = select(model.Job.id.label("job_id"))
 
-        data_conditions: list = []
+        data_conditions: List = []
 
         # We now build the stmt filters that relate to the input datasets
         # that this job uses. We keep track of the requested dataset id in `requested_ids`,
@@ -494,7 +493,7 @@ class JobSearch:
         # and the ids that have been used in the job that has already been run in `used_ids`.
         requested_ids = []
         data_types = []
-        used_ids: list = []
+        used_ids: List = []
         for k, input_list in input_data.items():
             # k will be matched against the JobParameter.name column. This can be prefixed depending on whether
             # the input is in a repeat, or not (section and conditional)
@@ -622,7 +621,7 @@ class JobSearch:
             stmt = stmt.where(Job.tool_version == str(tool_version))
 
         if job_state is None:
-            job_states: set[str] = {
+            job_states: Set[str] = {
                 Job.states.NEW,
                 Job.states.QUEUED,
                 Job.states.WAITING,
@@ -716,15 +715,7 @@ class JobSearch:
         return final_ordered_stmt
 
     def _build_stmt_for_hda(
-        self,
-        stmt: "Select[tuple[int]]",
-        data_conditions: list,
-        used_ids: list,
-        k,
-        v,
-        identifier,
-        value_index: int,
-        require_name_match: bool = True,
+        self, stmt, data_conditions, used_ids, k, v, identifier, value_index, require_name_match=True
     ):
         a = aliased(model.JobToInputDatasetAssociation)
         b = aliased(model.HistoryDatasetAssociation)
@@ -770,7 +761,7 @@ class JobSearch:
                     and_(
                         or_(a.dataset_version.in_([0, b.version]), b.update_time < model.Job.create_time),
                         b.extension == c.extension,
-                        b.metadata == c.metadata,  # type: ignore[arg-type]
+                        b.metadata == c.metadata,
                         *name_condition,
                     ),
                     e.history_dataset_association_id.isnot(None),
@@ -1393,7 +1384,7 @@ class JobSearch:
             return stmt
 
 
-def view_show_job(trans, job: Job, full: bool) -> dict:
+def view_show_job(trans, job: Job, full: bool) -> Dict:
     is_admin = trans.user_is_admin
     job_dict = job.to_dict("element", system_details=is_admin)
     if trans.app.config.expose_dataset_path and "command_line" not in job_dict:
@@ -1602,7 +1593,7 @@ def summarize_invocation_jobs(
 
 class JobsSummary(TypedDict):
     populated_state: str
-    states: dict[str, int]
+    states: Dict[str, int]
     model: str
     id: int
 
@@ -1694,7 +1685,7 @@ def summarize_destination_params(trans, job):
     return destination_params
 
 
-def summarize_job_parameters(trans: ProvidesUserContext, job: Job) -> dict[str, Any]:
+def summarize_job_parameters(trans: ProvidesUserContext, job: Job):
     """Produce a dict-ified version of job parameters ready for tabular rendering.
 
     Precondition: the caller has verified the job is accessible to the user
@@ -1771,7 +1762,7 @@ def summarize_job_parameters(trans: ProvidesUserContext, job: Job) -> dict[str, 
                     or input.type == "data_collection"
                     or isinstance(input_value, model.HistoryDatasetAssociation)
                 ):
-                    value: list[Union[dict[str, Any], None]] = []
+                    value: List[Union[Dict[str, Any], None]] = []
                     for element in listify(input_value):
                         if isinstance(element, model.HistoryDatasetAssociation):
                             hda = element
@@ -1830,12 +1821,12 @@ def summarize_job_parameters(trans: ProvidesUserContext, job: Job) -> dict[str, 
     # Load parameter objects, if a parameter type has changed, it's possible for the value to no longer be valid
     if tool:
         try:
-            params_objects = tool.get_param_values(job, ignore_errors=False)
+            params_objects = job.get_param_values(app, ignore_errors=False)
         except Exception:
-            params_objects = tool.get_param_values(job, ignore_errors=True)
+            params_objects = job.get_param_values(app, ignore_errors=True)
             # use different param_objects in the following line, since we want to display original values as much as possible
             upgrade_messages = tool.check_and_update_param_values(
-                tool.get_param_values(job, ignore_errors=True), trans, update_values=False
+                job.get_param_values(app, ignore_errors=True), trans, update_values=False
             )
             has_parameter_errors = True
         parameters = inputs_recursive(tool.inputs, params_objects, depth=1, upgrade_messages=upgrade_messages)
@@ -1869,7 +1860,7 @@ def summarize_job_outputs(job: model.Job, tool, params):
         ("hdca", "dataset_collection_id", job.output_dataset_collection_instances),
     )
     for src, attribute, output_associations in possible_outputs:
-        output_associations = cast(list, output_associations)  # during iteration, mypy sees it as object
+        output_associations = cast(List, output_associations)  # during iteration, mypy sees it as object
         for output_association in output_associations:
             output_name = output_association.name
             if output_name not in output_labels and tool:

@@ -3,6 +3,7 @@ from tempfile import NamedTemporaryFile
 from typing import (
     Any,
     cast,
+    List,
     NamedTuple,
     Optional,
 )
@@ -79,7 +80,7 @@ class ServiceBase:
         """Encodes a raw database ID."""
         return encode_with_security(self.security, id, kind=kind)
 
-    def decode_ids(self, ids: list[EncodedDatabaseIdField]) -> list[int]:
+    def decode_ids(self, ids: List[EncodedDatabaseIdField]) -> List[int]:
         """
         Decodes all encoded IDs in the given list.
         """

@@ -1,6 +1,7 @@
 import logging
 from typing import (
     Callable,
+    Dict,
 )
 
 from sqlalchemy import select
@@ -21,7 +22,7 @@ log = logging.getLogger(__name__)
 class RepositoryRevisionsController(BaseShedAPIController):
     """RESTful controller for interactions with tool shed repository revisions."""
 
-    def __get_value_mapper(self, trans) -> dict[str, Callable]:
+    def __get_value_mapper(self, trans) -> Dict[str, Callable]:
         value_mapper = {
             "id": trans.security.encode_id,
             "repository_id": trans.security.encode_id,

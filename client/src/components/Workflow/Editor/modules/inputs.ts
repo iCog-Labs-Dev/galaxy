@@ -9,7 +9,6 @@ export interface WorkflowInput {
     description: string;
     stateOverwrites?: {
         parameter_type?: "text" | "integer" | "boolean" | "color" | "float" | "directory_uri";
-        collection_type?: "sample_sheet";
     };
     icon: IconDefinition;
 }
@@ -27,15 +26,6 @@ export function getWorkflowInputs(): WorkflowInput[] {
             title: "Input Dataset Collection",
             description: "Input for a collection of datasets",
             icon: faFolder,
-        },
-        {
-            moduleId: "data_collection_input",
-            title: "Input Sample Sheet Collection",
-            description: "Input for a collection of datasets with attached sample sheet metadata",
-            icon: faFolder,
-            stateOverwrites: {
-                collection_type: "sample_sheet",
-            },
         },
         {
             moduleId: "parameter_input",

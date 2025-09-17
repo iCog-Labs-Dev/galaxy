@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import (
-    Annotated,
     Any,
+    List,
     Optional,
     Union,
 )
@@ -11,6 +11,7 @@ from pydantic import (
     RootModel,
 )
 from typing_extensions import (
+    Annotated,
     Literal,
 )
 
@@ -108,7 +109,7 @@ class BrowsableFilesSourcePlugin(FilesSourcePlugin):
 
 
 class FilesSourcePluginList(RootModel):
-    root: list[Union[BrowsableFilesSourcePlugin, FilesSourcePlugin]] = Field(
+    root: List[Union[BrowsableFilesSourcePlugin, FilesSourcePlugin]] = Field(
         default=[],
         title="List of files source plugins",
         examples=[
@@ -142,7 +143,7 @@ class RemoteFile(RemoteEntry):
 
 
 class ListJstreeResponse(RootModel):
-    root: list[Any] = Field(
+    root: List[Any] = Field(
         default=[],
         title="List of files",
         description="List of files in Jstree format.",
@@ -158,7 +159,7 @@ AnyRemoteEntry = Annotated[
 
 
 class ListUriResponse(RootModel):
-    root: list[AnyRemoteEntry] = Field(
+    root: List[AnyRemoteEntry] = Field(
         default=[],
         title="List of remote entries",
         description="List of directories and files.",

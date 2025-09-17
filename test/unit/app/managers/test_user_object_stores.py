@@ -1,5 +1,7 @@
 from typing import (
+    List,
     Optional,
+    Type,
 )
 
 from yaml import safe_load
@@ -31,10 +33,10 @@ SIMPLE_FILE_SOURCE_DESCRIPTION = "a description of my object store"
 
 
 class Config:
-    object_store_templates: Optional[list[RawTemplateConfig]] = None
+    object_store_templates: Optional[List[RawTemplateConfig]] = None
     object_store_templates_config_file: Optional[str] = None
 
-    def __init__(self, templates: list[RawTemplateConfig]):
+    def __init__(self, templates: List[RawTemplateConfig]):
         self.object_store_templates = templates
 
 
@@ -505,7 +507,7 @@ class TestUserObjectStoreTestCase(BaseTestCase):
         self,
         user_object_store: UserConcreteObjectStoreModel,
         modify: ModifyInstancePayload,
-        exception_type: type[Exception],
+        exception_type: Type[Exception],
     ):
         exception_thrown = False
         try:

@@ -5,6 +5,8 @@ from tempfile import mkdtemp
 from typing import (
     Any,
     ClassVar,
+    Dict,
+    List,
     Optional,
     TYPE_CHECKING,
 )
@@ -113,7 +115,7 @@ class DockerContainerResolverTestCase(IntegrationTestCase):
     cache is cleared before each test
     """
 
-    assumptions: dict[str, Any]
+    assumptions: Dict[str, Any]
     container_type: str = "docker"
     dataset_populator: DatasetPopulator
     framework_tool_and_types = True
@@ -157,7 +159,8 @@ class DockerContainerResolverTestCase(IntegrationTestCase):
 
     def _remove_tested_docker_image_from_cache(self):
         cmd1 = ["docker", "image", "ls", "--quiet", "--filter", f'reference={self.assumptions["run"]["cache_name"]}']
-        if image_ids := execute(cmd1):
+        image_ids = execute(cmd1)
+        if image_ids:
             image_id_list = image_ids.splitlines()
             assert len(image_id_list) == 1
             cmd2 = ["docker", "image", "rm", "--force", image_id_list[0]]
@@ -248,7 +251,7 @@ class ContainerResolverTestProtocol(Protocol):
         ...
 
     @property
-    def assumptions(self) -> dict[str, Any]:
+    def assumptions(self) -> Dict[str, Any]:
         """a dictionary storing the assumptions of the three tests
 
         needs to contain 3 keys ("run", "list", "build")
@@ -302,7 +305,7 @@ class ContainerResolverTestProtocol(Protocol):
         """
         ...
 
-    def _check_status(self, status: dict[str, Any], assumptions: dict[str, Any]) -> None:
+    def _check_status(self, status: Dict[str, Any], assumptions: Dict[str, Any]) -> None:
         """
         function to check the status of a API call against assumptions dict
         """
@@ -389,7 +392,7 @@ class ContainerResolverTestCases:
             for o in self.assumptions["run"]["output"]:
                 assert o in output
 
-    def _check_status(self: ContainerResolverTestProtocol, status: dict[str, Any], assumptions: dict[str, Any]) -> None:
+    def _check_status(self: ContainerResolverTestProtocol, status: Dict[str, Any], assumptions: Dict[str, Any]) -> None:
         """see ContainerResolverTestProtocol._check_status"""
         if "unresolved" in assumptions:
             assert status["model_class"] == "NullDependency"
@@ -500,7 +503,7 @@ class TestDefaultContainerResolvers(DockerContainerResolverTestCase, ContainerRe
     - listing containers does not cache them
     """
 
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "bedtools v2.26.0",
@@ -632,13 +635,13 @@ class TestMulledContainerResolvers(DockerContainerResolverTestCase, ContainerRes
     - building the container creates a cache entry (cached=True, 1st call resolves with mulled and 2nd with cached_mulled)
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {
             "type": "cached_mulled",
         },
         {"type": "mulled"},
     ]
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "bedtools v2.26.0",
@@ -707,7 +710,7 @@ class TestMulledSingularityContainerResolvers(
        - 2nd round resolves cached image, uses the cached container
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {
             "type": "cached_mulled_singularity",
         },
@@ -775,7 +778,7 @@ class TestMulledContainerResolversNoAutoInstall(TestMulledContainerResolvers):
     No difference (since the cached name is identical to the URI)
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {
             "type": "cached_mulled",
         },
@@ -795,7 +798,7 @@ class TestMulledSingularityContainersResolversNoAutoInstall(TestMulledSingularit
     the path is used instead of the URI)
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {
             "type": "cached_mulled_singularity",
         },
@@ -865,11 +868,11 @@ class TestCondaFallBack(DockerContainerResolverTestCase, ContainerResolverTestCa
     """
 
     allow_conda_fallback: bool = True
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {"type": "null"},
     ]
 
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "bedtools v2.26.0",
@@ -907,11 +910,11 @@ class TestCondaFallBackAndRequireContainer(DockerContainerResolverTestCase, Cont
     """
 
     allow_conda_fallback: bool = True
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {"type": "null"},
     ]
 
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "expect_failure": True,
             "cached": False,
@@ -966,10 +969,10 @@ class TestExplicitContainerResolver(DockerContainerResolverTestCase, ContainerRe
     - list and build resolve the URI and do not cache the container
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {"type": "explicit"},
     ]
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "Program: bwa (alignment via Burrows-Wheeler transformation)",
@@ -1032,10 +1035,10 @@ class TestExplicitSingularityContainerResolver(
     - list and build resolve the URI and do not cache the container
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {"type": "explicit_singularity"},
     ]
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "Program: bwa (alignment via Burrows-Wheeler transformation)",
@@ -1095,10 +1098,10 @@ class TestCachedExplicitSingularityContainerResolver(
     - list resolves to the path irrespective if the path is existent (TODO bug?)
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {"type": "cached_explicit_singularity"},
     ]
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "Program: bwa (alignment via Burrows-Wheeler transformation)",
@@ -1160,10 +1163,10 @@ class TestCachedExplicitSingularityContainerResolverWithSingularityRequirement(
     here
     """
 
-    container_resolvers_config: list[dict[str, Any]] = [
+    container_resolvers_config: List[Dict[str, Any]] = [
         {"type": "cached_explicit_singularity"},
     ]
-    assumptions: dict[str, Any] = {
+    assumptions: Dict[str, Any] = {
         "run": {
             "output": [
                 "cowsay works LOL",

@@ -9,6 +9,7 @@ from typing import (
     Any,
     Generic,
     Optional,
+    Type,
     TypeVar,
 )
 
@@ -28,7 +29,7 @@ class AccessibleManagerMixin(Generic[U]):
     """
 
     # declare what we are using from base ModelManager
-    model_class: type[U]
+    model_class: Type[U]
 
     @abc.abstractmethod
     def by_id(self, id: int) -> U: ...
@@ -73,7 +74,7 @@ class OwnableManagerMixin(Generic[U]):
     """
 
     # declare what we are using from base ModelManager
-    model_class: type[U]
+    model_class: Type[U]
 
     @abc.abstractmethod
     def by_id(self, id: int) -> U: ...

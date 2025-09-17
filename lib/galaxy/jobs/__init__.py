@@ -15,7 +15,6 @@ import shutil
 import sys
 import time
 import traceback
-from collections.abc import Iterable
 from dataclasses import (
     dataclass,
     field,
@@ -24,6 +23,9 @@ from json import loads
 from typing import (
     Any,
     Callable,
+    Dict,
+    Iterable,
+    List,
     Optional,
     TYPE_CHECKING,
 )
@@ -315,10 +317,10 @@ class JobConfigurationLimits:
     anonymous_user_concurrent_jobs: Optional[int] = None
     walltime: Optional[str] = None
     walltime_delta: Optional[datetime.timedelta] = None
-    total_walltime: dict[str, Any] = field(default_factory=dict)
+    total_walltime: Dict[str, Any] = field(default_factory=dict)
     output_size: Optional[int] = None
-    destination_user_concurrent_jobs: dict[str, int] = field(default_factory=dict)
-    destination_total_concurrent_jobs: dict[str, int] = field(default_factory=dict)
+    destination_user_concurrent_jobs: Dict[str, int] = field(default_factory=dict)
+    destination_total_concurrent_jobs: Dict[str, int] = field(default_factory=dict)
 
 
 class JobConfiguration(ConfiguresHandlers):
@@ -327,14 +329,14 @@ class JobConfiguration(ConfiguresHandlers):
     These features are configured in the job configuration, by default, ``job_conf.yml``
     """
 
-    runner_plugins: list[dict]
+    runner_plugins: List[dict]
     handlers: dict
-    handler_runner_plugins: dict[str, str]
-    tools: dict[str, list]
-    tool_classes: dict[str, list]
-    resource_groups: dict[str, list]
-    destinations: dict[str, tuple]
-    resource_parameters: dict[str, Any]
+    handler_runner_plugins: Dict[str, str]
+    tools: Dict[str, list]
+    tool_classes: Dict[str, list]
+    resource_groups: Dict[str, list]
+    destinations: Dict[str, tuple]
+    resource_parameters: Dict[str, Any]
     DEFAULT_BASE_HANDLER_POOLS = ("job-handlers",)
 
     DEFAULT_NWORKERS = 4
@@ -354,7 +356,7 @@ class JobConfiguration(ConfiguresHandlers):
         """Parse the job configuration XML."""
         self.app = app
         self.runner_plugins = []
-        self.dynamic_params: Optional[dict[str, Any]] = None
+        self.dynamic_params: Optional[Dict[str, Any]] = None
         self.handlers = {}
         self.handler_runner_plugins = {}
         self.default_handler_id = None
@@ -862,7 +864,7 @@ class JobConfiguration(ConfiguresHandlers):
 
         :returns: list of job runner plugins
         """
-        rval: dict[str, BaseJobRunner] = {}
+        rval: Dict[str, BaseJobRunner] = {}
         if handler_id in self.handler_runner_plugins:
             plugins_to_load = [rp for rp in self.runner_plugins if rp["id"] in self.handler_runner_plugins[handler_id]]
             log.info(
@@ -982,8 +984,6 @@ class JobConfiguration(ConfiguresHandlers):
 
 
 class HasResourceParameters:
-    tool: Optional["Tool"]
-
     def get_resource_parameters(self, job=None):
         # Find the dymically inserted resource parameters and give them
         # to rule.
@@ -991,8 +991,8 @@ class HasResourceParameters:
         if job is None:
             job = self.get_job()
 
-        assert self.tool
-        param_values = self.tool.get_param_values(job, ignore_errors=True)
+        app = self.app
+        param_values = job.get_param_values(app, ignore_errors=True)
         resource_params = {}
         try:
             resource_params_raw = param_values["__job_resource"]
@@ -1026,9 +1026,9 @@ class MinimalJobWrapper(HasResourceParameters):
         self.app = app
         self.tool = tool
         self.sa_session = self.app.model.context
-        self.extra_filenames: list[str] = []
-        self.environment_variables: list[dict[str, str]] = []
-        self.interactivetools: list[dict[str, Any]] = []
+        self.extra_filenames: List[str] = []
+        self.environment_variables: List[Dict[str, str]] = []
+        self.interactivetools: List[Dict[str, Any]] = []
         self.command_line = None
         self.version_command_line = None
         self._dependency_shell_commands = None
@@ -1234,7 +1234,7 @@ class MinimalJobWrapper(HasResourceParameters):
         """
         job = _job or self.get_job()
         param_dict = {p.name: p.value for p in job.parameters}
-        param_dict = self.tool.params_from_strings(param_dict)
+        param_dict = self.tool.params_from_strings(param_dict, self.app)
         return param_dict
 
     @property
@@ -1297,7 +1297,7 @@ class MinimalJobWrapper(HasResourceParameters):
             # search again, now we know tool doesn't require name match
             param_dump = {p.name: p.value for p in job.parameters if not p.name.startswith("__")}
             assert self.tool
-            params = self.tool.params_from_strings(param_dump)
+            params = self.tool.params_from_strings(param_dump, self.app)
             json_internal = params_to_json_internal(self.tool.inputs, params, self.app)
             job_to_copy = self.app.job_search.by_tool_input(
                 job.user,
@@ -1520,7 +1520,9 @@ class MinimalJobWrapper(HasResourceParameters):
                         dep_job_assoc.job,
                         "Execution of this dataset's job is paused because its input datasets are in an error state.",
                     )
-            job.set_final_state(job.states.ERROR)
+            job.set_final_state(
+                job.states.ERROR, supports_skip_locked=self.app.application_stack.supports_skip_locked()
+            )
             job.command_line = self.command_line
             job.info = message
             # TODO: Put setting the stdout, stderr, and exit code in one place
@@ -1847,7 +1849,7 @@ class MinimalJobWrapper(HasResourceParameters):
         user = job.user
         object_store_id = self.get_destination_configuration("object_store_id", None)
         split_object_stores: Optional[Callable[[str], ObjectStorePopulator]] = None
-        object_store_id_overrides: Optional[dict[str, Optional[str]]] = None
+        object_store_id_overrides: Optional[Dict[str, Optional[str]]] = None
 
         if object_store_id is None:
             object_store_id = job.preferred_object_store_id
@@ -2290,7 +2292,7 @@ class MinimalJobWrapper(HasResourceParameters):
 
         # Finally set the job state.  This should only happen *after* all
         # dataset creation, and will allow us to eliminate force_history_refresh.
-        job.set_final_state(final_job_state)
+        job.set_final_state(final_job_state, supports_skip_locked=self.app.application_stack.supports_skip_locked())
         if not job.tasks:
             # If job was composed of tasks, don't attempt to recollect statistics
             self._collect_metrics(job, job_metrics_directory)
@@ -2698,7 +2700,7 @@ class MinimalJobWrapper(HasResourceParameters):
         """
         if self.tool and self.tool.id == "upload1":
             job = self.get_job()
-            param_dict = self.tool.get_param_values(job)
+            param_dict = job.get_param_values(self.app)
             return param_dict.get("link_data_only") == "link_to_files"
         else:
             # The tool is unavailable, we try to move the outputs.

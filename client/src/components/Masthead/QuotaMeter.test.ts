@@ -19,7 +19,7 @@ async function createQuotaMeterWrapper(config: any, user: RegisteredUser) {
     const pinia = createTestingPinia();
     const userStore = useUserStore();
     userStore.currentUser = user;
-    const wrapper = mount(QuotaMeter as object, {
+    const wrapper = mount(QuotaMeter, {
         localVue,
         pinia,
     });

@@ -6,6 +6,7 @@ from datetime import (
     timedelta,
 )
 from typing import (
+    List,
     Optional,
 )
 
@@ -508,7 +509,7 @@ class GalaxyRBACAgent(RBACAgent):
 
         return True
 
-    def can_access_collection(self, user_roles: list[Role], collection: DatasetCollection):
+    def can_access_collection(self, user_roles: List[Role], collection: DatasetCollection):
         action_tuples = collection.dataset_action_tuples
         if not self.can_access_datasets(user_roles, action_tuples):
             return False
@@ -1415,8 +1416,8 @@ WHERE history.user_id != :user_id and history_dataset_association.dataset_id = :
         self,
         user: User,
         *,
-        group_ids: Optional[list[int]] = None,
-        role_ids: Optional[list[int]] = None,
+        group_ids: Optional[List[int]] = None,
+        role_ids: Optional[List[int]] = None,
     ) -> None:
         """
         Set user groups and user roles, replacing current associations.
@@ -1437,8 +1438,8 @@ WHERE history.user_id != :user_id and history_dataset_association.dataset_id = :
         self,
         group: Group,
         *,
-        user_ids: Optional[list[int]] = None,
-        role_ids: Optional[list[int]] = None,
+        user_ids: Optional[List[int]] = None,
+        role_ids: Optional[List[int]] = None,
     ) -> None:
         """
         Set group users and group roles, replacing current associations.
@@ -1459,8 +1460,8 @@ WHERE history.user_id != :user_id and history_dataset_association.dataset_id = :
         self,
         role: Role,
         *,
-        user_ids: Optional[list[int]] = None,
-        group_ids: Optional[list[int]] = None,
+        user_ids: Optional[List[int]] = None,
+        group_ids: Optional[List[int]] = None,
     ) -> None:
         """
         Set role users and role groups, replacing current associations.

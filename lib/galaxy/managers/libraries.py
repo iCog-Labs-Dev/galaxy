@@ -4,7 +4,10 @@ Manager and Serializer for libraries.
 
 import logging
 from typing import (
+    Dict,
     Optional,
+    Set,
+    Tuple,
 )
 
 from sqlalchemy.exc import (
@@ -130,7 +133,7 @@ class LibraryManager:
         trans.sa_session.commit()
         return library
 
-    def list(self, trans, deleted: Optional[bool] = False) -> tuple[Query, dict[str, set]]:
+    def list(self, trans, deleted: Optional[bool] = False) -> Tuple[Query, Dict[str, Set]]:
         """
         Return a list of libraries from the DB.
 
@@ -212,7 +215,7 @@ class LibraryManager:
         else:
             return library
 
-    def get_library_dict(self, trans, library: Library, prefetched_ids: Optional[dict[str, set]] = None) -> dict:
+    def get_library_dict(self, trans, library: Library, prefetched_ids: Optional[Dict[str, Set]] = None) -> dict:
         """
         Return library data in the form of a dictionary.
 
@@ -278,7 +281,7 @@ class LibraryManager:
         manage_roles = self.get_manage_roles(trans, library)
         add_roles = self.get_add_roles(trans, library)
 
-        def make_tuples(roles: set):
+        def make_tuples(roles: Set):
             tuples = []
             for role in roles:
                 # use role name for non-private roles, and user.email from private rules
@@ -294,13 +297,13 @@ class LibraryManager:
             add_library_item_role_list=make_tuples(add_roles),
         )
 
-    def get_access_roles(self, trans, library: Library) -> set[Role]:
+    def get_access_roles(self, trans, library: Library) -> Set[Role]:
         """
         Load access roles for all library permissions
         """
         return set(library.get_access_roles(trans.app.security_agent))
 
-    def get_modify_roles(self, trans, library: Library) -> set[Role]:
+    def get_modify_roles(self, trans, library: Library) -> Set[Role]:
         """
         Load modify roles for all library permissions
         """
@@ -310,7 +313,7 @@ class LibraryManager:
             )
         )
 
-    def get_manage_roles(self, trans, library: Library) -> set[Role]:
+    def get_manage_roles(self, trans, library: Library) -> Set[Role]:
         """
         Load manage roles for all library permissions
         """
@@ -320,7 +323,7 @@ class LibraryManager:
             )
         )
 
-    def get_add_roles(self, trans, library: Library) -> set[Role]:
+    def get_add_roles(self, trans, library: Library) -> Set[Role]:
         """
         Load add roles for all library permissions
         """

@@ -13,15 +13,7 @@
             :title-suffix="suffixPrimary"
             :invocation-preferred-object-store-id="selectedObjectStoreId">
         </WorkflowTargetPreferredObjectStorePopover>
-        <b-modal
-            v-model="showPreferredObjectStoreModal"
-            :title="primaryModalTitle"
-            v-bind="modalProps"
-            size="lg"
-            scrollable
-            centered
-            ok-only
-            ok-title="Close">
+        <b-modal v-model="showPreferredObjectStoreModal" :title="primaryModalTitle" v-bind="modalProps" hide-footer>
             <WorkflowSelectPreferredObjectStore
                 :invocation-preferred-object-store-id="selectedObjectStoreId"
                 @updated="onUpdate" />
@@ -45,11 +37,7 @@
             v-model="showIntermediatePreferredObjectStoreModal"
             :title="intermediateModalTitle"
             v-bind="modalProps"
-            size="lg"
-            scrollable
-            centered
-            ok-only
-            ok-title="Close">
+            hide-footer>
             <WorkflowSelectPreferredObjectStore
                 :invocation-preferred-object-store-id="selectedIntermediateObjectStoreId"
                 @updated="onUpdateIntermediate" />
@@ -103,10 +91,10 @@ export default {
             }
         },
         primaryModalTitle() {
-            return `Invocation ${this.preferredOrEmptyString} Galaxy Storage`;
+            return `Invocation ${this.preferredOrEmptyString} Storage Location`;
         },
         intermediateModalTitle() {
-            return `Invocation ${this.preferredOrEmptyString} Galaxy Storage (Intermediate Datasets)`;
+            return `Invocation ${this.preferredOrEmptyString} Storage Location (Intermediate Datasets)`;
         },
         suffixPrimary() {
             if (this.splitObjectStore) {
@@ -134,10 +122,12 @@ export default {
         async onUpdate(preferredObjectStoreId) {
             this.selectedObjectStoreId = preferredObjectStoreId;
             this.$emit("updated", preferredObjectStoreId, false);
+            this.showPreferredObjectStoreModal = false;
         },
         async onUpdateIntermediate(preferredObjectStoreId) {
             this.selectedIntermediateObjectStoreId = preferredObjectStoreId;
             this.$emit("updated", preferredObjectStoreId, true);
+            this.showIntermediatePreferredObjectStoreModal = false;
         },
     },
 };

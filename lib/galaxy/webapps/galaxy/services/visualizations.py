@@ -3,6 +3,7 @@ import logging
 from typing import (
     cast,
     Optional,
+    Tuple,
     Union,
 )
 
@@ -75,7 +76,7 @@ class VisualizationsService(ServiceBase):
         trans: ProvidesUserContext,
         payload: VisualizationIndexQueryPayload,
         include_total_count: bool = False,
-    ) -> tuple[VisualizationSummaryList, Union[int, None]]:
+    ) -> Tuple[VisualizationSummaryList, Union[int, None]]:
         """Return a list of Visualizations viewable by the user
 
         :rtype:     list

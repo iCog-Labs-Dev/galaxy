@@ -2,6 +2,8 @@ import contextlib
 import json
 from typing import (
     Any,
+    Dict,
+    List,
 )
 
 from sqlalchemy import select
@@ -43,8 +45,8 @@ steps:
       input1: test_input
 """
 
-ActionJson = dict[str, Any]
-ActionsJson = list[ActionJson]
+ActionJson = Dict[str, Any]
+ActionsJson = List[ActionJson]
 
 
 class TestWorkflowRefactoringIntegration(integration_util.IntegrationTestCase, UsesShedApi):
@@ -794,7 +796,7 @@ steps:
         with self.workflow_populator.export_for_update(workflow_id) as workflow_object:
             yield workflow_object
 
-    def _refactor(self, actions: list[dict[str, Any]], stored_workflow=None, dry_run=False, style="ga"):
+    def _refactor(self, actions: List[Dict[str, Any]], stored_workflow=None, dry_run=False, style="ga"):
         stmt = select(User).order_by(User.id.desc()).limit(1)
         user = self._app.model.session.execute(stmt).scalar_one()
         mock_trans = MockTrans(self._app, user)

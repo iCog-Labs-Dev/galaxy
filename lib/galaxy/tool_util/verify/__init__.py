@@ -113,11 +113,8 @@ def verify(
     if attributes is not None and attributes.get("md5", None) is not None:
         expected_checksum_type = "md5"
         expected_checksum = attributes.get("md5")
-    elif attributes is not None and attributes.get("checksum") is not None:
-        checksum_value = attributes.get("checksum")
-        assert (
-            checksum_value is not None
-        )  # redundant with the test in the elif, but cannot use := until we drop support for Python 3.7
+    elif attributes is not None and attributes.get("checksum", None) is not None:
+        checksum_value = attributes.get("checksum", None)
         expected_checksum_type, expected_checksum = checksum_value.split("$", 1)
 
     if expected_checksum_type:

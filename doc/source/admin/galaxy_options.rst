@@ -1217,6 +1217,22 @@
 :Type: str
 
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``enable_tool_document_cache``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Description:
+    This option is deprecated, and the tool document cache will be
+    removed in the next release. Whether to enable the tool document
+    cache. This cache stores expanded XML strings. Enabling the tool
+    cache results in slightly faster startup times. The tool cache is
+    backed by a SQLite database, which cannot be stored on certain
+    network disks. The cache location is configurable with the
+    ``tool_cache_data_dir`` tag in tool config files.
+:Default: ``false``
+:Type: bool
+
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 ``tool_search_index_dir``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2445,17 +2461,6 @@
     The URL linked by the "How to Cite Galaxy" link in the "Help"
     menu.
 :Default: ``https://galaxyproject.org/citing-galaxy``
-:Type: str
-
-
-~~~~~~~~~~~~~~~~~~~
-``citation_bibtex``
-~~~~~~~~~~~~~~~~~~~
-
-:Description:
-    The BibTeX citation for Galaxy, to be displayed in the History
-    Tool Reference List
-:Default: ``@article{Galaxy2024, title={The Galaxy platform for accessible, reproducible, and collaborative data analyses: 2024 update}, author={{The Galaxy Community}}, journal={Nucleic Acids Research}, year={2024}, doi={10.1093/nar/gkae410}, url={https://doi.org/10.1093/nar/gkae410}}``
 :Type: str
 
 

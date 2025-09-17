@@ -5,6 +5,7 @@ import tempfile
 from typing import (
     cast,
     IO,
+    List,
     Optional,
     Union,
 )
@@ -110,7 +111,7 @@ log = logging.getLogger(__name__)
 
 router = Router(tags=["repositories"])
 
-IndexResponse = Union[RepositorySearchResults, list[Repository], PaginatedRepositoryIndexResults]
+IndexResponse = Union[RepositorySearchResults, List[Repository], PaginatedRepositoryIndexResults]
 
 
 @as_form
@@ -272,7 +273,7 @@ class FastAPIRepositories:
         owner: Optional[str] = OptionalRepositoryOwnerParam,
         name: Optional[str] = OptionalRepositoryNameParam,
         tsr_id: Optional[str] = OptionalRepositoryIdParam,
-    ) -> list[str]:
+    ) -> List[str]:
         return get_ordered_installable_revisions(self.app, name, owner, tsr_id)
 
     @router.post(
@@ -414,7 +415,7 @@ class FastAPIRepositories:
         self,
         trans: SessionRequestContext = DependsOnTrans,
         encoded_repository_id: str = RepositoryIdPathParam,
-    ) -> list[str]:
+    ) -> List[str]:
         repository = get_repository_in_tool_shed(self.app, encoded_repository_id)
         ensure_can_manage(trans, repository)
         return trans.app.security_agent.usernames_that_can_push(repository)
@@ -428,7 +429,7 @@ class FastAPIRepositories:
         trans: SessionRequestContext = DependsOnTrans,
         encoded_repository_id: str = RepositoryIdPathParam,
         username: str = UsernameIdPathParam,
-    ) -> list[str]:
+    ) -> List[str]:
         repository = get_repository_in_tool_shed(self.app, encoded_repository_id)
         if not can_manage_repo(trans, repository):
             raise InsufficientPermissionsException("You do not have permission to update this repository.")
@@ -512,7 +513,7 @@ class FastAPIRepositories:
         trans: SessionRequestContext = DependsOnTrans,
         encoded_repository_id: str = RepositoryIdPathParam,
         username: str = UsernameIdPathParam,
-    ) -> list[str]:
+    ) -> List[str]:
         repository = get_repository_in_tool_shed(self.app, encoded_repository_id)
         if not can_manage_repo(trans, repository):
             raise InsufficientPermissionsException("You do not have permission to update this repository.")
@@ -530,13 +531,13 @@ class FastAPIRepositories:
         encoded_repository_id: str = RepositoryIdPathParam,
         commit_message: Optional[str] = CommitMessageQueryParam,
         trans: SessionRequestContext = DependsOnTrans,
-        files: Optional[list[UploadFile]] = None,
+        files: Optional[List[UploadFile]] = None,
         revision_request: RepositoryUpdateRequest = Depends(RepositoryUpdateRequestFormData.as_form),  # type: ignore[attr-defined]
     ) -> RepositoryUpdate:
         try:
             # Code stolen from Marius' work in Galaxy's Tools API.
 
-            files2: list[StarletteUploadFile] = cast(list[StarletteUploadFile], files or [])
+            files2: List[StarletteUploadFile] = cast(List[StarletteUploadFile], files or [])
             # FastAPI's UploadFile is a very light wrapper around starlette's UploadFile
             if not files2:
                 data = await request.form()

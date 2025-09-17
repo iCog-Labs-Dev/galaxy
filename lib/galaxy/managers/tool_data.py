@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import (
     cast,
+    Dict,
     Optional,
 )
 
@@ -37,7 +38,7 @@ class ToolDataManager:
         self._app = app
 
     @property
-    def data_tables(self) -> dict[str, ToolDataTable]:
+    def data_tables(self) -> Dict[str, ToolDataTable]:
         return self._app.tool_data_tables.data_tables
 
     def index(self) -> ToolDataEntryList:

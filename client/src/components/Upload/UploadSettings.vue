@@ -11,7 +11,7 @@ library.add(faCog);
 defineProps({
     deferred: {
         type: Boolean,
-        default: undefined,
+        default: null,
     },
     disabled: {
         type: Boolean,
@@ -49,7 +49,7 @@ const emit = defineEmits(["input"]);
                         :value="toPosixLines"
                         @click="emit('input', 'toPosixLines')" />
                     <UploadOption
-                        v-if="deferred !== undefined"
+                        v-if="deferred !== null"
                         class="upload-deferred"
                         title="Defer dataset resolution"
                         :value="deferred"

@@ -9,6 +9,8 @@ import logging
 import sys
 from typing import (
     Any,
+    Dict,
+    List,
 )
 
 from galaxy.managers import base
@@ -28,14 +30,14 @@ class ConfigurationManager:
 
     def get_configuration(
         self, trans: ProvidesUserContext, serialization_params: SerializationParams
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         is_admin = trans.user_is_admin
         host = getattr(trans, "host", None)
         serializer_class = AdminConfigSerializer if is_admin else ConfigSerializer
         serializer = serializer_class(self._app)
         return serializer.serialize_to_view(self._app.config, host=host, **serialization_params.model_dump())
 
-    def version(self) -> dict[str, Any]:
+    def version(self) -> Dict[str, Any]:
         version_info = {
             "version_major": self._app.config.version_major,
             "version_minor": self._app.config.version_minor,
@@ -47,7 +49,7 @@ class ConfigurationManager:
     def decode_id(
         self,
         encoded_id: str,
-    ) -> dict[str, int]:
+    ) -> Dict[str, int]:
         # Handle the special case for library folders
         if (len(encoded_id) % 16 == 1) and encoded_id.startswith("F"):
             encoded_id = encoded_id[1:]
@@ -57,11 +59,11 @@ class ConfigurationManager:
     def encode_id(
         self,
         decoded_id: int,
-    ) -> dict[str, str]:
+    ) -> Dict[str, str]:
         encoded_id = self._app.security.encode_id(decoded_id)
         return {"encoded_id": encoded_id}
 
-    def tool_lineages(self) -> list[dict[str, dict]]:
+    def tool_lineages(self) -> List[Dict[str, Dict]]:
         rval = []
         for id, tool in self._app.toolbox.tools():
             try:
@@ -73,7 +75,7 @@ class ConfigurationManager:
                 rval.append(entry)
         return rval
 
-    def dynamic_tool_confs(self) -> list[dict[str, str]]:
+    def dynamic_tool_confs(self) -> List[Dict[str, str]]:
         # WARNING: If this method is ever changed so as not to require admin privileges, update the nginx proxy
         # documentation, since this path is used as an authentication-by-proxy method for securing other paths on the
         # server. A dedicated endpoint should probably be added to do that instead.
@@ -118,7 +120,7 @@ class ConfigSerializer(base.ModelSerializer):
             return True if item.get(key) else False
 
         object_store = self.app.object_store
-        self.serializers: dict[str, base.Serializer] = {
+        self.serializers: Dict[str, base.Serializer] = {
             # TODO: this is available from user data, remove
             "is_admin_user": lambda *a, **c: False,
             "brand": _use_config,
@@ -129,7 +131,6 @@ class ConfigSerializer(base.ModelSerializer):
             "wiki_url": _use_config,
             "screencasts_url": _use_config,
             "citation_url": _use_config,
-            "citation_bibtex": _use_config,
             "citations_export_message_html": _use_config,
             "support_url": _use_config,
             "quota_url": _use_config,
@@ -256,5 +257,5 @@ class AdminConfigSerializer(ConfigSerializer):
             }
         )
 
-    def _serialize_tool_shed_urls(self, item: Any, key: str, **context) -> list[str]:
+    def _serialize_tool_shed_urls(self, item: Any, key: str, **context) -> List[str]:
         return list(self.app.tool_shed_registry.tool_sheds.values()) if self.app.tool_shed_registry else []

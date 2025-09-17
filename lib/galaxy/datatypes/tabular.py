@@ -14,6 +14,8 @@ import tempfile
 from json import dumps
 from typing import (
     cast,
+    Dict,
+    List,
     Optional,
     Union,
 )
@@ -251,10 +253,10 @@ class TabularData(Text):
     def make_html_peek_header(
         self,
         dataset: DatasetProtocol,
-        skipchars: Optional[list] = None,
-        column_names: Optional[list] = None,
+        skipchars: Optional[List] = None,
+        column_names: Optional[List] = None,
         column_number_format: str = "%s",
-        column_parameter_alias: Optional[dict] = None,
+        column_parameter_alias: Optional[Dict] = None,
         **kwargs,
     ) -> str:
         if skipchars is None:
@@ -304,7 +306,7 @@ class TabularData(Text):
             raise Exception(f"Can't create peek header: {util.unicodify(exc)}")
         return "".join(out)
 
-    def make_html_peek_rows(self, dataset: DatasetProtocol, skipchars: Optional[list] = None, **kwargs) -> str:
+    def make_html_peek_rows(self, dataset: DatasetProtocol, skipchars: Optional[List] = None, **kwargs) -> str:
         if skipchars is None:
             skipchars = []
         out = []
@@ -409,7 +411,7 @@ class Tabular(TabularData):
 
     file_ext = "tabular"
 
-    def get_column_names(self, first_line: str) -> Optional[list[str]]:
+    def get_column_names(self, first_line: str) -> Optional[List[str]]:
         return None
 
     def set_meta(
@@ -512,7 +514,7 @@ class Tabular(TabularData):
         data_lines = 0
         comment_lines = 0
         column_names = None
-        column_types: list = []
+        column_types: List = []
         first_line_column_types = []
         if dataset.has_data():
             # NOTE: if skip > num_check_lines, we won't detect any metadata, and will use default
@@ -600,7 +602,7 @@ class SraManifest(Tabular):
         super().set_meta(dataset, overwrite=overwrite, **kwd)
         dataset.metadata.comment_lines = 1
 
-    def get_column_names(self, first_line: str) -> Optional[list[str]]:
+    def get_column_names(self, first_line: str) -> Optional[List[str]]:
         return first_line.strip().split("\t")
 
 
@@ -853,7 +855,7 @@ class Sam(Tabular, _BamOrSam):
             _BamOrSam().set_meta(dataset, overwrite=overwrite, **kwd)
 
     @staticmethod
-    def merge(split_files: list[str], output_file: str) -> None:
+    def merge(split_files: List[str], output_file: str) -> None:
         """
         Multiple SAM files may each have headers. Since the headers should all be the same, remove
         the headers from files 1-n, keeping them in the first file only
@@ -1064,7 +1066,7 @@ class BaseVcf(Tabular):
             dataset.metadata.sample_names = line.split()[9:]
 
     @staticmethod
-    def merge(split_files: list[str], output_file: str) -> None:
+    def merge(split_files: List[str], output_file: str) -> None:
         stderr_f = tempfile.NamedTemporaryFile(prefix="bam_merge_stderr")
         stderr_name = stderr_f.name
         command = ["bcftools", "concat"] + split_files + ["-o", output_file]
@@ -1235,7 +1237,7 @@ class Eland(Tabular):
         ]
 
     def make_html_table(
-        self, dataset: DatasetProtocol, skipchars: Optional[list] = None, peek: Optional[list] = None, **kwargs
+        self, dataset: DatasetProtocol, skipchars: Optional[List] = None, peek: Optional[List] = None, **kwargs
     ) -> str:
         """Create HTML table, used for displaying peek"""
         skipchars = skipchars or []

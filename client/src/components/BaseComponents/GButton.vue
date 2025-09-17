@@ -99,7 +99,7 @@ const buttonElementRef = useResolveElement(buttonRef);
         :data-title="currentTitle"
         :class="{ ...variantClasses, ...styleClasses }"
         :to="!props.disabled ? props.to : ''"
-        :href="!props.disabled ? (props.to ?? props.href) : ''"
+        :href="!props.disabled ? props.to ?? props.href : ''"
         :title="props.tooltip ? false : currentTitle"
         :aria-disabled="props.disabled"
         v-bind="$attrs"
@@ -120,7 +120,6 @@ const buttonElementRef = useResolveElement(buttonRef);
     display: inline-flex;
     gap: var(--spacing-1);
     align-items: center;
-    padding: 8px 12px;
     margin: 0;
     border: 1px solid;
     border-radius: var(--spacing-1);
@@ -128,10 +127,7 @@ const buttonElementRef = useResolveElement(buttonRef);
     vertical-align: middle;
     cursor: pointer;
 
-    transition:
-        color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out,
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
         box-shadow 0.15s ease-in-out;
 
     @media (prefers-reduced-motion) {
@@ -158,7 +154,7 @@ const buttonElementRef = useResolveElement(buttonRef);
 
     &.g-medium {
         font-size: var(--font-size-medium);
-        padding:8px 12px;
+        padding: var(--spacing-1) var(--spacing-2);
     }
 
     &.g-large {
@@ -196,8 +192,8 @@ const buttonElementRef = useResolveElement(buttonRef);
 
     @each $color in "blue", "green", "red", "yellow", "orange" {
         &.g-#{$color} {
-            background-color: #0a0a0a;
-            border-color: #0a0a0a;
+            background-color: var(--color-#{$color}-600);
+            border-color: var(--color-#{$color}-600);
             color: var(--color-#{$color}-100);
 
             &:hover,

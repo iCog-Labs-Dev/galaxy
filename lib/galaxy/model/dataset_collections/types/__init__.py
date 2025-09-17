@@ -3,11 +3,9 @@ from abc import (
     ABCMeta,
     abstractmethod,
 )
-from collections.abc import (
+from typing import (
     Iterable,
     Mapping,
-)
-from typing import (
     TYPE_CHECKING,
     Union,
 )

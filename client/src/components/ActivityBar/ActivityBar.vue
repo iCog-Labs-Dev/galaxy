@@ -8,7 +8,7 @@ import { useRoute } from "vue-router/composables";
 import draggable from "vuedraggable";
 
 import { useConfig } from "@/composables/config";
-import { convertDropData } from "@/stores/activitySetup";  
+import { convertDropData } from "@/stores/activitySetup";
 import { useActivityStore } from "@/stores/activityStore";
 import type { Activity } from "@/stores/activityStoreTypes";
 import { useEventStore } from "@/stores/eventStore";
@@ -48,15 +48,15 @@ const props = withDefaults(
         defaultActivities: undefined,
         activityBarId: "default",
         specialActivities: () => [],
-        // showAdmin: true,
-        // optionsTitle: "More",
+        showAdmin: true,
+        optionsTitle: "More",
         optionsHeading: "Additional Activities",
-        // optionsIcon: () => faEllipsisH,
-        // optionsSearchPlaceholder: "Search Activities",
-        // optionsTooltip: "View additional activities",
+        optionsIcon: () => faEllipsisH,
+        optionsSearchPlaceholder: "Search Activities",
+        optionsTooltip: "View additional activities",
         initialActivity: undefined,
         hidePanel: false,
-    },
+    }
 );
 
 // require user to long click before dragging
@@ -85,7 +85,7 @@ watchImmediate(
         } else {
             activityStore.resetDefaultActivities();
         }
-    },
+    }
 );
 
 const { isAdmin, isAnonymous } = storeToRefs(userStore);
@@ -101,13 +101,13 @@ const { activities: storeActivities, isSideBarOpen, sidePanelWidth } = storeToRe
 const activities = computed({
     get() {
         return storeActivities.value.filter(
-            (activity) => activity.id !== "user-defined-tools" || canUseUnprivilegedTools.value,
+            (activity) => activity.id !== "user-defined-tools" || canUseUnprivilegedTools.value
         );
     },
     set(newActivities: Activity[]) {
         // Find any filtered-out activities and add them back
         const filteredOut = storeActivities.value.filter(
-            (activity) => activity.id === "user-defined-tools" && !canUseUnprivilegedTools.value,
+            (activity) => activity.id === "user-defined-tools" && !canUseUnprivilegedTools.value
         );
         storeActivities.value = [...newActivities, ...filteredOut];
     },
@@ -228,15 +228,7 @@ defineExpose({
             @dragover.prevent="onDragOver"
             @dragenter.prevent="onDragEnter"
             @dragleave.prevent="onDragLeave">
-              <div class="sidebar-logo text-center">
-                    <img
-                    src="https://i.postimg.cc/g0tDwRVD/rejuve-logo.png"
-                    alt="Logo"
-                    width="56"
-                    height="56"
-                    />
-            </div>
-            <b-nav vertical class="flex-nowrap h-100 vertical-overflow" style="margin-top: 24px; align-items: center;">
+            <b-nav vertical class="flex-nowrap p-1 h-100 vertical-overflow">
                 <draggable
                     v-model="activities"
                     :class="{ 'activity-popper-disabled': isDragging }"
@@ -299,8 +291,8 @@ defineExpose({
                     </div>
                 </draggable>
             </b-nav>
-            <b-nav v-if="!isAnonymous" vertical class="flex-nowrap" style="align-items:center">
-                <!-- <NotificationItem
+            <b-nav v-if="!isAnonymous" vertical class="activity-footer flex-nowrap p-1">
+                <NotificationItem
                     v-if="isConfigLoaded && config.enable_notification_system"
                     id="notifications"
                     :activity-bar-id="props.activityBarId"
@@ -351,11 +343,11 @@ defineExpose({
                         :to="activity.to ?? undefined"
                         :variant="activity.variant"
                         @click="onActivityClicked(activity)" />
-                </template> -->
+                </template>
             </b-nav>
         </div>
         <FlexPanel
-            v-if="false"
+            v-if="isSideBarOpen && !hidePanel"
             side="left"
             :collapsible="false"
             :reactive-width.sync="sidePanelWidth">
@@ -364,7 +356,7 @@ defineExpose({
             <VisualizationPanel v-else-if="isActiveSideBar('visualizations')" />
             <MultiviewPanel v-else-if="isActiveSideBar('multiview')" />
             <NotificationsPanel v-else-if="isActiveSideBar('notifications')" />
-            <UserToolPanel v-if="isActiveSideBar('user-defined-tools')" in-panel />
+            <UserToolPanel v-if="isActiveSideBar('user-defined-tools')" />
             <InteractiveToolsPanel v-else-if="isActiveSideBar('interactivetools')" />
             <SettingsPanel
                 v-else-if="isActiveSideBar('settings')"
@@ -382,14 +374,8 @@ defineExpose({
 @import "theme/blue.scss";
 
 .activity-bar {
-    background: white;
-    border-right: solid 1px var(--border);
-    padding: 16px 8px;
-}
-
-.activity-bar ul div:nth-of-type(4)  .nav-icon {
-    background-color: #0a0a0a;
-      color: white;
+    background: $panel-bg-color;
+    border-right: $border-default;
 }
 
 .activity-bar::-webkit-scrollbar {

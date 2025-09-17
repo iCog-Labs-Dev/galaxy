@@ -2,6 +2,8 @@ import sys
 from typing import (
     Any,
     Generic,
+    Tuple,
+    Type,
     TypeVar,
 )
 
@@ -21,7 +23,7 @@ ref_to_name = {}
 
 class GenericModel(BaseModel):
     @classmethod
-    def model_parametrized_name(cls, params: tuple[type[Any], ...]) -> str:
+    def model_parametrized_name(cls, params: Tuple[Type[Any], ...]) -> str:
         suffix = cls.__determine_suffix__(params)
         class_name = cls.__name__.split("Generic", 1)[-1]
         return f"{class_name}{suffix}"
@@ -33,7 +35,7 @@ class GenericModel(BaseModel):
         return result
 
     @classmethod
-    def __determine_suffix__(cls, params: tuple[type[Any], ...]) -> str:
+    def __determine_suffix__(cls, params: Tuple[Type[Any], ...]) -> str:
         suffix = "Incoming"
         if params[0] is EncodedDatabaseIdField:
             suffix = "Response"

@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import select
 
 from galaxy.exceptions import RequestParameterInvalidException
@@ -15,8 +17,8 @@ from tool_shed_client.schema import (
 )
 
 
-def index(app: ToolShedApp, deleted: bool) -> list[ApiUser]:
-    users: list[ApiUser] = []
+def index(app: ToolShedApp, deleted: bool) -> List[ApiUser]:
+    users: List[ApiUser] = []
     for user in get_users_by_deleted(app.model.context, User, deleted):
         users.append(get_api_user(app, user))
     return users

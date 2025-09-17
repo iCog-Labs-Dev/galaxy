@@ -8,13 +8,13 @@ class TapisOAuth2(BaseOAuth2):
     DEFAULT_TENANT_ID = "tacc"
 
     @property
-    def AUTHORIZATION_URL(self):  # type: ignore[override]
+    def AUTHORIZATION_URL(self):
         """Generate authorization URL based on tenant ID setting"""
         tenant = self.setting("TENANT_ID", self.DEFAULT_TENANT_ID)
         return f"https://{tenant}.tapis.io/v3/oauth2/authorize"
 
     @property
-    def ACCESS_TOKEN_URL(self):  # type: ignore[override]
+    def ACCESS_TOKEN_URL(self):
         """Generate access token URL based on tenant ID setting"""
         tenant = self.setting("TENANT_ID", self.DEFAULT_TENANT_ID)
         return f"https://{tenant}.tapis.io/v3/oauth2/tokens"

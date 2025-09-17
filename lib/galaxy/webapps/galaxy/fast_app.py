@@ -1,5 +1,6 @@
 from typing import (
     Any,
+    Dict,
 )
 
 from a2wsgi import WSGIMiddleware
@@ -148,7 +149,7 @@ def get_fastapi_instance(root_path="") -> FastAPI:
     )
 
 
-def get_openapi_schema() -> dict[str, Any]:
+def get_openapi_schema() -> Dict[str, Any]:
     """
     Dumps openAPI schema without starting a full app and webserver.
     """

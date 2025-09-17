@@ -18,9 +18,6 @@
                         <td v-if="Array.isArray(parameter.value)">
                             <JobParametersArrayValue :parameter_value="parameter.value" />
                         </td>
-                        <td v-else-if="isRequestJson(parameter)" class="tool-parameter-value">
-                            <DataFetchRequestParameter :parameter-value="parameter.value" />
-                        </td>
                         <td v-else class="tool-parameter-value">
                             {{ parameter.value }}
                         </td>
@@ -56,13 +53,10 @@ import Vue from "vue";
 import JobOutputs from "../JobInformation/JobOutputs";
 import JobParametersArrayValue from "./JobParametersArrayValue";
 
-import DataFetchRequestParameter from "./DataFetchRequestParameter.vue";
-
 Vue.use(BootstrapVue);
 
 export default {
     components: {
-        DataFetchRequestParameter,
         JobOutputs,
         JobParametersArrayValue,
     },
@@ -123,9 +117,6 @@ export default {
         this.initJob();
     },
     methods: {
-        isRequestJson(parameter) {
-            return parameter.text == "request_json" && typeof parameter.value == "string";
-        },
         initJob() {
             let url;
             if (this.jobId) {

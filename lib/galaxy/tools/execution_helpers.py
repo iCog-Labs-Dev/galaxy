@@ -5,7 +5,7 @@ tool execution code, and tool action code.
 """
 
 import logging
-from collections.abc import Collection
+from typing import Collection
 
 log = logging.getLogger(__name__)
 

@@ -5,6 +5,7 @@ Mixins for Annotatable model managers and serializers.
 import abc
 import logging
 from typing import (
+    Dict,
     Optional,
 )
 
@@ -77,7 +78,7 @@ class AnnotatableManagerMixin:
 
 
 class AnnotatableSerializerMixin:
-    serializers: dict[str, Serializer]
+    serializers: Dict[str, Serializer]
 
     def add_serializers(self):
         self.serializers["annotation"] = self.serialize_annotation
@@ -91,7 +92,7 @@ class AnnotatableSerializerMixin:
 
 
 class AnnotatableDeserializerMixin:
-    deserializers: dict[str, Deserializer]
+    deserializers: Dict[str, Deserializer]
 
     def add_deserializers(self):
         self.deserializers["annotation"] = self.deserialize_annotation

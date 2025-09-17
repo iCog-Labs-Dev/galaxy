@@ -36,7 +36,7 @@ export default {
     },
     data() {
         return {
-            loadingMessage: "Loading Galaxy storage information",
+            loadingMessage: "Loading storage location information",
         };
     },
 };

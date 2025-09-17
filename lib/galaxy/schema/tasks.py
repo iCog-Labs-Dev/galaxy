@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import (
+    List,
     Optional,
 )
 from uuid import UUID
@@ -118,7 +119,7 @@ class ComputeDatasetHashTaskRequest(Model):
 
 
 class PurgeDatasetsTaskRequest(Model):
-    dataset_ids: list[int]
+    dataset_ids: List[int]
 
 
 class TaskState(str, Enum):

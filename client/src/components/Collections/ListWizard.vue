@@ -17,8 +17,9 @@ import {
 } from "./common/useCollectionCreator";
 import { showHid } from "./common/useCollectionCreator";
 import type { WhichListBuilder } from "./ListWizard/types";
-import { useAutoPairing } from "./usePairing";
+import { autoPairWithCommonFilters } from "./pairing";
 
+import AutoPairing from "./common/AutoPairing.vue";
 import ListCollectionCreator from "./ListCollectionCreator.vue";
 import WhichBuilder from "./ListWizard/WhichBuilder.vue";
 import PairedOrUnpairedListCollectionCreator from "./PairedOrUnpairedListCollectionCreator.vue";
@@ -35,8 +36,8 @@ const isBusy = ref<boolean>(false);
 const whichBuilder = ref<WhichListBuilder>("list");
 const store = useCollectionBuilderItemSelection();
 const { currentHistoryId, createPayload } = useCollectionCreation();
-const { countPaired, currentForwardFilter, currentReverseFilter, AutoPairing, autoPair, onFilters } = useAutoPairing();
-
+const currentForwardFilter = ref("");
+const currentReverseFilter = ref("");
 const creationError = ref<string | null>(null);
 const collectionCreated = ref(false);
 
@@ -44,13 +45,18 @@ type InferrableBuilder = "list" | "list:paired";
 const collectionCreator = ref<CollectionCreatorComponent>();
 const { selectedItems } = storeToRefs(store);
 
+const countPaired = ref(-1);
+const countUnpaired = ref(-1);
 const inferredBuilder = ref<InferrableBuilder>("list");
 const builderInputsValid = ref(false);
 
 async function initialize() {
     isBusy.value = true;
-    autoPair(selectedItems.value);
-    // updates currentForwardFilter, currentReverseFilter, countPaired
+    const summary = autoPairWithCommonFilters(selectedItems.value, true);
+    currentForwardFilter.value = summary.forwardFilter || "";
+    currentReverseFilter.value = summary.reverseFilter || "";
+    countPaired.value = summary.pairs?.length || 0;
+    countUnpaired.value = summary.unpaired.length;
     if (countPaired.value * 2 > selectedItems.value.length * 0.2) {
         whichBuilder.value = "list:paired";
         inferredBuilder.value = "list:paired";
@@ -136,7 +142,7 @@ const wizard = useWizard({
 });
 
 const collectionTypeForPairedOrUnpairedBuilder = computed(
-    () => whichBuilder.value as SupportedPairedOrPairedBuilderCollectionTypes,
+    () => whichBuilder.value as SupportedPairedOrPairedBuilderCollectionTypes
 );
 
 const buildButtonLabel = computed(() => {
@@ -175,7 +181,7 @@ async function ruleOnAttemptCreate(createRequest: RuleCreationRequestT) {
             request.name,
             request.collectionType,
             request.elementIdentifiers,
-            request.hide_source_items,
+            request.hide_source_items
         );
         await onCreate(payload);
     }
@@ -183,6 +189,11 @@ async function ruleOnAttemptCreate(createRequest: RuleCreationRequestT) {
 
 function setWhichBuilder(newWhichBuilder: WhichListBuilder) {
     whichBuilder.value = newWhichBuilder;
+}
+
+function onFilters(forwardFilter: string, reverseFilter: string) {
+    currentForwardFilter.value = forwardFilter;
+    currentReverseFilter.value = reverseFilter;
 }
 
 function goToAutoPairing() {

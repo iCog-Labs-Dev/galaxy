@@ -90,7 +90,7 @@ watch(
             showRightPanel.value = !showPanels.value && workflow.readme ? "help" : null;
         }
     },
-    { immediate: true },
+    { immediate: true }
 );
 
 watch(
@@ -99,7 +99,7 @@ watch(
         if (!show) {
             activeNodeId.value = null;
         }
-    },
+    }
 );
 const computedActiveNodeId = computed<number | undefined>(() => {
     if (showGraph.value) {
@@ -245,7 +245,7 @@ const stepsNotMatchingRequest = computed<string[]>(() => {
 });
 
 const isValidRerun = computed(
-    () => Boolean(props.isRerun) && checkInputMatching.value && stepsNotMatchingRequest.value.length === 0,
+    () => Boolean(props.isRerun) && checkInputMatching.value && stepsNotMatchingRequest.value.length === 0
 );
 
 const hasValidationErrors = computed(() => stepValidation.value !== null);
@@ -270,10 +270,6 @@ function onStorageUpdate(objectStoreId: string, intermediate: boolean) {
     } else {
         preferredObjectStoreId.value = objectStoreId;
     }
-}
-
-function updateActiveNodeId(nodeId: number | null) {
-    activeNodeId.value = nodeId;
 }
 
 async function onExecute() {
@@ -408,7 +404,7 @@ async function onExecute() {
                                 <BFormCheckbox v-model="splitObjectStore">
                                     <HelpText
                                         uri="galaxy.workflows.runtimeSettings.splitObjectStore"
-                                        text="Send outputs and intermediate to different Galaxy storage?" />
+                                        text="Send outputs and intermediate to different storage locations?" />
                                 </BFormCheckbox>
                             </div>
                             <div class="mr-4">
@@ -467,7 +463,7 @@ async function onExecute() {
                             @onChange="onChange"
                             @onValidation="onValidation"
                             @stop-flagging="checkInputMatching = false"
-                            @update:active-node-id="updateActiveNodeId" />
+                            @update:active-node-id="($event) => (activeNodeId = $event)" />
                     </BOverlay>
                 </div>
                 <div v-if="showRightPanel" class="h-100 w-50 d-flex flex-shrink-0">
@@ -491,8 +487,6 @@ async function onExecute() {
 
 <style scoped lang="scss">
 @import "theme/blue.scss";
-
-
 
 .workflow-runtime-settings-panel {
     background-color: $brand-light;

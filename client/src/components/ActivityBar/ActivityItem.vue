@@ -13,7 +13,6 @@ import localize from "@/utils/localization";
 import GButton from "../BaseComponents/GButton.vue";
 import TextShort from "@/components/Common/TextShort.vue";
 import Popper from "@/components/Popper/Popper.vue";
-import type { Component } from "vue";
 
 const router = useRouter();
 
@@ -26,7 +25,7 @@ export interface Props {
     id: string;
     activityBarId: string;
     title?: string;
-    icon?: IconDefinition | object;
+    icon?: IconDefinition;
     indicator?: number;
     isActive?: boolean;
     tooltip?: string;
@@ -52,10 +51,6 @@ const props = withDefaults(defineProps<Props>(), {
     variant: "primary",
 });
 
-function isFontAwesome(icon: any): icon is IconDefinition {
-  return icon && typeof icon === "object" && "iconName" in icon;
-}
-
 const emit = defineEmits<{
     (e: "click"): void;
 }>();
@@ -63,22 +58,19 @@ const emit = defineEmits<{
 function onClick(evt: MouseEvent): void {
     emit("click");
     if (props.to) {
-        // Check if it's an external URL
-        if (/^https?:\/\//.test(props.to)) {
-            window.location.href = props.to;  // full redirect
-        } else {
-            router.push(props.to);           // internal Vue route
-        }
+        router.push(props.to);
     }
 }
+
 const store = useActivityStore(props.activityBarId);
 const meta = computed(() => store.metaForId(props.id));
 </script>
 
-
-        <template v-slot:reference   :link-attrs="{ id: `activity-wrapper-${id}` }">
+<template>
+    <Popper :placement="tooltipPlacement">
+        <template v-slot:reference>
             <b-nav-item
-                class="activity-item"
+                class="activity-item my-1 p-2"
                 :class="{ 'nav-item-active': isActive }"
                 :link-attrs="{ id: `activity-${id}` }"
                 :link-classes="`variant-${props.variant}`"
@@ -96,27 +88,16 @@ const meta = computed(() => store.metaForId(props.id));
                             width: `${Math.round(progressPercentage)}%`,
                         }" />
                 </span>
-
                 <div class="nav-icon">
-                    <!-- Badge indicator -->
-                    <span
-                    v-if="indicator > 0"
-                    class="nav-indicator"
-                    data-description="activity indicator"
-                    >
-                    {{ Math.min(indicator, 99) }}
+                    <span v-if="indicator > 0" class="nav-indicator" data-description="activity indicator">
+                        {{ Math.min(indicator, 99) }}
                     </span>
-
-                    <!-- Render FontAwesome -->
-                    <FontAwesomeIcon v-if="isFontAwesome(icon)" :icon="icon" />
-
-                    <!-- Render Lucide (Vue component) -->
-                    <component v-else :is="icon" :size="24" stroke-width="2" />
+                    <FontAwesomeIcon :icon="icon" />
                 </div>
                 <TextShort v-if="title" :text="title" class="nav-title" />
             </b-nav-item>
         </template>
-        <!-- <div class="text-center px-2 py-1">
+        <div class="text-center px-2 py-1">
             <small v-if="tooltip">{{ localize(tooltip) }}</small>
             <small v-else>No tooltip available for this item</small>
             <div v-if="options" class="nav-options p-1">
@@ -126,16 +107,14 @@ const meta = computed(() => store.metaForId(props.id));
                     </GButton>
                 </router-link>
             </div>
-        </div> -->
-
+        </div>
+    </Popper>
+</template>
 
 <style scoped lang="scss">
 @import "theme/blue.scss";
 
 .activity-item {
-      margin-bottom: 8px;
-      
-      border-radius: 8px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -149,25 +128,12 @@ const meta = computed(() => store.metaForId(props.id));
     }
 }
 
-.activity-wrapper-workflow {
-    color: white;
-    background-color: #0a0a0a;
-}   
-
 .nav-icon {
     position: relative;
     display: flex;
     justify-content: center;
     cursor: pointer;
     font-size: 1rem;
-    color: #0a0a0a88;
-    padding: 8px;
-   width: fit-content;
-   border-radius: 8px;
-}
-
-.activity-wrapper-workflow .nav-icon {
-    color: white
 }
 
 .nav-indicator {
@@ -225,18 +191,4 @@ const meta = computed(() => store.metaForId(props.id));
     -o-transition: none;
     transition: none;
 }
-
-.nav-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0.5rem; // spacing between logo and icon
-}
-
-.nav-logo img {
-    display: block;
-    width: 24px;
-    height: 24px;
-}
-
 </style>

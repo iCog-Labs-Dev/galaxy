@@ -1,4 +1,6 @@
 from typing import (
+    Dict,
+    List,
     Optional,
     Union,
 )
@@ -20,7 +22,7 @@ from galaxy.datatypes.registry import Registry
 
 def view_index(
     datatypes_registry: Registry, extension_only: Optional[bool] = True, upload_only: Optional[bool] = True
-) -> Union[list[DatatypeDetails], list[str]]:
+) -> Union[List[DatatypeDetails], List[str]]:
     if extension_only:
         if upload_only:
             return datatypes_registry.upload_file_formats
@@ -36,13 +38,13 @@ def view_index(
 
 
 def view_mapping(datatypes_registry: Registry) -> DatatypesMap:
-    ext_to_class_name: dict[str, str] = {}
+    ext_to_class_name: Dict[str, str] = {}
     classes = []
     for k, v in datatypes_registry.datatypes_by_extension.items():
         c = v.__class__
         ext_to_class_name[k] = f"{c.__module__}.{c.__name__}"
         classes.append(c)
-    class_to_classes: dict[str, dict[str, bool]] = {}
+    class_to_classes: Dict[str, Dict[str, bool]] = {}
 
     def visit_bases(types, cls):
         for base in cls.__bases__:
@@ -67,8 +69,8 @@ def view_types_and_mapping(
     )
 
 
-def view_sniffers(datatypes_registry: Registry) -> list[str]:
-    rval: list[str] = []
+def view_sniffers(datatypes_registry: Registry) -> List[str]:
+    rval: List[str] = []
     for sniffer_elem in datatypes_registry.sniffer_elems:
         datatype = sniffer_elem.get("type")
         if datatype is not None:
@@ -90,7 +92,7 @@ def view_converters(datatypes_registry: Registry) -> DatatypeConverterList:
     return parse_obj_as(DatatypeConverterList, converters)
 
 
-def _get_edam_details(datatypes_registry: Registry, edam_ids: dict[str, str]) -> dict[str, dict]:
+def _get_edam_details(datatypes_registry: Registry, edam_ids: Dict[str, str]) -> Dict[str, Dict]:
     details_dict = {}
     for format, edam_iri in edam_ids.items():
         edam_details = datatypes_registry.edam.get(edam_iri, {})
@@ -106,7 +108,7 @@ def _get_edam_details(datatypes_registry: Registry, edam_ids: dict[str, str]) ->
 
 def view_edam_formats(
     datatypes_registry: Registry, detailed: Optional[bool] = False
-) -> Union[dict[str, str], dict[str, dict[str, str]]]:
+) -> Union[Dict[str, str], Dict[str, Dict[str, str]]]:
     if detailed:
         return _get_edam_details(datatypes_registry, datatypes_registry.edam_formats)
     else:
@@ -115,7 +117,7 @@ def view_edam_formats(
 
 def view_edam_data(
     datatypes_registry: Registry, detailed: Optional[bool] = False
-) -> Union[dict[str, str], dict[str, dict[str, str]]]:
+) -> Union[Dict[str, str], Dict[str, Dict[str, str]]]:
     if detailed:
         return _get_edam_details(datatypes_registry, datatypes_registry.edam_data)
     else:
@@ -161,7 +163,7 @@ def view_visualization_mappings(
     return parse_obj_as(DatatypeVisualizationMappingsList, mappings)
 
 
-def get_preferred_visualization(datatypes_registry: Registry, datatype_extension: str) -> Optional[dict[str, str]]:
+def get_preferred_visualization(datatypes_registry: Registry, datatype_extension: str) -> Optional[Dict[str, str]]:
     """
     Get the preferred visualization mapping for a specific datatype extension.
     Returns a dictionary with 'visualization' and 'default_params' keys, or None if no mapping exists.

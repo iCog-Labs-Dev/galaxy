@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from string import Template
 from typing import (
     Any,
+    Dict,
     Optional,
 )
 
@@ -57,7 +58,7 @@ DEFAULT_INTEGRITY_CHECK = True
 DEFAULT_INTEGRITY_COUNT = 35
 DEFAULT_INTEGRITY_SLEEP = 0.25
 REQUIRED_TEMPLATE_PARAMS = ["working_directory", "command"]
-OPTIONAL_TEMPLATE_PARAMS: dict[str, Any] = {
+OPTIONAL_TEMPLATE_PARAMS: Dict[str, Any] = {
     "galaxy_lib": None,
     "galaxy_virtual_env": None,
     "headers": "",

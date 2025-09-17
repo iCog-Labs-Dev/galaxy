@@ -12,7 +12,11 @@ from queue import (
     Queue,
 )
 from typing import (
+    Dict,
+    List,
     Optional,
+    Tuple,
+    Type,
     Union,
 )
 
@@ -107,7 +111,7 @@ class JobHandler(JobHandlerI):
 
 
 class ItemGrabber:
-    grab_model: Union[type[model.Job], type[model.WorkflowInvocation]]
+    grab_model: Union[Type[model.Job], Type[model.WorkflowInvocation]]
 
     def __init__(
         self,
@@ -244,7 +248,7 @@ class BaseJobHandlerQueue(JobQueueI, Monitors):
         # Keep track of the pid that started the job manager, only it has valid threads
         self.parent_pid = os.getpid()
         # This queue is not used if track_jobs_in_database is True.
-        self.queue: Queue[tuple[int, Optional[str]]] = Queue()
+        self.queue: Queue[Tuple[int, Optional[str]]] = Queue()
 
 
 class JobHandlerQueue(BaseJobHandlerQueue):
@@ -260,9 +264,9 @@ class JobHandlerQueue(BaseJobHandlerQueue):
         # Initialize structures for handling job limits
         self.__clear_job_count()
         # Contains job ids for jobs that are waiting (only use from monitor thread)
-        self.waiting_jobs: list[int] = []
+        self.waiting_jobs: List[int] = []
         # Contains wrappers of jobs that are limited or ready (so they aren't created unnecessarily/multiple times)
-        self.job_wrappers: dict[int, JobWrapper] = {}
+        self.job_wrappers: Dict[int, JobWrapper] = {}
         name = "JobHandlerQueue.monitor_thread"
         self._init_monitor_thread(name, target=self.__monitor, config=app.config)
         self.job_grabber = None
@@ -1086,7 +1090,7 @@ class JobHandlerStopQueue(BaseJobHandlerQueue):
         if error_msg is not None:
             final_state = job.states.ERROR
             job.info = error_msg
-        job.set_final_state(final_state)
+        job.set_final_state(final_state, supports_skip_locked=self.app.application_stack.supports_skip_locked())
         self.sa_session.add(job)
         self.sa_session.flush()
 
@@ -1100,7 +1104,7 @@ class JobHandlerStopQueue(BaseJobHandlerQueue):
         Called repeatedly by `monitor` to stop jobs.
         """
         # Pull all new jobs from the queue at once
-        jobs_to_check: list[tuple[model.Job, Optional[str]]] = []
+        jobs_to_check: List[Tuple[model.Job, Optional[str]]] = []
         with self.sa_session.begin():
             self._add_newly_deleted_jobs(jobs_to_check)
             try:
@@ -1126,7 +1130,7 @@ class JobHandlerStopQueue(BaseJobHandlerQueue):
             self.shutdown_monitor()
             log.info("job handler stop queue stopped")
 
-    def _add_newly_deleted_jobs(self, jobs_to_check: list[tuple[model.Job, Optional[str]]]):
+    def _add_newly_deleted_jobs(self, jobs_to_check: List[Tuple[model.Job, Optional[str]]]):
         if self.track_jobs_in_database:
             newly_deleted_jobs = self._get_new_jobs()
             for job in newly_deleted_jobs:
@@ -1142,7 +1146,7 @@ class JobHandlerStopQueue(BaseJobHandlerQueue):
         )
         return self.sa_session.scalars(stmt).all()
 
-    def _pull_from_queue(self, jobs_to_check: list[tuple[model.Job, Optional[str]]]):
+    def _pull_from_queue(self, jobs_to_check: List[Tuple[model.Job, Optional[str]]]):
         # Pull jobs from the queue (in the case of Administrative stopped jobs)
         try:
             while 1:
@@ -1156,7 +1160,7 @@ class JobHandlerStopQueue(BaseJobHandlerQueue):
         except Empty:
             pass
 
-    def _check_jobs(self, jobs_to_check: list[tuple[model.Job, Optional[str]]]):
+    def _check_jobs(self, jobs_to_check: List[Tuple[model.Job, Optional[str]]]):
         for job, error_msg in jobs_to_check:
             if (
                 job.state

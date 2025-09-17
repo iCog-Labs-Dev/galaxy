@@ -235,8 +235,6 @@ function selectText() {
                 <span v-localize>Cancel</span>
             </BButton>
         </div>
-
-        <slot></slot>
     </section>
 </template>
 

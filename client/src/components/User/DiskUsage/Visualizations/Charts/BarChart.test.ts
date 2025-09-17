@@ -1,6 +1,4 @@
-import { createTestingPinia } from "@pinia/testing";
 import { mount } from "@vue/test-utils";
-import { getLocalVue } from "tests/jest/helpers";
 
 import type { DataValuePoint } from ".";
 
@@ -24,12 +22,8 @@ const TEST_DATA = [
 ];
 
 function mountBarChartWrapper(props: BarChartProps) {
-    const pinia = createTestingPinia();
-    const localVue = getLocalVue();
     return mount(BarChart as object, {
         propsData: props,
-        localVue,
-        pinia,
     });
 }
 

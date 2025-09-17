@@ -100,8 +100,9 @@ class RootController(controller.JSAppLauncher, UsesAnnotations):
         if the file could not be returned, returns a message as a string.
         """
         # TODO: unencoded id
+        data = trans.sa_session.query(HistoryDatasetAssociation).get(id)
         authz_method = kwd.get("authz_method", "rbac")
-        if data := trans.sa_session.query(HistoryDatasetAssociation).get(id):
+        if data:
             if authz_method == "rbac" and trans.app.security_agent.can_access_dataset(
                 trans.get_current_user_roles(), data.dataset
             ):

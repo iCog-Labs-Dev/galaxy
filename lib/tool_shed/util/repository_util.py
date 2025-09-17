@@ -4,7 +4,9 @@ import os
 import re
 import tempfile
 from typing import (
+    List,
     Optional,
+    Tuple,
     TYPE_CHECKING,
 )
 
@@ -196,10 +198,10 @@ def create_repository(
     description,
     long_description,
     user,
-    category_ids: Optional[list[str]] = None,
+    category_ids: Optional[List[str]] = None,
     remote_repository_url=None,
     homepage_url=None,
-) -> tuple[model.Repository, str]:
+) -> Tuple[model.Repository, str]:
     """Create a new ToolShed repository"""
     category_ids = category_ids or []
     sa_session = app.model.session
@@ -436,7 +438,7 @@ def change_repository_name_in_hgrc_file(hgrc_file: str, new_name: str) -> None:
 
 def update_repository(
     trans: "ProvidesUserContext", id: str, **kwds
-) -> tuple[Optional[model.Repository], Optional[str]]:
+) -> Tuple[Optional[model.Repository], Optional[str]]:
     """Update an existing ToolShed repository"""
     app = trans.app
     sa_session = app.model.session
@@ -453,7 +455,7 @@ def update_repository(
 
 def update_validated_repository(
     trans: "ProvidesUserContext", repository: model.Repository, **kwds
-) -> tuple[Optional[model.Repository], Optional[str]]:
+) -> Tuple[Optional[model.Repository], Optional[str]]:
     """Update an existing ToolShed repository metadata once permissions have been checked."""
     app = trans.app
     sa_session = app.model.session

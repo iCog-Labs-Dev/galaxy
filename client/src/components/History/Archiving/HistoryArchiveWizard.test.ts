@@ -27,6 +27,7 @@ const { server, http } = useServerMock();
 const TEST_HISTORY_ID = "test-history-id";
 const TEST_HISTORY = {
     id: TEST_HISTORY_ID,
+    name: "fake-history-name",
     archived: false,
 };
 
@@ -58,8 +59,15 @@ describe("HistoryArchiveWizard.vue", () => {
         server.use(
             http.get("/api/remote_files/plugins", ({ response }) => {
                 return response(200).json([]);
-            }),
+            })
         );
+    });
+
+    it("should render the history name in the header", async () => {
+        const wrapper = await mountComponentWithHistory(TEST_HISTORY as HistorySummary);
+
+        const header = wrapper.find("h1");
+        expect(header.text()).toContain(TEST_HISTORY.name);
     });
 
     it("should render only the simple archival mode when no writeable file sources are available", async () => {
@@ -88,7 +96,7 @@ describe("HistoryArchiveWizard.vue", () => {
                         },
                     },
                 ]);
-            }),
+            })
         );
 
         const wrapper = await mountComponentWithHistory(TEST_HISTORY as HistorySummary);

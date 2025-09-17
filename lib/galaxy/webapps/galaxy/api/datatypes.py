@@ -5,6 +5,8 @@ API operations allowing clients to determine datatype supported by Galaxy.
 import logging
 from typing import (
     cast,
+    Dict,
+    List,
     Optional,
     Union,
 )
@@ -78,7 +80,7 @@ class FastAPIDatatypes:
         self,
         extension_only: Optional[bool] = ExtensionOnlyQueryParam,
         upload_only: Optional[bool] = UploadOnlyQueryParam,
-    ) -> Union[list[DatatypeDetails], list[str]]:
+    ) -> Union[List[DatatypeDetails], List[str]]:
         """Gets the list of all available data types."""
         return view_index(self.datatypes_registry, extension_only, upload_only)
 
@@ -117,7 +119,7 @@ class FastAPIDatatypes:
         summary="Returns the list of all installed sniffers",
         response_description="List of datatype sniffers",
     )
-    async def sniffers(self) -> list[str]:
+    async def sniffers(self) -> List[str]:
         """Gets the list of all installed data type sniffers."""
         return view_sniffers(self.datatypes_registry)
 
@@ -137,9 +139,9 @@ class FastAPIDatatypes:
         summary="Returns a dictionary/map of datatypes and EDAM formats",
         response_description="Dictionary/map of datatypes and EDAM formats",
     )
-    async def edam_formats(self) -> dict[str, str]:
+    async def edam_formats(self) -> Dict[str, str]:
         """Gets a map of datatypes and their corresponding EDAM formats."""
-        return cast(dict[str, str], view_edam_formats(self.datatypes_registry))
+        return cast(Dict[str, str], view_edam_formats(self.datatypes_registry))
 
     @router.get(
         "/api/datatypes/edam_formats/detailed",
@@ -159,9 +161,9 @@ class FastAPIDatatypes:
         summary="Returns a dictionary/map of datatypes and EDAM data",
         response_description="Dictionary/map of datatypes and EDAM data",
     )
-    async def edam_data(self) -> dict[str, str]:
+    async def edam_data(self) -> Dict[str, str]:
         """Gets a map of datatypes and their corresponding EDAM data."""
-        return cast(dict[str, str], view_edam_data(self.datatypes_registry))
+        return cast(Dict[str, str], view_edam_data(self.datatypes_registry))
 
     @router.get(
         "/api/datatypes/edam_data/detailed",

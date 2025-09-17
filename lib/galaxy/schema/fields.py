@@ -1,6 +1,5 @@
 import re
 from typing import (
-    Annotated,
     Callable,
     get_origin,
     TYPE_CHECKING,
@@ -15,6 +14,7 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 from typing_extensions import (
+    Annotated,
     get_args,
 )
 

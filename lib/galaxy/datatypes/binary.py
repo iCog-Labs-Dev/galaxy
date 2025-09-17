@@ -13,11 +13,14 @@ import subprocess
 import tarfile
 import tempfile
 import zipfile
-from collections.abc import Iterable
 from json import dumps
 from typing import (
     Any,
+    Dict,
+    Iterable,
+    List,
     Optional,
+    Tuple,
     TYPE_CHECKING,
     Union,
 )
@@ -372,7 +375,7 @@ class DynamicCompressedArchive(CompressedArchive):
     compressed_format: str
     uncompressed_datatype_instance: Data
 
-    def matches_any(self, target_datatypes: list[Any]) -> bool:
+    def matches_any(self, target_datatypes: List[Any]) -> bool:
         """Treat two aspects of compressed datatypes separately."""
         compressed_target_datatypes = []
         uncompressed_target_datatypes = []
@@ -658,7 +661,7 @@ class BamNative(CompressedArchive, _BamOrSam):
         _BamOrSam().set_meta(dataset, overwrite=overwrite, **kwd)
 
     @staticmethod
-    def merge(split_files: list[str], output_file: str) -> None:
+    def merge(split_files: List[str], output_file: str) -> None:
         """
         Merges BAM files
 
@@ -1113,7 +1116,7 @@ class CRAM(Binary):
             if self.set_index_file(dataset, index_file):
                 dataset.metadata.cram_index = index_file
 
-    def get_cram_version(self, filename: str) -> tuple[int, int]:
+    def get_cram_version(self, filename: str) -> Tuple[int, int]:
         try:
             with open(filename, "rb") as fh:
                 header = bytearray(fh.read(6))
@@ -2207,7 +2210,7 @@ class H5MLM(H5):
             to_ext = to_ext or dataset.extension
             return self._serve_raw(dataset, to_ext, headers, **kwd)
 
-        out_dict: dict = {}
+        out_dict: Dict = {}
         try:
             with h5py.File(dataset.get_file_name(), "r", locking=False) as handle:
                 out_dict["Attributes"] = {}

@@ -466,17 +466,8 @@ AnyValidatorModel = Annotated[
     Field(discriminator="type"),
 ]
 
-AnySafeValidatorModel = Annotated[
-    Union[
-        RegexParameterValidatorModel,
-        InRangeParameterValidatorModel,
-        LengthParameterValidatorModel,
-    ],
-    Field(discriminator="type"),
-]
 
 DiscriminatedAnyValidatorModel = TypeAdapter(AnyValidatorModel)  # type:ignore[var-annotated]
-DiscriminatedAnySafeValidatorModel = TypeAdapter(AnySafeValidatorModel)  # type:ignore[var-annotated]
 
 
 def raise_error_if_validation_fails(

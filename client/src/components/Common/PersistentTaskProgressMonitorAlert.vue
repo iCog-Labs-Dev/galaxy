@@ -4,10 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { BAlert, BLink } from "bootstrap-vue";
 import { computed, watch } from "vue";
 
-import { useDownloadTracker } from "@/composables/downloadTracker";
 import type { TaskMonitor } from "@/composables/genericTaskMonitor";
-import type { MonitoringRequest } from "@/composables/persistentProgressMonitor";
-import { usePersistentProgressTaskMonitor } from "@/composables/persistentProgressMonitor";
+import { type MonitoringRequest, usePersistentProgressTaskMonitor } from "@/composables/persistentProgressMonitor";
 import { useShortTermStorage } from "@/composables/shortTermStorage";
 
 import FileSourceNameSpan from "@/components/FileSources/FileSourceNameSpan.vue";
@@ -67,8 +65,6 @@ const {
     reset,
 } = usePersistentProgressTaskMonitor(props.monitorRequest, props.useMonitor);
 
-const downloadTracker = useDownloadTracker();
-
 const downloadUrl = computed(() => {
     // We can only download the result if the task is completed and the task type is short_term_storage.
     const requestId = props.taskId || storedTaskId;
@@ -95,11 +91,9 @@ watch(
                 taskType: props.monitorRequest.taskType,
                 request: props.monitorRequest,
                 startedAt: new Date(),
-                isFinal: false,
             });
-            downloadTracker.trackDownloadRequest(props.monitorRequest);
         }
-    },
+    }
 );
 
 watch(
@@ -110,7 +104,7 @@ watch(
         if (completed && props.enableAutoDownload && downloadUrl.value && props.taskId) {
             window.open(downloadUrl.value, "_blank");
         }
-    },
+    }
 );
 
 function dismissAlert() {

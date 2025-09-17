@@ -10,6 +10,7 @@ import tempfile
 import threading
 from time import sleep
 from typing import (
+    Tuple,
     TYPE_CHECKING,
 )
 
@@ -56,7 +57,7 @@ class LocalJobRunner(BaseJobRunner):
 
         super().__init__(app, nworkers)
 
-    def _command_line(self, job_wrapper: "MinimalJobWrapper") -> tuple[str, str]:
+    def _command_line(self, job_wrapper: "MinimalJobWrapper") -> Tuple[str, str]:
         """ """
         command_line = job_wrapper.runner_command_line
 

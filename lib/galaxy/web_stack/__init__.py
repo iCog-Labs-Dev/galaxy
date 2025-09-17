@@ -7,7 +7,10 @@ import sys
 import threading
 from typing import (
     Callable,
+    FrozenSet,
+    List,
     Optional,
+    Type,
 )
 
 from galaxy.model import database_utils
@@ -24,8 +27,8 @@ class ApplicationStackLogFilter(logging.Filter):
 
 class ApplicationStack:
     name: Optional[str] = None
-    prohibited_middleware: frozenset[str] = frozenset()
-    log_filter_class: type[logging.Filter] = ApplicationStackLogFilter
+    prohibited_middleware: FrozenSet[str] = frozenset()
+    log_filter_class: Type[logging.Filter] = ApplicationStackLogFilter
     log_format = "%(name)s %(levelname)s %(asctime)s [pN:%(processName)s,p:%(process)d,tN:%(threadName)s] %(message)s"
     # TODO: this belongs in the pool configuration
     server_name_template = "{server_name}"
@@ -183,7 +186,7 @@ class WebApplicationStack(ApplicationStack):
 class GunicornApplicationStack(ApplicationStack):
     name = "Gunicorn"
     do_post_fork = "--preload" in os.environ.get("GUNICORN_CMD_ARGS", "") or "--preload" in sys.argv
-    postfork_functions: list[Callable] = []
+    postfork_functions: List[Callable] = []
     # Will be set to True by external hook
     late_postfork_event = threading.Event()
     late_postfork_thread: threading.Thread
@@ -274,7 +277,7 @@ class WeblessApplicationStack(ApplicationStack):
         return (self.config.server_name,) if self.in_pool(pool_name) else None
 
 
-def application_stack_class() -> type[ApplicationStack]:
+def application_stack_class() -> Type[ApplicationStack]:
     """Returns the correct ApplicationStack class for the stack under which
     this Galaxy process is running.
     """

@@ -7,10 +7,10 @@ import json
 import logging
 import re
 from typing import (
-    Annotated,
     Any,
+    Dict,
+    List,
     Optional,
-    TYPE_CHECKING,
     Union,
 )
 
@@ -22,6 +22,7 @@ from fastapi import (
     status,
 )
 from markupsafe import escape
+from typing_extensions import Annotated
 
 from galaxy import (
     exceptions,
@@ -38,6 +39,7 @@ from galaxy.model import (
     FormDefinition,
     FormValues,
     HistoryDatasetAssociation,
+    Job,
     Role,
     User,
     UserAddress,
@@ -92,9 +94,6 @@ from galaxy.webapps.galaxy.api import (
 )
 from galaxy.webapps.galaxy.api.common import UserIdPathParam
 from galaxy.webapps.galaxy.services.users import UsersService
-
-if TYPE_CHECKING:
-    from galaxy.work.context import SessionRequestContext
 
 log = logging.getLogger(__name__)
 
@@ -171,7 +170,7 @@ class FastAPIUsers:
     )
     def recalculate_disk_usage(
         self,
-        trans: "SessionRequestContext" = DependsOnTrans,
+        trans: ProvidesUserContext = DependsOnTrans,
     ):
         """This route will be removed in a future version.
 
@@ -193,7 +192,7 @@ class FastAPIUsers:
     def recalculate_disk_usage_by_user_id(
         self,
         user_id: UserIdPathParam,
-        trans: "SessionRequestContext" = DependsOnTrans,
+        trans: ProvidesUserContext = DependsOnTrans,
     ):
         result = self.service.recalculate_disk_usage(trans, user_id)
         return Response(status_code=status.HTTP_204_NO_CONTENT) if result is None else result
@@ -209,7 +208,7 @@ class FastAPIUsers:
         f_email: Optional[str] = FilterEmailQueryParam,
         f_name: Optional[str] = FilterNameQueryParam,
         f_any: Optional[str] = FilterAnyQueryParam,
-    ) -> list[MaybeLimitedUserModel]:
+    ) -> List[MaybeLimitedUserModel]:
         return self.service.get_index(trans=trans, deleted=True, f_email=f_email, f_name=f_name, f_any=f_any)
 
     @router.post(
@@ -304,7 +303,7 @@ class FastAPIUsers:
         self,
         trans: ProvidesUserContext = DependsOnTrans,
         user_id: FlexibleUserIdType = FlexibleUserIdPathParam,
-    ) -> list[UserQuotaUsage]:
+    ) -> List[UserQuotaUsage]:
         if user := self.service.get_user_full(trans, user_id, False):
             rval = self.user_serializer.serialize_disk_usage(user)
             return rval
@@ -320,7 +319,7 @@ class FastAPIUsers:
         self,
         trans: ProvidesUserContext = DependsOnTrans,
         user_id: FlexibleUserIdType = FlexibleUserIdPathParam,
-    ) -> list[UserObjectstoreUsage]:
+    ) -> List[UserObjectstoreUsage]:
         if user := self.service.get_user_full(trans, user_id, False):
             return user.dictify_objectstore_usage()
         else:
@@ -483,14 +482,14 @@ class FastAPIUsers:
             )
         else:
             # Have everything needed; create new build.
-            build_dict: dict[str, Any] = {"name": name}
+            build_dict: Dict[str, Any] = {"name": name}
             if len_type in ["text", "file"]:
                 # Create new len file
                 new_len = HistoryDatasetAssociation(extension="len", create_dataset=True, sa_session=trans.sa_session)
                 trans.sa_session.add(new_len)
                 new_len.name = name
                 new_len.visible = False
-                new_len.state = Dataset.states.OK
+                new_len.state = Job.states.OK
                 new_len.info = "custom build .len file"
                 try:
                     trans.app.object_store.create(new_len.dataset)
@@ -644,7 +643,7 @@ class FastAPIUsers:
         f_email: Optional[str] = FilterEmailQueryParam,
         f_name: Optional[str] = FilterNameQueryParam,
         f_any: Optional[str] = FilterAnyQueryParam,
-    ) -> list[MaybeLimitedUserModel]:
+    ) -> List[MaybeLimitedUserModel]:
         return self.service.get_index(trans=trans, deleted=deleted, f_email=f_email, f_name=f_name, f_any=f_any)
 
     @router.get(

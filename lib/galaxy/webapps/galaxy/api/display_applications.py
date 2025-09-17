@@ -4,6 +4,8 @@ API operations on annotations.
 
 import logging
 from typing import (
+    Dict,
+    List,
     Optional,
 )
 
@@ -36,7 +38,7 @@ class FastAPIDisplay:
     )
     def index(
         self,
-    ) -> list[DisplayApplication]:
+    ) -> List[DisplayApplication]:
         """
         Returns the list of display applications.
         """
@@ -50,7 +52,7 @@ class FastAPIDisplay:
     )
     def reload(
         self,
-        payload: Optional[dict[str, list[str]]] = Body(default=None),
+        payload: Optional[Dict[str, List[str]]] = Body(default=None),
     ) -> ReloadFeedback:
         """
         Reloads the list of display applications.

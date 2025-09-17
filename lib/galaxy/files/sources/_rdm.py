@@ -1,33 +1,26 @@
 import logging
 from typing import (
-    Any,
+    List,
     NamedTuple,
     Optional,
-    Union,
+    Tuple,
 )
 
-from galaxy.files.models import (
-    BaseFileSourceConfiguration,
-    BaseFileSourceTemplateConfiguration,
-    FilesSourceRuntimeContext,
+from typing_extensions import Unpack
+
+from galaxy.files import OptionalUserContext
+from galaxy.files.sources import (
+    BaseFilesSource,
+    FilesSourceProperties,
+    PluginKind,
     RemoteDirectory,
     RemoteFile,
 )
-from galaxy.files.sources import (
-    BaseFilesSource,
-    PluginKind,
-)
-from galaxy.util.config_templates import TemplateExpansion
 
 log = logging.getLogger(__name__)
 
 
-class RDMFileSourceTemplateConfiguration(BaseFileSourceTemplateConfiguration):
-    token: Union[str, TemplateExpansion]
-    public_name: Union[str, TemplateExpansion]
-
-
-class RDMFileSourceConfiguration(BaseFileSourceConfiguration):
+class RDMFilesSourceProperties(FilesSourceProperties):
     token: str
     public_name: str
 
@@ -75,35 +68,34 @@ class RDMRepositoryInteractor:
 
     def get_file_containers(
         self,
-        context: FilesSourceRuntimeContext[RDMFileSourceConfiguration],
-        write_intent: bool,
+        writeable: bool,
+        user_context: OptionalUserContext = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         query: Optional[str] = None,
         sort_by: Optional[str] = None,
-    ) -> tuple[list[RemoteDirectory], int]:
+    ) -> Tuple[List[RemoteDirectory], int]:
         """Returns the list of file containers in the repository and the total count containers.
 
         If writeable is True, only containers that the user can write to will be returned.
+        The user_context might be required to authenticate the user in the repository.
         """
         raise NotImplementedError()
 
     def get_files_in_container(
         self,
-        context: FilesSourceRuntimeContext[RDMFileSourceConfiguration],
         container_id: str,
         writeable: bool,
+        user_context: OptionalUserContext = None,
         query: Optional[str] = None,
-    ) -> list[RemoteFile]:
+    ) -> List[RemoteFile]:
         """Returns the list of files of a file container.
 
         If writeable is True, we are signaling that the user intends to write to the container.
         """
         raise NotImplementedError()
 
-    def create_draft_file_container(
-        self, title: str, public_name: str, context: FilesSourceRuntimeContext[RDMFileSourceConfiguration]
-    ) -> dict[str, Any]:
+    def create_draft_file_container(self, title: str, public_name: str, user_context: OptionalUserContext = None):
         """Creates a draft file container in the repository with basic metadata.
 
         The metadata is usually just the title of the container and the user that created it.
@@ -115,13 +107,14 @@ class RDMRepositoryInteractor:
         container_id: str,
         filename: str,
         file_path: str,
-        context: FilesSourceRuntimeContext[RDMFileSourceConfiguration],
+        user_context: OptionalUserContext = None,
     ) -> None:
         """Uploads a file with the provided filename (from file_path) to a draft container with the given container_id.
 
         The draft container must have been created in advance with the `create_draft_file_container` method.
 
         The file must exist in the file system at the given file_path.
+        The user_context might be required to authenticate the user in the repository.
         """
         raise NotImplementedError()
 
@@ -130,16 +123,18 @@ class RDMRepositoryInteractor:
         container_id: str,
         file_identifier: str,
         file_path: str,
-        context: FilesSourceRuntimeContext[RDMFileSourceConfiguration],
+        user_context: OptionalUserContext = None,
     ) -> None:
         """Downloads a file with the provided filename from the container with the given container_id.
 
         The file will be downloaded to the file system at the given file_path.
+        The user_context might be required to authenticate the user in the repository if the
+        file is not publicly available.
         """
         raise NotImplementedError()
 
 
-class RDMFilesSource(BaseFilesSource[RDMFileSourceTemplateConfiguration, RDMFileSourceConfiguration]):
+class RDMFilesSource(BaseFilesSource):
     """Base class for Research Data Management (RDM) file sources.
 
     This class is not intended to be used directly, but rather to be subclassed
@@ -155,21 +150,20 @@ class RDMFilesSource(BaseFilesSource[RDMFileSourceTemplateConfiguration, RDMFile
 
     plugin_kind = PluginKind.rdm
 
-    template_config_class = RDMFileSourceTemplateConfiguration
-    resolved_config_class = RDMFileSourceConfiguration
-
-    def __init__(self, template_config: RDMFileSourceTemplateConfiguration):
-        super().__init__(template_config)
-        if not self.template_config.url:
+    def __init__(self, **kwd: Unpack[RDMFilesSourceProperties]):
+        props = self._parse_common_config_opts(kwd)
+        self.url = props.get("url")
+        if not self.url:
             raise Exception("URL for RDM repository must be provided in configuration")
-        self._repository_interactor = self.get_repository_interactor(self.template_config.url)
+        self._props = props
+        self._repository_interactor = self.get_repository_interactor(self.url)
 
     @property
     def repository(self) -> RDMRepositoryInteractor:
         return self._repository_interactor
 
     def get_url(self) -> Optional[str]:
-        return self.template_config.url
+        return self.url
 
     def get_repository_interactor(self, repository_url: str) -> RDMRepositoryInteractor:
         """Returns an interactor compatible with the given repository URL.
@@ -188,8 +182,16 @@ class RDMFilesSource(BaseFilesSource[RDMFileSourceTemplateConfiguration, RDMFile
     def get_container_id_from_path(self, source_path: str) -> str:
         raise NotImplementedError()
 
-    def get_authorization_token(self, context: FilesSourceRuntimeContext[RDMFileSourceConfiguration]) -> Optional[str]:
-        return context.config.token
+    def _serialization_props(self, user_context: OptionalUserContext = None):
+        effective_props = {}
+        for key, val in self._props.items():
+            effective_props[key] = self._evaluate_prop(val, user_context=user_context)
+        return effective_props
 
-    def get_public_name(self, context: FilesSourceRuntimeContext[RDMFileSourceConfiguration]) -> str:
-        return context.config.public_name or "Anonymous Galaxy User"
+    def get_authorization_token(self, user_context: OptionalUserContext) -> Optional[str]:
+        effective_props = self._serialization_props(user_context)
+        return effective_props.get("token")
+
+    def get_public_name(self, user_context: OptionalUserContext) -> Optional[str]:
+        effective_props = self._serialization_props(user_context)
+        return effective_props.get("public_name")

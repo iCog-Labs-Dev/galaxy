@@ -17,7 +17,9 @@ import os
 import re
 import sys
 from typing import (
+    Dict,
     IO,
+    List,
     Optional,
     Union,
 )
@@ -90,7 +92,7 @@ class GenomeGraphs(Tabular):
         """
         return open(dataset.get_file_name(), "rb")
 
-    def ucsc_links(self, dataset: DatasetProtocol, type: str, app, base_url: str) -> list:
+    def ucsc_links(self, dataset: DatasetProtocol, type: str, app, base_url: str) -> List:
         """
         from the ever-helpful angie hinrichs angie@soe.ucsc.edu
         a genome graphs call looks like this
@@ -385,6 +387,16 @@ class SNPMatrix(Rgenetics):
             dataset.peek = "file does not exist"
             dataset.blurb = "file purged from disk"
 
+    def sniff(self, filename: str) -> bool:
+        """need to check the file header hex code"""
+        with open(filename, "b") as infile:
+            head = infile.read(16)
+        head = [hex(x) for x in head]
+        if head != "":
+            return False
+        else:
+            return True
+
 
 class Lped(Rgenetics):
     """
@@ -651,7 +663,7 @@ class RexpBase(Html):
         """Returns the mime type of the datatype"""
         return "text/html"
 
-    def get_phecols(self, phenolist: list, maxConc: int = 20) -> list:
+    def get_phecols(self, phenolist: List, maxConc: int = 20) -> List:
         """
         sept 2009: cannot use whitespace to split - make a more complex structure here
         and adjust the methods that rely on this structure
@@ -672,7 +684,7 @@ class RexpBase(Html):
             if nrows == 0:  # set up from header
                 head = row
                 totcols = len(row)
-                concordance: list[dict] = [{} for x in head]
+                concordance: List[Dict] = [{} for x in head]
             else:
                 for col, code in enumerate(row):  # keep column order correct
                     if col >= totcols:

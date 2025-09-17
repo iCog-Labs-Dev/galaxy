@@ -9,8 +9,8 @@ from io import (
     StringIO,
 )
 from typing import (
-    Annotated,
     cast,
+    List,
     Optional,
 )
 
@@ -25,6 +25,7 @@ from starlette.responses import (
     Response,
     StreamingResponse,
 )
+from typing_extensions import Annotated
 
 from galaxy.datatypes.dataproviders.base import MAX_LIMIT
 from galaxy.schema import (
@@ -152,7 +153,7 @@ class FastAPIDatasets:
         ),
         serialization_params: SerializationParams = Depends(query_serialization_params),
         filter_query_params: FilterQueryParams = Depends(get_filter_query_params),
-    ) -> list[AnyHistoryContentItem]:
+    ) -> List[AnyHistoryContentItem]:
         entries, total_matches = self.service.index(trans, history_id, serialization_params, filter_query_params)
         response.headers["total_matches"] = str(total_matches)
         return entries

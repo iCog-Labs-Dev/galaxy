@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
-import type { CardAction } from "@/components/Common/GCard.types";
-
 import type { DataValuePoint } from "./Charts";
 
 import GCard from "@/components/Common/GCard.vue";
@@ -21,7 +19,7 @@ function onViewItem() {
     emit("view-item", props.data.id);
 }
 
-const primaryActions: CardAction[] = [
+const primaryActions = [
     {
         id: "view",
         label: "View",

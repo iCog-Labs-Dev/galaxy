@@ -2,7 +2,6 @@ import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/jest-globals";
 import "fake-indexeddb/auto";
 
-import failOnConsole from "jest-fail-on-console";
 import Vue from "vue";
 
 // not available in jsdom, mock it out
@@ -31,5 +30,3 @@ global.setImmediate = global.setTimeout;
 // Always mock the following imports
 jest.mock("@/composables/hashedUserId");
 jest.mock("@/composables/userLocalStorage");
-
-failOnConsole();

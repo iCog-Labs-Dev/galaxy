@@ -4,8 +4,10 @@ import logging
 from collections import namedtuple
 from typing import (
     Any,
+    Dict,
+    List,
     Optional,
-    Union,
+    Tuple,
 )
 
 from galaxy import (
@@ -14,14 +16,12 @@ from galaxy import (
 )
 from galaxy.model import (
     DatasetCollectionElement,
-    DatasetInstance,
     HistoryDatasetCollectionAssociation,
 )
 from galaxy.model.dataset_collections import (
     matching,
     subcollections,
 )
-from galaxy.model.dataset_collections.adapters import PromoteCollectionElementToCollectionAdapter
 from galaxy.util.permutations import (
     build_combos,
     input_classification,
@@ -171,11 +171,11 @@ def expand_workflow_inputs(param_inputs, inputs=None):
     return WorkflowParameterExpansion(param_combinations, params_keys, input_combinations)
 
 
-ExpandedT = tuple[list[ToolStateJobInstanceT], Optional[matching.MatchingCollections]]
+ExpandedT = Tuple[List[ToolStateJobInstanceT], Optional[matching.MatchingCollections]]
 
 
-def expand_flat_parameters_to_nested(incoming_copy: ToolRequestT) -> dict[str, Any]:
-    nested_dict: dict[str, Any] = {}
+def expand_flat_parameters_to_nested(incoming_copy: ToolRequestT) -> Dict[str, Any]:
+    nested_dict: Dict[str, Any] = {}
     for incoming_key, incoming_value in incoming_copy.items():
         if not incoming_key.startswith("__"):
             process_key(incoming_key, incoming_value=incoming_value, d=nested_dict)
@@ -290,10 +290,10 @@ def reorder_parameters(tool, incoming, nested_dict, nested):
     return reordered_incoming
 
 
-def split_inputs_flat(inputs: dict[str, Any], classifier):
-    single_inputs: dict[str, Any] = {}
-    matched_multi_inputs: dict[str, Any] = {}
-    multiplied_multi_inputs: dict[str, Any] = {}
+def split_inputs_flat(inputs: Dict[str, Any], classifier):
+    single_inputs: Dict[str, Any] = {}
+    matched_multi_inputs: Dict[str, Any] = {}
+    multiplied_multi_inputs: Dict[str, Any] = {}
 
     for input_key in inputs:
         input_type, expanded_val = classifier(input_key)
@@ -308,9 +308,9 @@ def split_inputs_flat(inputs: dict[str, Any], classifier):
 
 
 def split_inputs_nested(inputs, nested_dict, classifier):
-    single_inputs: dict[str, Any] = {}
-    matched_multi_inputs: dict[str, Any] = {}
-    multiplied_multi_inputs: dict[str, Any] = {}
+    single_inputs: Dict[str, Any] = {}
+    matched_multi_inputs: Dict[str, Any] = {}
+    multiplied_multi_inputs: Dict[str, Any] = {}
     unset_value = object()
 
     def visitor(input, value, prefix, prefixed_name, prefixed_label, error, **kwargs):
@@ -333,18 +333,9 @@ def split_inputs_nested(inputs, nested_dict, classifier):
     return (single_inputs_nested, matched_multi_inputs, multiplied_multi_inputs)
 
 
-CollectionExpansionListT = Union[
-    list[Union[DatasetCollectionElement, PromoteCollectionElementToCollectionAdapter]], list[DatasetInstance]
-]
-
-
 def __expand_collection_parameter(
-    trans: WorkRequestContext,
-    input_key,
-    incoming_val,
-    collections_to_match: "matching.CollectionsToMatch",
-    linked=False,
-) -> CollectionExpansionListT:
+    trans: WorkRequestContext, input_key, incoming_val, collections_to_match, linked=False
+):
     # If subcollectin multirun of data_collection param - value will
     # be "hdca_id|subcollection_type" else it will just be hdca_id
     if "|" in incoming_val:
@@ -374,7 +365,7 @@ def __expand_collection_parameter(
         subcollection_elements = subcollections._split_dataset_collection(collection, subcollection_type)
         return subcollection_elements
     else:
-        hdas: list[DatasetInstance] = []
+        hdas = []
         for element in collection.dataset_elements:
             hda = element.dataset_instance
             hda.element_identifier = element.element_identifier
@@ -382,7 +373,7 @@ def __expand_collection_parameter(
         return hdas
 
 
-def __collection_multirun_parameter(value: dict[str, Any]) -> bool:
+def __collection_multirun_parameter(value):
     is_batch = value.get("batch", False)
     if not is_batch:
         return False

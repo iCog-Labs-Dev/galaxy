@@ -1,4 +1,5 @@
 import random
+from typing import List
 
 from galaxy.util import UNKNOWN
 from galaxy_test.base.decorators import requires_admin
@@ -50,7 +51,7 @@ class TestDisplayApplicationsApi(ApiTestCase):
         response = self._post("display_applications/reload")
         self._assert_status_code_is(response, 403)
 
-    def _get_half_random_items(self, collection: list[str]) -> list[str]:
+    def _get_half_random_items(self, collection: List[str]) -> List[str]:
         half_num_items = int(len(collection) / 2)
         rval = random.sample(collection, half_num_items)
         return rval
