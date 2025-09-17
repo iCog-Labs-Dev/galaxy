@@ -18,57 +18,15 @@ import { userLogout } from "@/utils/logout";
 import { withPrefix } from "@/utils/redirect";
 
 import { loadMastheadWebhooks } from "./_webhooks";
-
-import MastheadDropdown from "./MastheadDropdown.vue";
-import MastheadItem from "./MastheadItem.vue";
-import QuotaMeter from "./QuotaMeter.vue";
+import MastheadDropdown from "./MastheadDropdown";
+import MastheadItem from "./MastheadItem";
+import QuotaMeter from "./QuotaMeter";
 
 const { isAnonymous, currentUser } = storeToRefs(useUserStore());
 
 const router = useRouter();
 const { config, isConfigLoaded } = useConfig();
-
-const hasOIDCRegistration = computed(() => {
-    const oIDCIdps = isConfigLoaded.value ? config.value.oidc : {};
-    const oIDCIdpsWithRegistration = getOIDCIdpsWithRegistration(oIDCIdps);
-    if (oIDCIdpsWithRegistration) {
-        return Object.keys(oIDCIdpsWithRegistration).length > 0;
-    } else {
-        return false;
-    }
-});
-
-const hasExactlyOneOIDCRegistration = computed(() => {
-    const oIDCIdps = isConfigLoaded.value ? config.value.oidc : {};
-    const oIDCIdpsWithRegistration = getOIDCIdpsWithRegistration(oIDCIdps);
-    if (oIDCIdpsWithRegistration) {
-        return Object.keys(oIDCIdpsWithRegistration).length === 1;
-    } else {
-        return false;
-    }
-});
-
-async function performLogin() {
-    const oIDCIdps = isConfigLoaded.value ? config.value.oidc : {};
-    if (config.value.disable_local_accounts && isOnlyOneOIDCProviderConfigured(oIDCIdps)) {
-        const redirectUri = await redirectToSingleProvider(oIDCIdps);
-        window.location = redirectUri;
-    } else {
-        openUrl("/login/start");
-    }
-}
-
-function performRegistration() {
-    if (!config.value.allow_local_account_creation && hasExactlyOneOIDCRegistration.value) {
-        const oIDCIdps = isConfigLoaded.value ? config.value.oidc : {};
-        const oIDCIdpsWithRegistration = getOIDCIdpsWithRegistration(oIDCIdps);
-        window.location =
-            oIDCIdpsWithRegistration[Object.keys(oIDCIdpsWithRegistration)[0]].end_user_registration_endpoint;
-    } else {
-        openUrl("/register/start");
-    }
-}
-
+// it works
 const props = defineProps({
     brand: {
         type: String,
@@ -133,7 +91,7 @@ onMounted(() => {
                 id="analysis"
                 v-g-tooltip.hover
                 class="ml-2 mr-2 p-0"
-                title="Home"
+                title="Homesdfsdf"
                 aria-label="homepage"
                 :href="withPrefix(logoUrl)">
                 <img alt="logo" :src="withPrefix(logoSrc)" />

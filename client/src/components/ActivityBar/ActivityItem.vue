@@ -14,6 +14,7 @@ import localize from "@/utils/localization";
 import GButton from "../BaseComponents/GButton.vue";
 import TextShort from "@/components/Common/TextShort.vue";
 import Popper from "@/components/Popper/Popper.vue";
+import type { Component } from "vue";
 
 const router = useRouter();
 
@@ -26,9 +27,8 @@ export interface Props {
     id: string;
     activityBarId: string;
     title?: string;
-    icon?: IconDefinition;
-    indicator?: number | boolean;
-    indicatorVariant?: ActivityVariant;
+    icon?: IconDefinition | object;
+    indicator?: number;
     isActive?: boolean;
     tooltip?: string;
     tooltipPlacement?: Placement;
@@ -56,6 +56,10 @@ const props = withDefaults(defineProps<Props>(), {
     windowTitle: undefined,
 });
 
+function isFontAwesome(icon: any): icon is IconDefinition {
+  return icon && typeof icon === "object" && "iconName" in icon;
+}
+
 const emit = defineEmits<{
     (e: "click"): void;
 }>();
@@ -63,24 +67,20 @@ const emit = defineEmits<{
 function onClick(evt: MouseEvent): void {
     emit("click");
     if (props.to) {
-        const Galaxy = getGalaxyInstance();
-        if (props.windowTitle && Galaxy?.frame?.active) {
-            const compactUrl = props.to + (props.to.includes("?") ? "&" : "?") + "compact=true";
-            // @ts-ignore - monkeypatched router, second arg is RouterPushOptions
-            router.push(compactUrl, { title: props.windowTitle });
+        // Check if it's an external URL
+        if (/^https?:\/\//.test(props.to)) {
+            window.location.href = props.to;  // full redirect
         } else {
-            router.push(props.to);
+            router.push(props.to);           // internal Vue route
         }
     }
 }
-
 const store = useActivityStore(props.activityBarId);
 const meta = computed(() => store.metaForId(props.id));
 </script>
 
-<template>
-    <Popper :placement="tooltipPlacement" class="activity-item-popper">
-        <template v-slot:reference>
+
+        <template v-slot:reference   :link-attrs="{ id: `activity-wrapper-${id}` }">
             <b-nav-item
                 class="activity-item"
                 :class="{ 'nav-item-active': isActive }"
@@ -100,27 +100,27 @@ const meta = computed(() => store.metaForId(props.id));
                             width: `${Math.round(progressPercentage)}%`,
                         }" />
                 </span>
+
                 <div class="nav-icon">
+                    <!-- Badge indicator -->
                     <span
-                        v-if="typeof indicator === 'number' && indicator > 0"
-                        class="nav-indicator"
-                        :class="`${indicatorVariant}-indicator`"
-                        data-description="activity indicator">
-                        {{ Math.min(indicator, 99) }}
+                    v-if="indicator > 0"
+                    class="nav-indicator"
+                    data-description="activity indicator"
+                    >
+                    {{ Math.min(indicator, 99) }}
                     </span>
-                    <span
-                        v-else-if="indicator === true"
-                        class="nav-indicator"
-                        :class="`${indicatorVariant}-indicator`"
-                        data-description="activity indicator">
-                        <FontAwesomeIcon :icon="faExclamation" />
-                    </span>
-                    <FontAwesomeIcon :icon="icon" />
+
+                    <!-- Render FontAwesome -->
+                    <FontAwesomeIcon v-if="isFontAwesome(icon)" :icon="icon" />
+
+                    <!-- Render Lucide (Vue component) -->
+                    <component v-else :is="icon" :size="24" stroke-width="2" />
                 </div>
                 <TextShort v-if="title" :text="localize(title)" class="nav-title" />
             </b-nav-item>
         </template>
-        <div class="text-center px-2 py-1">
+        <!-- <div class="text-center px-2 py-1">
             <small v-if="tooltip">{{ localize(tooltip) }}</small>
             <small v-else>No tooltip available for this item</small>
             <div v-if="options" class="nav-options p-1">
@@ -130,9 +130,8 @@ const meta = computed(() => store.metaForId(props.id));
                     </GButton>
                 </router-link>
             </div>
-        </div>
-    </Popper>
-</template>
+        </div> -->
+
 
 <style scoped lang="scss">
 @import "@/style/scss/theme/blue.scss";
@@ -147,6 +146,9 @@ const meta = computed(() => store.metaForId(props.id));
 }
 
 .activity-item {
+      margin-bottom: 8px;
+      
+      border-radius: 8px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -163,12 +165,25 @@ const meta = computed(() => store.metaForId(props.id));
     }
 }
 
+.activity-wrapper-workflow {
+    color: white;
+    background-color: #0a0a0a;
+}   
+
 .nav-icon {
     position: relative;
     display: flex;
     justify-content: center;
     cursor: pointer;
     font-size: 1rem;
+    color: #0a0a0a88;
+    padding: 8px;
+   width: fit-content;
+   border-radius: 8px;
+}
+
+.activity-wrapper-workflow .nav-icon {
+    color: white
 }
 
 .nav-indicator {
@@ -233,4 +248,18 @@ const meta = computed(() => store.metaForId(props.id));
     -o-transition: none;
     transition: none;
 }
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem; // spacing between logo and icon
+}
+
+.nav-logo img {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
 </style>

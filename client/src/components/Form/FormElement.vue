@@ -495,18 +495,21 @@ const extendedCollectionType = computed<ExtendedCollectionType>(() => {
         border: solid 3px $brand-primary;
     }
     &:not(.temp-focus) {
-        border: solid 1px $portlet-bg-color;
-        box-shadow: 0 0 5px $portlet-bg-color;
+        border: solid 1px var(--border);
+        box-shadow: none;
+        border: none;
     }
 
     .ui-form-title {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        background-color: white !important;
+        border-bottom: none;
+        
 
         // inherit the border radius from the parent .alert class
-        border-top-left-radius: inherit;
-        border-top-right-radius: inherit;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
 
         &:deep(.form-element-header-badge) {
             display: flex;
@@ -517,10 +520,10 @@ const extendedCollectionType = computed<ExtendedCollectionType>(() => {
             padding-right: $spacer;
 
             &.populated {
-                background-color: $state-success-bg;
+                background-color: white;
             }
             &.unpopulated {
-                background-color: $state-info-bg;
+                background-color: white;
             }
         }
     }

@@ -30,7 +30,7 @@ withDefaults(
     <div v-else>
         <div class="position-relative pb-4">
             <div class="ui-form-header-underlay sticky-top" />
-            <div class="tool-header sticky-top bg-secondary px-2 py-1 rounded">
+            <div class="tool-header sticky-top px-2 py-1 rounded">
                 <div class="d-flex justify-content-between">
                     <div class="py-1 d-flex flex-wrap flex-gapx-1 align-items-center">
                         <img v-if="logo" class="fa-fw" alt="logo" :src="absPath(logo)" />

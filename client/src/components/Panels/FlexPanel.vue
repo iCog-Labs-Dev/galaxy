@@ -48,7 +48,7 @@ const panelWidth = computed({
 });
 
 const root = ref<HTMLElement | null>(null);
-const show = ref(true);
+const show = ref(false); // we can also remove both side by making it false
 
 const showToggle = ref(false);
 const hoverToggle = ref(false);

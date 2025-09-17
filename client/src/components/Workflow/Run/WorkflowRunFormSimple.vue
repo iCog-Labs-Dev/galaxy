@@ -414,36 +414,6 @@ function updateActiveNodeId(nodeId: number | null) {
     activeNodeId.value = nodeId;
 }
 
-function onExportConfigured(config: typeof exportOnCompleteConfig.value) {
-    exportOnCompleteConfig.value = config;
-    showExportWizard.value = false;
-}
-
-function clearExportConfig() {
-    exportOnCompleteConfig.value = null;
-}
-
-function onExportWizardCancel() {
-    showExportWizard.value = false;
-    // Force checkbox to re-render and reset to unchecked state if no config was set
-    if (exportOnCompleteConfig.value === null) {
-        exportCheckboxKey.value++;
-    }
-}
-
-const exportEnabled = computed({
-    get: () => exportOnCompleteConfig.value !== null,
-    set: (value: boolean) => {
-        if (value) {
-            // User wants to enable - open wizard, don't actually enable yet
-            showExportWizard.value = true;
-        } else {
-            // User wants to disable - clear the config
-            clearExportConfig();
-        }
-    },
-});
-
 async function onExecute() {
     waitingForRequest.value = true;
 
@@ -634,13 +604,25 @@ onBeforeMount(() => {
                         </div>
                     </div>
 
-                    <!-- Use cached jobs -->
-                    <div class="settings-row">
-                        <GCheckbox v-model="useCachedJobs" toggle>
-                            Re-use jobs with identical parameters
-                            <HelpText uri="galaxy.workflows.runtimeSettings.useCachedJobs" info-icon />
-                        </GCheckbox>
-                    </div>
+                        <template v-if="isConfigLoaded && config.object_store_allows_id_selection">
+                            <div class="mr-4">
+                                <BFormCheckbox v-model="splitObjectStore">
+                                    <HelpText
+                                        uri="galaxy.workflows.runtimeSettings.splitObjectStore"
+                                        text="Send outputs and intermediate to different Galaxy storage?" />
+                                </BFormCheckbox>
+                            </div>
+                            <div class="mr-4">
+                                <WorkflowStorageConfiguration
+                                    :split-object-store="splitObjectStore"
+                                    :invocation-preferred-object-store-id="preferredObjectStoreId ?? undefined"
+                                    :invocation-intermediate-preferred-object-store-id="
+                                        preferredIntermediateObjectStoreId
+                                    "
+                                    @updated="onStorageUpdate">
+                                </WorkflowStorageConfiguration>
+                            </div>
+                        </template>
 
                     <!-- Send notification -->
                     <div v-if="isConfigLoaded && config.enable_notification_system" class="settings-row">
@@ -743,7 +725,7 @@ onBeforeMount(() => {
                             @search-change="onSearchChange"
                             @stop-flagging="checkInputMatching = false"
                             @update:active-node-id="updateActiveNodeId" />
-                    </GOverlay>
+                    </BOverlay>
                 </div>
                 <div v-if="showRightPanel" class="h-100 w-50 d-flex flex-shrink-0">
                     <WorkflowRunGraph
@@ -777,6 +759,8 @@ onBeforeMount(() => {
 
 <style scoped lang="scss">
 @import "@/style/scss/theme/blue.scss";
+
+
 
 .workflow-runtime-settings-panel {
     background-color: $brand-light;

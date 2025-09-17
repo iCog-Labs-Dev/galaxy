@@ -3,14 +3,14 @@
         <div id="everything">
             <div id="background" />
             <template v-if="!embedded">
-                <Masthead
+                <!-- <Masthead
                     v-if="showMasthead"
                     id="masthead"
                     :brand="config.brand"
                     :logo-url="config.logo_url"
                     :logo-src="theme?.['--masthead-logo-img'] ?? config.logo_src"
                     :logo-src-secondary="theme?.['--masthead-logo-img-secondary'] ?? config.logo_src_secondary"
-                    :window-tab="windowTab" />
+                    :window-tab="windowTab" /> -->
                 <Alert
                     v-if="config.message_box_visible && config.message_box_content"
                     id="messagebox"

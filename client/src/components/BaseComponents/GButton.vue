@@ -120,6 +120,7 @@ const buttonElementRef = useResolveElement(buttonRef);
     display: inline-flex;
     gap: var(--spacing-1);
     align-items: center;
+    padding: 8px 12px;
     margin: 0;
     border: 1px solid;
     border-radius: var(--spacing-1);
@@ -157,7 +158,7 @@ const buttonElementRef = useResolveElement(buttonRef);
 
     &.g-medium {
         font-size: var(--font-size-medium);
-        padding: var(--spacing-1) var(--spacing-2);
+        padding:8px 12px;
     }
 
     &.g-large {
@@ -195,8 +196,8 @@ const buttonElementRef = useResolveElement(buttonRef);
 
     @each $color in "blue", "green", "red", "yellow", "orange" {
         &.g-#{$color} {
-            background-color: var(--color-#{$color}-600);
-            border-color: var(--color-#{$color}-600);
+            background-color: #0a0a0a;
+            border-color: #0a0a0a;
             color: var(--color-#{$color}-100);
 
             &:hover,

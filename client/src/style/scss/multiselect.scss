@@ -1,5 +1,7 @@
 .multiselect {
     font-weight: normal;
+    width: fit-content;
+    min-width: 400px;
 
     .multiselect__content-wrapper {
         overflow-x: hidden;
