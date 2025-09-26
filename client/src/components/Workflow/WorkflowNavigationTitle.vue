@@ -97,7 +97,7 @@ const { currentHistoryId } = storeToRefs(useHistoryStore());
 
 function runWorkflowAndRedirect() {
     emit('on-execute');
-    window.open("http://100.67.47.42:3001/workflow?showLatest=true", "_blank");
+    window.location.href = "http://100.67.47.42:3001/workflow?showLatest=true";
 }
 
 
