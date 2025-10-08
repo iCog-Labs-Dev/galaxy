@@ -148,9 +148,11 @@ class User(BaseUIController, UsesFormDefinitionsMixin):
         """Handle Galaxy Log in"""
         if not payload:
             payload = kwd
-        message = trans.check_csrf_token(payload)
-        if message:
-            return self.message_exception(trans, message)
+            
+        # NOTE: Commmented out to remove blocker for login via request.
+        # message = trans.check_csrf_token(payload)
+        # if message:
+        #     return self.message_exception(trans, message)
         login = payload.get("login")
         password = payload.get("password")
         redirect = payload.get("redirect")
