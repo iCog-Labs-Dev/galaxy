@@ -1,1 +1,14 @@
-../lib/galaxy/config/sample/auth_conf.xml.sample
+
+<?xml version="1.0"?>
+<auth>
+    <authenticator>
+        <type>jwt_custom</type>
+    </authenticator>
+
+    <authenticator>
+        <type>localdb</type>
+        <options>
+            <allow-password-change>true</allow-password-change>
+        </options>
+    </authenticator>
+</auth>
