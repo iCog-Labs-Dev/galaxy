@@ -23,6 +23,7 @@ import GButtonGroup from "../BaseComponents/GButtonGroup.vue";
 import AsyncButton from "../Common/AsyncButton.vue";
 import ButtonSpinner from "../Common/ButtonSpinner.vue";
 import LoadingSpan from "../LoadingSpan.vue";
+import { faDatabase } from "font-awesome-6";
 
 const router = useRouter();
 
@@ -149,21 +150,21 @@ async function rerunWorkflow() {
                     <span>(Version: {{ workflow.version + 1 }})</span>
                 </div>
                 <div class="d-flex flex-gapx-1 align-self-baseline">
+                       
                     <GButtonGroup data-button-group>
-                        <GButton
-                            v-if="owned && workflow"
-                            tooltip
-                            data-button-edit
-                            transparent
-                            color="blue"
-                            size="small"
-                            :title="localize('Edit Workflow')"
-                            disabled-title="This workflow has been deleted."
-                            :disabled="workflow.deleted"
-                            :to="`/workflows/edit?id=${workflow.id}&version=${workflow.version}`">
-                            <FontAwesomeIcon :icon="faEdit" fixed-width />
-                        </GButton>
-                        <AsyncButton
+                      
+                    <GButton
+                        tooltip
+                        data-button-libraries
+                        transparent
+                        color="blue"
+                        size="small"
+                        title="Data Libraries"
+                        :to="`/libraries`">
+                        <FontAwesomeIcon :icon="faDatabase" fixed-width />
+                    </GButton>
+
+                        <!-- <AsyncButton
                             v-else
                             data-description="import workflow button"
                             transparent
@@ -173,10 +174,11 @@ async function rerunWorkflow() {
                             :title="workflowImportTitle"
                             :icon="faUpload"
                             :action="onImport">
-                        </AsyncButton>
+                        </AsyncButton> -->
 
                         <slot name="workflow-title-actions" />
                     </GButtonGroup>
+                       
                     <ButtonSpinner
                         v-if="!props.invocation"
                         id="run-workflow"

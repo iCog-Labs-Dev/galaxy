@@ -31,10 +31,9 @@ const count = computed(() => invocationStore.getInvocationCountByWorkflowId(prop
             <FontAwesomeIcon :icon="faList" fixed-width />
             <span>never run</span>
         </BBadge>
-
-        <BBadge
-            v-else-if="count > 0"
-            v-g-tooltip.hover
+        <!-- <BBadge
+            v-else-if="count != undefined && count > 0"
+            v-b-tooltip.hover.noninteractive
             pill
             :title="localize('View workflow invocations')"
             class="outline-badge cursor-pointer"
@@ -45,6 +44,16 @@ const count = computed(() => invocationStore.getInvocationCountByWorkflowId(prop
                 workflow runs:
                 {{ count }}
             </span>
-        </BBadge>
+        </BBadge> -->
+        <!-- <BButton
+            v-else
+            v-b-tooltip.hover.noninteractive
+            :title="localize('View workflow invocations')"
+            class="inline-icon-button"
+            variant="link"
+            size="sm"
+            :to="`/workflows/${props.workflow.id}/invocations`">
+            <FontAwesomeIcon :icon="faList" fixed-width />
+        </BButton> -->
     </div>
 </template>

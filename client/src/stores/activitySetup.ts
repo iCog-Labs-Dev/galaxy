@@ -54,7 +54,7 @@ export const defaultActivities = [
     //     mutable: false,
     //     optional: false,
     //     panel: true,
-    //     title: "Tools",
+    //     title: "Tools","http://37.27.231.93/dashboard"
     //     to: null,
     //     tooltip: "Search and run tools",
     //     visible: true,

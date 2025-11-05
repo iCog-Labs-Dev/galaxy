@@ -89,21 +89,21 @@ export function useWorkflowCardBadges(
                 invocationCount.value !== null &&
                 invocationCount.value === 0,
         },
-        {
-            id: "invocations-count",
-            label: invocationText.value,
-            title: "View workflow invocations",
-            variant: "outline-primary",
-            icon: faList,
-            to: `/workflows/${workflow.value.id}/invocations`,
-            visible:
-                !hideRuns &&
-                !isAnonymous.value &&
-                !shared.value &&
-                !workflow.value.number_of_steps &&
-                invocationCount.value !== null &&
-                invocationCount.value > 0,
-        },
+        // {
+        //     id: "invocations-count",
+        //     label: invocationText.value,
+        //     title: "View workflow invocations",
+        //     variant: "outline-primary",
+        //     icon: faList,
+        //     to: `/workflows/${workflow.value.id}/invocations`,
+        //     visible:
+        //         !hideRuns &&
+        //         !isAnonymous.value &&
+        //         !shared.value &&
+        //         !workflow.value.number_of_steps &&
+        //         invocationCount.value !== undefined &&
+        //         invocationCount.value > 0,
+        // },
         {
             id: "step-count",
             label: `${workflow.value.number_of_steps} steps`,
