@@ -45,7 +45,7 @@ onMounted(initCounts);
             <FontAwesomeIcon :icon="faList" fixed-width />
             <span>never run</span>
         </BBadge>
-        <BBadge
+        <!-- <BBadge
             v-else-if="count != undefined && count > 0"
             v-b-tooltip.hover.noninteractive
             pill
@@ -58,8 +58,8 @@ onMounted(initCounts);
                 workflow runs:
                 {{ count }}
             </span>
-        </BBadge>
-        <BButton
+        </BBadge> -->
+        <!-- <BButton
             v-else
             v-b-tooltip.hover.noninteractive
             :title="localize('View workflow invocations')"
@@ -68,6 +68,6 @@ onMounted(initCounts);
             size="sm"
             :to="`/workflows/${props.workflow.id}/invocations`">
             <FontAwesomeIcon :icon="faList" fixed-width />
-        </BButton>
+        </BButton> -->
     </div>
 </template>

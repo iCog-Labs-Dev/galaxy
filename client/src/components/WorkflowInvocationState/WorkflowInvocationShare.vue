@@ -99,7 +99,7 @@ function shareInvocationButtonClicked() {
 
 <template>
     <div v-if="owned" class="d-flex">
-        <GButton
+        <!-- <GButton
             tooltip
             title="Share Invocation"
             size="small"
@@ -109,7 +109,7 @@ function shareInvocationButtonClicked() {
             :disabled="!workflow"
             @click="shareInvocationButtonClicked">
             <FontAwesomeIcon :icon="faShareAlt" fixed-width />
-        </GButton>
+        </GButton> -->
 
         <GModal
             :show.sync="modalToggle"

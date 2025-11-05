@@ -154,7 +154,7 @@ async function resumePausedJobs() {
                         :spin="changingCurrentHistory" />
                 </BButton>
 
-                <BDropdown
+                <!-- <BDropdown
                     v-b-tooltip.top.hover.noninteractive
                     no-caret
                     size="sm"
@@ -277,7 +277,7 @@ async function resumePausedJobs() {
                         <FontAwesomeIcon fixed-width :icon="faUsersCog" class="mr-1" />
                         <span v-localize>Share & Manage Access</span>
                     </BDropdownItem>
-                </BDropdown>
+                </BDropdown> -->
             </BButtonGroup>
         </nav>
 
