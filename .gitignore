@@ -196,3 +196,6 @@ involucro
 
 # Env file
 .env
+
+# url config file
+config_for_url.json

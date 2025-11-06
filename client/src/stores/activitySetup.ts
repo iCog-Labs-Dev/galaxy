@@ -29,7 +29,9 @@ import { Gem, CircleGauge, FlaskConical, Workflow } from "lucide-vue";
 
 import type { Activity } from "@/stores/activityStoreTypes";
 import type { EventData } from "@/stores/eventStore";
+import config from "@/config/config_for_url.json";
 
+const base  = config.PLATFORM_URL || "http://37.27.231.93";
 export const defaultActivities = [
     // {
     //     anonymous: true,
@@ -66,7 +68,7 @@ export const defaultActivities = [
         optional: true,
         panel: false,
         title: "",
-        to: "http://37.27.231.93/dashboard",
+        to: `${base}/dashboard`,
         tooltip: "Dashboard",
         visible: true,
     },
@@ -79,7 +81,7 @@ export const defaultActivities = [
         optional: true,
         panel: false,
         title: "",
-        to: "http://37.27.231.93/annotation",
+        to: `${base}/annotation`,
         tooltip: "Annotation Service",
         visible: true,
     }, 
@@ -92,7 +94,7 @@ export const defaultActivities = [
         optional: true,
         panel: false,
         title: "",
-        to: "http://37.27.231.93/hyphothesis",
+        to: `${base}/hyphothesis`,
         tooltip: "Hyphotesis Generation",
         visible: true,
     },
@@ -105,7 +107,7 @@ export const defaultActivities = [
         optional: true,
         panel: false,
         title: "",
-        to: "http://37.27.231.93/workflow",
+        to: `${base}/workflow`,
         tooltip: "Workflows",
         visible: true,
     },

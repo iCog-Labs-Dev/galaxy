@@ -24,6 +24,9 @@ import AsyncButton from "../Common/AsyncButton.vue";
 import ButtonSpinner from "../Common/ButtonSpinner.vue";
 import LoadingSpan from "../LoadingSpan.vue";
 import { faDatabase } from "font-awesome-6";
+import config from "@/config/config_for_url.json";
+
+const base = config.PLATFORM_URL || "http://37.27.231.93";
 
 const router = useRouter();
 
@@ -98,7 +101,7 @@ const { currentHistoryId } = storeToRefs(useHistoryStore());
 
 function runWorkflowAndRedirect() {
     emit('on-execute');
-    window.location.href = "http://37.27.231.93/workflow?showLatest=true";
+    window.location.href = `${base}/workflow?showLatest=true`;
 }
 
 
