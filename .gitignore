@@ -205,3 +205,6 @@ lib/galaxy/agents/gtn/data/gtn_search.db
 
 # Env file
 .env
+
+# url config file
+config_for_url.json
