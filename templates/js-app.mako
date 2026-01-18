@@ -17,7 +17,7 @@
         <meta name="description" content="${meta_description}" />
 
         <title>
-            Galaxy
+            Rejuve.bio
             %if app.config.brand:
             | ${app.config.brand}
             %endif
