@@ -3,6 +3,7 @@ API operations on the contents of a history dataset.
 """
 
 import logging
+import os
 from io import (
     BytesIO,
     IOBase,
@@ -12,6 +13,7 @@ from typing import (
     Annotated,
     cast,
     Optional,
+    Literal
 )
 
 from fastapi import (
@@ -73,6 +75,10 @@ from galaxy.webapps.galaxy.services.datasets import (
     RequestDataType,
     UpdateObjectStoreIdPayload,
 )
+
+from galaxy.security.idencoding import IdAsLowercaseAlphanumEncodingHelper
+from galaxy.exceptions import ObjectAttributeInvalidException, RequestParameterInvalidException
+from bioblend.galaxy import GalaxyInstance
 
 log = logging.getLogger(__name__)
 
@@ -139,6 +145,7 @@ DisplayChunkSizeQueryParam = Query(
 @router.cbv
 class FastAPIDatasets:
     service: DatasetsService = depends(DatasetsService)
+    encoder = IdAsLowercaseAlphanumEncodingHelper(service.security)
 
     @router.get(
         "/api/datasets",
@@ -160,6 +167,96 @@ class FastAPIDatasets:
         response.headers["total_matches"] = str(total_matches)
         return entries
 
+    # NOTE: API endpoint to adopt local files and return dataset_id
+    @router.post(
+        "/api/datasets/adopt_file",
+        summary="Return galaxy dataset id for local stored files."
+    )
+    async def adopt_local_file(
+        self,
+        request: Request,
+        file_path: str = Query(..., description="Absolute path to the local file"),
+        history_id: Optional[str] = Query(None, description="Input history id if available"),
+        extension: Optional[str] = Query(None, description="Input file extension if available"),
+        file_origin: Optional[Literal["annotation", "hypothesis"]] = Query(None, description="Source of the file either from hyp gen or annotation service"),
+        trans=DependsOnTrans,
+    ):
+        default_history_name = "GX_integration"
+
+        file_path = os.path.abspath(file_path)
+
+        if not os.path.exists(file_path):
+            raise RequestParameterInvalidException(f"File does not exist: {file_path}")
+
+        if not os.path.isfile(file_path):
+            raise RequestParameterInvalidException("Only regular files can be adopted")
+
+        if not os.access(file_path, os.R_OK):
+            raise RequestParameterInvalidException("Galaxy cannot read the file")
+
+        
+        log.info(f"Adopting local file {file_path[:10]} into {history_id if history_id else file_origin}")
+        
+        if history_id:
+            history = self.service.history_manager.get_owned(
+                id = history_id,
+                user = trans.user
+                )
+                        
+        else:
+            
+            headers = request.headers
+            api_key = headers.get('x-api-key')
+            galaxy_url = str(request.base_url).rstrip("/")
+            
+            if not api_key:
+                raise RequestParameterInvalidException("Missing api-key header")
+
+            gi = GalaxyInstance(url = galaxy_url, key = api_key)    
+        
+            if file_origin:
+                           
+                histories = gi.histories.get_histories(name = file_origin)
+
+                if histories:
+                    log.info(f"Fetching galaxy history with name {file_origin}")
+                    history_id = histories[0]["id"]
+                else:
+                    log.info(f"Creating galaxy history with name {file_origin}")
+                    new_history = gi.histories.create_history(name = file_origin)
+                    history_id = new_history["id"]
+                    
+            else:
+                log.warning("No history found to input the local file to, creating a new history.")
+                new_history = gi.histories.create_history(name = default_history_name)
+                history_id = new_history["id"]
+                
+            history = self.service.history_manager.get_owned(
+                id = history_id,
+                user = trans.user
+            )
+                
+        
+        # Create an empty HDA with the given extension
+        hda = self.service.hda_manager.create(history=history, extension=extension, visible=True)
+        
+        # Link the file (no data copy, mark non-purgable)
+        hda.link_to(file_path) # this is optional so we can't purge the dataset from galaxy.
+        
+        # NOTE: Available but not really usefull for our case, methods to Populate metadata and peek.
+        hda.init_meta(copy_from=None)
+        hda.set_meta()
+        hda.set_peek()
+        
+        # Save changes
+        # trans.sa_session.commit()
+        trans.sa_session.flush()
+        
+        return {
+            'dataset_id': self.encoder.encode_id(hda.id),
+            "history_id": history_id
+            }
+        
     @router.get(
         "/api/datasets/{dataset_id}/storage",
         summary="Display user-facing storage details related to the objectstore a dataset resides in.",
