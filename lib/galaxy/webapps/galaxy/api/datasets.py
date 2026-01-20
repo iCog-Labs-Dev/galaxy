@@ -193,15 +193,20 @@ class FastAPIDatasets:
 
         if not os.access(file_path, os.R_OK):
             raise RequestParameterInvalidException("Galaxy cannot read the file")
+        
+        log.debug("adopt_local_file: file_validation_passed")
 
         
         log.info(f"Adopting local file {file_path[:10]} into {history_id if history_id else file_origin}")
         
         if history_id:
+            log.info("using existing history, to add local file")
+            
             history = self.service.history_manager.get_owned(
                 id = history_id,
                 user = trans.user
                 )
+            log.info("hda_created")
                         
         else:
             
@@ -235,13 +240,15 @@ class FastAPIDatasets:
                 id = history_id,
                 user = trans.user
             )
-                
-        
+            
+            log.info("hda_created")
+            
         # Create an empty HDA with the given extension
         hda = self.service.hda_manager.create(history=history, extension=extension, visible=True)
         
         # Link the file (no data copy, mark non-purgable)
         hda.link_to(file_path) # this is optional so we can't purge the dataset from galaxy.
+        log.info("Local file has been linked to history dataset successfully.")
         
         # NOTE: Available but not really usefull for our case, methods to Populate metadata and peek.
         hda.init_meta(copy_from=None)
@@ -250,7 +257,9 @@ class FastAPIDatasets:
         
         # Save changes
         # trans.sa_session.commit()
+        log.debug("Applying changes and flushing_session.")
         trans.sa_session.flush()
+        log.info("Local file adoption_complete, into galaxy history.")
         
         return {
             'dataset_id': self.encoder.encode_id(hda.id),
