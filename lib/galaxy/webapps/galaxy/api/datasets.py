@@ -175,7 +175,7 @@ class FastAPIDatasets:
     )
     async def adopt_local_file(
             self,
-            file_path: str = Query(..., description="Absolute path to the l`ocal file"),
+            file_path: str = Query(..., description="Absolute path to the local file"),
             file_name: Optional[str] = Query(None, description = "Imported file name to be set on the history."),
             extension: Optional[str] = Query(None, description="Input file extension if available"),
             file_origin: Optional[Literal["annotation", "hypothesis"]] = Query(None, description="Source of the file either from hyp gen or annotation service"),
@@ -183,71 +183,98 @@ class FastAPIDatasets:
             trans=DependsOnTrans,
         ):
         
-            try:
-                history_id = None
-                default_history_name = "GX_integration"
+        try:
+            log.info(f"Starting adopt_local_file with file_path: {file_path[:50]}")  # Log start with truncated path for security
+            
+            history_id = None
+            default_history_name = "GX_integration"
+            history = None
+            hda = None
 
-                file_path = os.path.abspath(file_path)
+            file_path = os.path.abspath(file_path)
 
-                if not os.path.exists(file_path):
-                    raise RequestParameterInvalidException(f"File does not exist: {file_path}")
+            if not os.path.exists(file_path):
+                log.error(f"File does not exist: {file_path}")
+                raise RequestParameterInvalidException(f"File does not exist: {file_path}")
 
-                if not os.path.isfile(file_path):
-                    raise RequestParameterInvalidException("Only regular files can be adopted")
+            if not os.path.isfile(file_path):
+                log.error(f"Only regular files can be adopted: {file_path}")
+                raise RequestParameterInvalidException("Only regular files can be adopted")
 
-                if not os.access(file_path, os.R_OK):
-                    raise RequestParameterInvalidException("Galaxy cannot read the file")
-                
-                log.debug("adopt_local_file: file_validation_passed")
+            if not os.access(file_path, os.R_OK):
+                log.error(f"Galaxy cannot read the file: {file_path}")
+                raise RequestParameterInvalidException("Galaxy cannot read the file")
+            
+            log.debug("adopt_local_file: file_validation_passed")
 
-                
-                if hist_id:
-                    history_id = trans.security.decode_id(hist_id)
-                
-                else:
-                    histories = self.service.history_manager.by_user(trans.user)
-                    for his in histories:
-                        if his.name == file_origin:
-                            history_id = his.id
-                            break
-                                   
-                log.info(f"Adopting local file {file_path[:10]} into {history_id if history_id else file_origin}")
-                
-                # Determine or create the history
-                history = None
-                
+            
+            if hist_id:
                 try:
-                    if history_id:
-                        log.info("using existing history, to add local file")
-                        
-                        history = self.service.history_manager.get_owned(
-                            id = history_id,
-                            user = trans.user
-                            )
-                        log.info("hda_created")
-                                    
-                    else:
-                        
-                        log.info("history not found to input the local file to, creating a new history.")
-                        history_name = file_origin or default_history_name
-                        
-                        history = self.service.history_manager.create(name = history_name, user = trans.user)
+                    history_id = trans.security.decode_id(hist_id)
+                    log.debug(f"Decoded history_id: {history_id}")
                 except Exception as e:
-                    log.error(f"Error fetching or creating history to add local file to: {str(e)}")
-                    
+                    log.error(f"Error decoding hist_id: {str(e)}")
+            
+            if not history_id:
+                histories = self.service.history_manager.by_user(trans.user)
                 
-                if not extension:
+                for his in histories:
+                    if his.name == file_origin:
+                        history_id = his.id
+                        log.info(f"Found existing history with name: {file_origin}, id: {history_id}")
+                        break
+                            
+            log.info(f"Adopting local file {file_path[:10]} into {history_id if history_id else file_origin}")
+            
+            # Determine or create the history
+            try:
+                if history_id:
+                    log.info("Using existing history to add local file")
+                    
+                    history = self.service.history_manager.get_owned(
+                        id = history_id,
+                        user = trans.user
+                        )
+                    log.info(f"Retrieved existing history: {history.id}")
+                                
+                else:
+                    
+                    log.info("History not found to input the local file to, creating a new history.")
+                    history_name = file_origin or default_history_name
+                    
+                    history = self.service.history_manager.create(name = history_name, user = trans.user)
+                    log.info(f"Created new history: {history.id}")
+                    
+            except Exception as e:
+                log.error(f"Error fetching or creating history to add local file to: {str(e)}")
+                raise  # Re-raise to handle at outer level
+            
+            if not extension:
+                try:
                     extension = path_suf(file_path).suffix
-                    
-                # Create an empty HDA with the given extension
+                    log.debug(f"Determined extension from file: {extension}")
+                except Exception as e:
+                    log.error(f"Error determining file extension: {str(e)}")
+                    raise
+            
+            # Create an empty HDA with the given extension
+            try:
                 hda = self.service.hda_manager.create(history=history, extension=extension, visible=True)
-                log.info("hda_created succesfully")
-                
-                # Link the file (no data copy, mark non-purgable)
+                log.info("HDA created successfully")
+            except Exception as e:
+                log.error(f"Error creating HDA: {str(e)}")
+                raise
+            
+            # Link the file (no data copy, mark non-purgable)
+            try:
                 hda.link_to(file_path)
                 dataset = hda.dataset
                 log.info("Local file has been linked to history dataset successfully.")
+            except Exception as e:
+                log.error(f"Error linking file to HDA: {str(e)}")
+                raise
 
+            try:
                 hda.name = file_name or os.path.basename(file_path)
                 hda.state = Dataset.states.OK
                 
@@ -263,15 +290,27 @@ class FastAPIDatasets:
                 trans.sa_session.flush()
                 
                 log.info("Local file has been linked to history dataset successfully.")            
-                log.info(f"updated the dataset state to: {hda.state}")
-            
-            except Exception as exc:
-                log.error(f"Error caused during file adoption: {exc}")
-                
-            return {
-                    'dataset_id': trans.security.encode_id(hda.id), 
-                    'history_id': trans.security.encode_id(history.id)
-                }
+                log.info(f"Updated the dataset state to: {hda.state}")
+            except Exception as e:
+                log.error(f"Error updating HDA properties or committing session: {str(e)}")
+                raise
+        
+        except Exception as exc:
+            log.error(f"Error caused during file adoption: {str(exc)}")
+            raise  # Re-raise the exception to let the API handle it appropriately (e.g., return 400/500)
+        
+        try:
+            encoded_dataset_id =  trans.security.encode_id(hda.id)
+            encoded_history_id = trans.security.encode_id(history.id)
+        except Exception as exc:
+            log.error(f"Error encoding the dataset and history ids: {exc}") 
+            raise
+        
+        log.info("File adoption completed successfully")
+        return {
+                'dataset_id': encoded_dataset_id, 
+                'history_id': encoded_history_id
+            }
             
     @router.get(
         "/api/datasets/{dataset_id}/storage",
