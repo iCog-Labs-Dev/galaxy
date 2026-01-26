@@ -4,6 +4,9 @@ API operations on the contents of a history dataset.
 
 import logging
 import os
+
+from pathlib import Path as path_suf
+
 from io import (
     BytesIO,
     IOBase,
@@ -28,6 +31,7 @@ from starlette.responses import (
     StreamingResponse,
 )
 
+from galaxy.model import Dataset
 from galaxy.datatypes.dataproviders.base import MAX_LIMIT
 from galaxy.schema import (
     FilterQueryParams,
@@ -76,9 +80,7 @@ from galaxy.webapps.galaxy.services.datasets import (
     UpdateObjectStoreIdPayload,
 )
 
-from galaxy.security.idencoding import IdAsLowercaseAlphanumEncodingHelper
-from galaxy.exceptions import ObjectAttributeInvalidException, RequestParameterInvalidException
-from bioblend.galaxy import GalaxyInstance
+from galaxy.exceptions import RequestParameterInvalidException
 
 log = logging.getLogger(__name__)
 
@@ -145,7 +147,6 @@ DisplayChunkSizeQueryParam = Query(
 @router.cbv
 class FastAPIDatasets:
     service: DatasetsService = depends(DatasetsService)
-    encoder = IdAsLowercaseAlphanumEncodingHelper(service.security)
 
     @router.get(
         "/api/datasets",
@@ -173,99 +174,105 @@ class FastAPIDatasets:
         summary="Return galaxy dataset id for local stored files."
     )
     async def adopt_local_file(
-        self,
-        request: Request,
-        file_path: str = Query(..., description="Absolute path to the local file"),
-        history_id: Optional[str] = Query(None, description="Input history id if available"),
-        extension: Optional[str] = Query(None, description="Input file extension if available"),
-        file_origin: Optional[Literal["annotation", "hypothesis"]] = Query(None, description="Source of the file either from hyp gen or annotation service"),
-        trans=DependsOnTrans,
-    ):
-        default_history_name = "GX_integration"
-
-        file_path = os.path.abspath(file_path)
-
-        if not os.path.exists(file_path):
-            raise RequestParameterInvalidException(f"File does not exist: {file_path}")
-
-        if not os.path.isfile(file_path):
-            raise RequestParameterInvalidException("Only regular files can be adopted")
-
-        if not os.access(file_path, os.R_OK):
-            raise RequestParameterInvalidException("Galaxy cannot read the file")
+            self,
+            file_path: str = Query(..., description="Absolute path to the l`ocal file"),
+            file_name: Optional[str] = Query(None, description = "Imported file name to be set on the history."),
+            extension: Optional[str] = Query(None, description="Input file extension if available"),
+            file_origin: Optional[Literal["annotation", "hypothesis"]] = Query(None, description="Source of the file either from hyp gen or annotation service"),
+            hist_id: Optional[str] = Query(None, description="Input history_id you want to import the dataset in."),
+            trans=DependsOnTrans,
+        ):
         
-        log.debug("adopt_local_file: file_validation_passed")
+            try:
+                history_id = None
+                default_history_name = "GX_integration"
 
-        
-        log.info(f"Adopting local file {file_path[:10]} into {history_id if history_id else file_origin}")
-        
-        if history_id:
-            log.info("using existing history, to add local file")
-            
-            history = self.service.history_manager.get_owned(
-                id = history_id,
-                user = trans.user
-                )
-            log.info("hda_created")
-                        
-        else:
-            
-            headers = request.headers
-            api_key = headers.get('x-api-key')
-            galaxy_url = str(request.base_url).rstrip("/")
-            
-            if not api_key:
-                raise RequestParameterInvalidException("Missing api-key header")
+                file_path = os.path.abspath(file_path)
 
-            gi = GalaxyInstance(url = galaxy_url, key = api_key)    
-        
-            if file_origin:
-                           
-                histories = gi.histories.get_histories(name = file_origin)
+                if not os.path.exists(file_path):
+                    raise RequestParameterInvalidException(f"File does not exist: {file_path}")
 
-                if histories:
-                    log.info(f"Fetching galaxy history with name {file_origin}")
-                    history_id = histories[0]["id"]
-                else:
-                    log.info(f"Creating galaxy history with name {file_origin}")
-                    new_history = gi.histories.create_history(name = file_origin)
-                    history_id = new_history["id"]
-                    
-            else:
-                log.warning("No history found to input the local file to, creating a new history.")
-                new_history = gi.histories.create_history(name = default_history_name)
-                history_id = new_history["id"]
+                if not os.path.isfile(file_path):
+                    raise RequestParameterInvalidException("Only regular files can be adopted")
+
+                if not os.access(file_path, os.R_OK):
+                    raise RequestParameterInvalidException("Galaxy cannot read the file")
                 
-            history = self.service.history_manager.get_owned(
-                id = history_id,
-                user = trans.user
-            )
+                log.debug("adopt_local_file: file_validation_passed")
+
+                
+                if hist_id:
+                    history_id = trans.security.decode_id(hist_id)
+                
+                else:
+                    histories = self.service.history_manager.by_user(trans.user)
+                    for his in histories:
+                        if his.name == file_origin:
+                            history_id = his.id
+                            break
+                                   
+                log.info(f"Adopting local file {file_path[:10]} into {history_id if history_id else file_origin}")
+                
+                # Determine or create the history
+                history = None
+                
+                try:
+                    if history_id:
+                        log.info("using existing history, to add local file")
+                        
+                        history = self.service.history_manager.get_owned(
+                            id = history_id,
+                            user = trans.user
+                            )
+                        log.info("hda_created")
+                                    
+                    else:
+                        
+                        log.info("history not found to input the local file to, creating a new history.")
+                        history_name = file_origin or default_history_name
+                        
+                        history = self.service.history_manager.create(name = history_name, user = trans.user)
+                except Exception as e:
+                    log.error(f"Error fetching or creating history to add local file to: {str(e)}")
+                    
+                
+                if not extension:
+                    extension = path_suf(file_path).suffix
+                    
+                # Create an empty HDA with the given extension
+                hda = self.service.hda_manager.create(history=history, extension=extension, visible=True)
+                log.info("hda_created succesfully")
+                
+                # Link the file (no data copy, mark non-purgable)
+                hda.link_to(file_path)
+                dataset = hda.dataset
+                log.info("Local file has been linked to history dataset successfully.")
+
+                hda.name = file_name or os.path.basename(file_path)
+                hda.state = Dataset.states.OK
+                
+                dataset.set_total_size()
+                hda.set_size()
+                hda.set_peek()
+                hda.init_meta(copy_from=None)
+                trans.sa_session.add(hda)
+                trans.sa_session.commit()
+                
+                trans.sa_session.add_all((hda, dataset) if hasattr(hda, "dataset") else (hda,))
+                trans.sa_session.commit()
+                trans.sa_session.flush()
+                
+                log.info("Local file has been linked to history dataset successfully.")            
+                log.info(f"updated the dataset state to: {hda.state}")
             
-            log.info("hda_created")
+            except Exception as exc:
+                log.error(f"Error caused during file adoption: {exc}")
+                
+            return {
+                    'dataset_id': trans.security.encode_id(hda.id), 
+                    'history_id': trans.security.encode_id(history.id)
+                }
             
-        # Create an empty HDA with the given extension
-        hda = self.service.hda_manager.create(history=history, extension=extension, visible=True)
-        
-        # Link the file (no data copy, mark non-purgable)
-        hda.link_to(file_path) # this is optional so we can't purge the dataset from galaxy.
-        log.info("Local file has been linked to history dataset successfully.")
-        
-        # NOTE: Available but not really usefull for our case, methods to Populate metadata and peek.
-        hda.init_meta(copy_from=None)
-        hda.set_meta()
-        hda.set_peek()
-        
-        # Save changes
-        # trans.sa_session.commit()
-        log.debug("Applying changes and flushing_session.")
-        trans.sa_session.flush()
-        log.info("Local file adoption_complete, into galaxy history.")
-        
-        return {
-            'dataset_id': self.encoder.encode_id(hda.id),
-            "history_id": history_id
-            }
-        
     @router.get(
         "/api/datasets/{dataset_id}/storage",
         summary="Display user-facing storage details related to the objectstore a dataset resides in.",
