@@ -47,6 +47,13 @@ from galaxy.schema.schema import (
     DatasetSourceType,
     ToolReportForDataset,
 )
+
+from galaxy.objectstore import (
+    ConcreteObjectStore,
+    DistributedObjectStore,
+    HierarchicalObjectStore,
+)
+
 from galaxy.util.zipstream import ZipstreamWrapper
 from galaxy.webapps.base.api import GalaxyFileResponse
 from galaxy.webapps.galaxy.api import (
@@ -180,6 +187,10 @@ class FastAPIDatasets:
             hist_id: Optional[str] = Query(None, description="Input history_id you want to import the dataset in."),
             trans=DependsOnTrans,
         ):
+        """ 
+        Adopt an existing local file in the same storage as galaxy, as a Galaxy history dataset.
+        No data is copied — Galaxy will reference the existing file in the local storage.
+        """
         
         try:
             log.info(f"Starting adopt_local_file with file_path: {file_path[:50]}")  # Log start with truncated path for security
@@ -273,6 +284,7 @@ class FastAPIDatasets:
                 raise
 
             try:
+                hda.info = f"Adopted file from local storage for {file_origin} service."
                 hda.name = file_name or os.path.basename(file_path)
                 hda.state = Dataset.states.OK
                 
@@ -295,7 +307,7 @@ class FastAPIDatasets:
         
         except Exception as exc:
             log.error(f"Error caused during file adoption: {str(exc)}")
-            raise  # Re-raise the exception to let the API handle it appropriately (e.g., return 400/500)
+            raise  # Re-raise the exception to let the API handle it appropriately (e.g., return 400/500
         
         try:
             encoded_dataset_id =  trans.security.encode_id(hda.id)
@@ -310,6 +322,127 @@ class FastAPIDatasets:
                 'history_id': encoded_history_id
             }
             
+    @router.post(
+        "/api/datasets/adopt_object",
+        summary="Adopt an existing MinIO/S3 object as a Galaxy dataset (no copy)",
+    )
+    async def adopt_minio_object(
+        self,
+        bucket: str = Query(..., description="bucket name (must match the bucket and the object store id in te config.)"),
+        object_key: str = Query(..., description="Full object key (path for object store .../file_path/object_name.dat)"),
+        file_name: Optional[str] = Query(None, description="Display name in history"),
+        extension: Optional[str] = Query(None, description="Galaxy extension (fastq.gz, vcf, etc.)"),
+        file_origin: Optional[Literal["annotation", "hypothesis"]] = Query(None),
+        hist_id: Optional[str] = Query(None, description="Encoded history_id"),
+        trans=DependsOnTrans,
+    ):
+        """
+        Adopt an existing object from MinIO/S3 into Galaxy **without copying**.
+        Galaxy will reference the object directly via the configured object store.
+        """
+        log.info(f"adopt_minio_object → bucket={bucket} key={object_key} store={bucket}")
+
+        history_id = None
+        default_history_name = "GX_integration"
+        history = None
+
+        if hist_id:
+            try:
+                history_id = trans.security.decode_id(hist_id)
+            except Exception:
+                pass
+
+        if not history_id and file_origin:
+            for his in self.service.history_manager.by_user(trans.user):
+                if his.name == file_origin:
+                    history_id = his.id
+                    break
+
+        if history_id:
+            history = self.service.history_manager.get_owned(id=history_id, user=trans.user)
+        else:
+            history_name = file_origin or default_history_name
+            history = self.service.history_manager.create(name=history_name, user=trans.user)
+
+        if not history:
+            raise RequestParameterInvalidException("Could not resolve/create history")
+
+        # Resolve the concrete object store
+        _object_store = trans.app.object_store
+
+        # 1. DistributedObjectStore
+        if isinstance(_object_store, DistributedObjectStore):
+            log.info("object store type distributed")
+            concrete_store = _object_store.get_concrete_store_by_object_store_id(bucket)
+        # 2. HierarchicalObjectStore fallback
+        elif isinstance(_object_store, HierarchicalObjectStore):
+            log.info("object store type hierarchical.")
+            # FIX: Need to be implemented to work for more than the first element of the list in the hierachical sense or should alter to 
+            concrete_store = list(_object_store.backends.values())[0]
+        if not isinstance(concrete_store, ConcreteObjectStore):
+            raise RequestParameterInvalidException(f"Could not resolve concrete object store '{bucket}'")
+
+        from pathlib import PurePosixPath
+        uuid_key = object_key.strip()
+        uuid_key = PurePosixPath(uuid_key).name
+        # normalize Galaxy-style dataset object keys
+        if uuid_key.startswith("dataset_") and uuid_key.endswith(".dat"):
+            uuid_key = uuid_key[len("dataset_"):-len(".dat")]
+        
+        existing_dataset = trans.sa_session.query(Dataset).filter_by(uuid=uuid_key).first()
+        check_obj = existing_dataset or Dataset(uuid=uuid_key, object_store_id=bucket)
+        
+        if not concrete_store.exists(obj=check_obj):
+            raise RequestParameterInvalidException(f"Object {uuid_key} not found in {bucket}")
+        
+        file_size = concrete_store.size(obj=check_obj)
+
+        dataset = check_obj
+        
+        if existing_dataset:
+            dataset = existing_dataset
+            hda = self.service.hda_manager.create(history=history, dataset = dataset, extension=extension)
+        else:
+            hda = self.service.hda_manager.create(history=history, extension=extension or None, visible=True)
+            dataset: Dataset = hda.dataset
+
+            # This is the key part that makes Galaxy reference the existing S3 object
+            dataset.object_store_id = bucket
+            dataset.uuid = uuid_key
+            dataset.file_path = object_key
+            dataset.file_size = file_size
+        
+        dataset.purged = False
+        dataset.purgable = False
+
+        # Nice metadata for provenance
+        hda.info = f"Adopted from object store: /{bucket}/ for service {file_origin}."
+        hda.name = file_name
+        hda.state = Dataset.states.OK
+
+        # Metadata / peek (same as your local adoption)
+        hda.set_peek()
+        try:
+            hda.init_meta(copy_from=None)
+        except Exception:
+            log.warning("init_meta failed (non-fatal)")
+
+        # Commit
+        trans.sa_session.add_all([dataset, hda])
+        trans.sa_session.commit()
+        trans.sa_session.flush()
+
+        log.info(f"Successfully adopted {bucket}/{object_key} → dataset_id={hda.id}")
+
+        # Return encoded IDs (same as your local endpoint)
+        encoded_dataset_id = trans.security.encode_id(hda.id)
+        encoded_history_id = trans.security.encode_id(history.id)
+
+        return {
+            "dataset_id": encoded_dataset_id,
+            "history_id": encoded_history_id,
+        }
+
     @router.get(
         "/api/datasets/{dataset_id}/storage",
         summary="Display user-facing storage details related to the objectstore a dataset resides in.",

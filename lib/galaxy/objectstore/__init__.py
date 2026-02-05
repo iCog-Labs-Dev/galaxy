@@ -4,7 +4,8 @@ objectstore package, abstraction for storing blobs of data for use in Galaxy.
 all providers ensure that data can be accessed on the filesystem for running
 tools
 """
-
+# NOTE: HEre are the implementaiton of the object store located.
+# TODO: Extend the object store class implementation to make them more flexible(uuid - object_key pair fix) 
 import abc
 import logging
 import os
@@ -83,7 +84,7 @@ log = logging.getLogger(__name__)
 def is_user_object_store(object_store_id: Optional[str]) -> bool:
     return object_store_id is not None and object_store_id.startswith(USER_OBJECTS_SCHEME)
 
-
+ 
 class UserObjectStoreResolver(Protocol):
     def resolve_object_store_uri_config(self, uri: str) -> ObjectStoreConfiguration:
         pass
